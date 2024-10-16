@@ -1,0 +1,436 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System;
+@using System.Text.RegularExpressions;
+@{
+    string pattern = "[ \\w-]+?(?=\\.)";
+    ContentModels.BlockParagraph content = (ContentModels.BlockParagraph)Model.Content;
+    ContentModels.BlockParagraphSettings settings = (ContentModels.BlockParagraphSettings)Model.Settings;
+    var paddingTop = settings.NoPaddingTop ? "padding-top:0;" : "";
+    var paddingBottom = settings.NoPaddingBottom ? "padding-bottom:0;" : "";
+    var hasAside = settings.HasAside ? "has-aside" : "";
+    var grayBackground = settings.HasGreyBackground ? "bg-gray" : "";
+    var columnSpacing = (hasAside == "" || settings?.SelectContent?.GetTemplateAlias() != "SingleNewsEvents") ? "col" : "col-12";
+    var alignmentTitle = settings.AlignStart ? "" : "text-center";
+    var alignmentBody = settings.AlignStart ? "justify-content-start" : "justify-content-center";
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (@settings.DisplaySection == "CreditSteps")
+    {
+        <section class="pageSection  @grayBackground" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-5 text-center text-lg-start">
+                        @if (!content.Title.IsNullOrWhiteSpace())
+                        {
+                            <h2 class="title ms-lg-0 @alignmentTitle">@content.Title</h2>
+                        }
+
+                        @Html.Raw(content.Paragraph)
+                        @if (!content.Subtitle.IsNullOrWhiteSpace())
+                        {
+                            <p class="bigFont colorHeading @alignmentTitle">@content.Subtitle</p>
+                        }
+
+                        @if ((bool)content.AddCtaAndDownload)
+                        {
+                            @if (content.Ctas != null)
+                            {
+                                <a title="@content.Ctas.Name" href="@content.Ctas.Url" target="@content.Ctas.Target" class="orangeBtn mt-lg-4 mx-auto ms-lg-0" data-link="@content.Ctas.Name" data-section="@content.Title">@content.Ctas.Name</a>
+                            }
+                        }
+
+                    </div>
+                    @if ((bool)content.HasBoxSmall)
+                    {
+                        <div class="col-12 col-lg-7 mt-3 mt-lg-0">
+                            <div class="row">
+
+                                @* <h3 class="h4 text-center">@content.BlockListTitle</h3>
+                    <div class="icon-labels"> *@
+                                @if (content != null && content.BoxSmallList != null && content.BoxSmallList.Any())
+                                {
+                                    foreach (var item in content.BoxSmallList)
+                                    {
+                                        var itemContent = (ContentModels.BlockBoxSmall)item.Content;
+                                        <div class="col-12 col-md-4">
+                                            <div class="roundIconCard bigIcon">
+
+
+
+                                                @if (string.IsNullOrEmpty(itemContent.Link?.Url))
+                                                {
+                                                    <img class="animateThis fadeGrow" src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">
+
+
+                                                }
+                                                <p>@itemContent.Text</p>
+
+                                            </div>
+                                        </div>
+                                    }
+                                }@*
+                    </div>
+                    *@
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    else if (@settings?.DisplaySection == "Sherlock Lending")
+    {
+
+        <section class="pageSection  @grayBackground" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container">
+                <div class="row justify-content-center text-center">
+                    <div class="col-12 col-md-10 col-lg-8">
+                        @if (!content.Title.IsNullOrWhiteSpace())
+                        {
+                            <h2 class="title @alignmentTitle">@content.Title</h2>
+                        }
+
+                        @Html.Raw(content.Paragraph)
+                    </div>
+                    <div class="col-12 my-3">
+                        @if ((bool)content.HasBoxSmall)
+                        {
+                            @if (content != null && content.BoxSmallList != null && content.BoxSmallList.Any())
+                            {
+                                foreach (var item in content.BoxSmallList)
+                                {
+                                    var itemContent = (ContentModels.BlockBoxSmall)item.Content;
+                                    <div class="boxBorder mx-2">
+                                        @if (string.IsNullOrEmpty(itemContent.Link?.Url))
+                                        {
+                                            <img class="" src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">
+
+
+                                        }
+                                        <h5>@itemContent.Text</h5>
+                                    </div>
+
+                                }
+                            }
+                        }
+                    </div>
+                    <div class="col-11 col-md-10 col-lg-8">
+                        @if (!content.Subtitle.IsNullOrWhiteSpace())
+                        {
+                            <p class="bigFont colorBlue @alignmentTitle">@content.Subtitle</p>
+                        }
+                        @if ((bool)content.AddCtaAndDownload)
+                        {
+                            @if (content.Ctas != null)
+                            {
+                                <a title="@content.Ctas.Name" href="@content.Ctas.Url" target="@content.Ctas.Target" class="orangeBtn mx-auto" data-link="@content.Ctas.Name" data-section="@content.Title">@content.Ctas.Name</a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else if (@settings?.DisplaySection == "Help")
+    {
+        <section class="pageSection  @grayBackground" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container text-center">
+                @if (!content.Title.IsNullOrWhiteSpace())
+                {
+                    <h2 class="title mb-0 @alignmentTitle">@content.Title</h2>
+                }
+
+                @Html.Raw(content.Paragraph)
+
+                <div class="row justify-content-center text-center">
+                    @if ((bool)content.HasBoxSmall)
+                    {
+                        @if (content != null && content.BoxSmallList != null && content.BoxSmallList.Any())
+                        {
+                            foreach (var item in content.BoxSmallList)
+                            {
+                                var itemContent = (ContentModels.BlockBoxSmall)item.Content;
+                                <div class="col-12 col-md-4 col-xxl-3 mt-md-5">
+                                    <div class="roundIconCard">
+                                        @if (string.IsNullOrEmpty(itemContent.Link?.Url))
+                                        {
+                                            <img class="animateThis fadeGrow" src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">
+
+
+                                        }
+                                        <p>@itemContent.Text</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="text-content @grayBackground" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container-lg">
+                <div class="row @alignmentBody">
+                    <div class="@columnSpacing @hasAside">
+                        <div>
+                            @if (!content.Title.IsNullOrWhiteSpace())
+                            {
+                                <h2 class="h2 @alignmentTitle mb-3 mb-lg-5">@content.Title</h2>
+                            }
+                            @if (!content.Subtitle.IsNullOrWhiteSpace())
+                            {
+                                <h3 class="h3 mb-3 mb-lg-5 @alignmentTitle">@content.Subtitle</h3>
+                            }
+                            @Html.Raw(content.Paragraph)
+                        </div>
+                        @if (hasAside != "")
+                        {
+                            var contentType = settings?.SelectContent;
+
+                            <aside>
+                                <h5 class="h5">@settings?.AsideTitle</h5>
+                                @switch (contentType?.GetTemplateAlias())
+                                {
+                                    case "ArticoloStorieDiSuccesso":
+                                        Umbraco.Cms.Core.Models.MediaWithCrops? coverImage = (Umbraco.Cms.Core.Models.MediaWithCrops?)@contentType.Value("sfondoHero");
+                                        <div class="custom-vertical-card shadow">
+                                            <div class="img-wrapper"><img src="@coverImage?.Url()" alt="@HtmlUtils.GetImageAlt(coverImage)"></div>
+                                            <p class="category-label text-white">@contentType?.Parent?.Name</p>
+                                            <div class="card-body">
+                                                <p class="date">@contentType?.UpdateDate.Day/@contentType?.UpdateDate.Month/@contentType?.UpdateDate.Year</p>
+                                                <h3 class="h5 card-title only-title">@contentType?.Value("titoloArticolo")</h3>
+                                                <a title="Read more" href="@contentType?.Url()" class="more" data-link-type="article" data-link="@contentType?.Value("titoloArticolo")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case "Articolo":
+                                        Umbraco.Cms.Core.Models.MediaWithCrops? coverImages = (Umbraco.Cms.Core.Models.MediaWithCrops?)@contentType.Value("sfondoHero");
+                                        <div class="custom-vertical-card shadow">
+                                            <div class="img-wrapper"><img src="@coverImages?.Url()" alt="@HtmlUtils.GetImageAlt(coverImages)"></div>
+                                            <p class="category-label text-white">@contentType?.Parent?.Name</p>
+                                            <div class="card-body">
+                                                <p class="date">@contentType?.UpdateDate.Day/@contentType?.UpdateDate.Month/@contentType?.UpdateDate.Year</p>
+                                                <h3 class="h5 card-title only-title">@contentType?.Value("titoloHero")</h3>
+                                                <a title="Read more" href="@contentType?.Url()" class="more" data-link-type="article" data-link="@contentType?.Value("titoloHero")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case "Family":
+                                        <div class="box">
+                                            <h6 class="box-title">@contentType?.Value("titoloFamily")</h6>
+                                            <p>@contentType?.Value("abstractFamily")</p>
+                                            <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloFamily")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                        </div>
+                                        break;
+                                    case "Mercato":
+                                        <div class="box">
+                                            <h6 class="box-title">@contentType?.Value("titoloHeroMercato")</h6>
+                                            <p>@contentType?.Value("abstractCardMercato")</p>
+                                            <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloHeroMercato")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                        </div>
+                                        break;
+                                    case "Soluzione":
+                                        <div class="box">
+                                            <h6 class="box-title">@contentType?.Value("titoloHeroSoluzione")</h6>
+                                            <p>@contentType?.Value("abstractSoluzione")</p>
+                                            <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloHeroSoluzione")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                        </div>
+                                        break;
+                                    case "ConsumatoriProdotto":
+                                    case "Contatto":
+                                        <div class="box">
+                                            <h6 class="box-title">@contentType?.Value("titoloCard")</h6>
+                                            <p>@contentType?.Value("descrizioneCard")</p>
+                                            <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloCard")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                        </div>
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            </aside>
+                        }
+                    </div>
+                </div>
+                @if ((bool)content.AddCtaAndDownload)
+                {
+                    <div class="row justify-content-center">
+                        <div class="col text-center">
+                            @if (content.Ctas != null)
+                            {
+                                <a title="@content.Ctas.Name" href="@content.Ctas.Url" target="@content.Ctas.Target" class="more big-more me-3 me-lg-5" data-link-type="cta" data-link="@content.Ctas.Name" data-section="@content.Title">@content.Ctas.Name</a>
+                            }
+                            @if (content.Downloads != null && content.Downloads.Url != null)
+                            {
+                                <a title="@content.Downloads.Name" href="@content.Downloads.Url" target="@content.Downloads.Target" class="download big-download ms-lg-3" download data-link-type="download" data-link="@Regex.Matches(content.Downloads.Url, @pattern, RegexOptions.IgnoreCase).FirstOrDefault()" data-section="@content.Title">@content.Downloads.Name</a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            @if ((bool)content.HasBoxSmall)
+            {
+                <div class="container-lg">
+                    <div class="row justify-content-center pt-lg-4 mt-lg-2">
+                        <div class="col">
+                            <h3 class="h4 text-center">@content.BlockListTitle</h3>
+                            <div class="icon-labels">
+                                @if (content != null && content.BoxSmallList != null && content.BoxSmallList.Any())
+                                {
+                                    foreach (var item in content.BoxSmallList)
+                                    {
+                                        var itemContent = (ContentModels.BlockBoxSmall)item.Content;
+                                        if (string.IsNullOrEmpty(itemContent.Link?.Url))
+                                        {
+                                            <span><img src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">@itemContent.Text</span>
+                                        }
+                                        else
+                                        {
+                                            var label = string.IsNullOrEmpty(itemContent.Link?.Name) ? itemContent.Text : itemContent.Link.Name;
+                                            <a title="@HtmlUtils.GetImageAlt(itemContent.Icon)" href="@itemContent.Link?.Url" target="@itemContent.Link?.Target" data-link-type="cta" data-link="@label" class="small-box-link"><img src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">@label</a>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </section>
+    }
+}
+else
+{
+    <section class="text-content @grayBackground" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+        <div class="container-lg">
+            <div class="row @alignmentBody">
+                <div class="@columnSpacing @hasAside">
+                    <div>
+                        @if (!content.Title.IsNullOrWhiteSpace())
+                        {
+                            <h2 class="h2 @alignmentTitle mb-3 mb-lg-5">@content.Title</h2>
+                        }
+                        @if (!content.Subtitle.IsNullOrWhiteSpace())
+                        {
+                            <h3 class="h3 mb-3 mb-lg-5 @alignmentTitle">@content.Subtitle</h3>
+                        }
+                        @Html.Raw(content.Paragraph)
+                    </div>
+                    @if (hasAside != "")
+                    {
+                        var contentType = settings?.SelectContent;
+
+                        <aside>
+                            <h5 class="h5">@settings?.AsideTitle</h5>
+                            @switch (contentType?.GetTemplateAlias())
+                            {
+                                case "ArticoloStorieDiSuccesso":
+                                    Umbraco.Cms.Core.Models.MediaWithCrops? coverImage = (Umbraco.Cms.Core.Models.MediaWithCrops?)@contentType.Value("sfondoHero");
+                                    <div class="custom-vertical-card shadow">
+                                        <div class="img-wrapper"><img src="@coverImage?.Url()" alt="@HtmlUtils.GetImageAlt(coverImage)"></div>
+                                        <p class="category-label text-white">@contentType?.Parent?.Name</p>
+                                        <div class="card-body">
+                                            <p class="date">@contentType?.UpdateDate.Day/@contentType?.UpdateDate.Month/@contentType?.UpdateDate.Year</p>
+                                            <h3 class="h5 card-title only-title">@contentType?.Value("titoloArticolo")</h3>
+                                            <a title="Read more" href="@contentType?.Url()" class="more" data-link-type="article" data-link="@contentType?.Value("titoloArticolo")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                        </div>
+                                    </div>
+                                    break;
+                                case "Articolo":
+                                    Umbraco.Cms.Core.Models.MediaWithCrops? coverImages = (Umbraco.Cms.Core.Models.MediaWithCrops?)@contentType.Value("sfondoHero");
+                                    <div class="custom-vertical-card shadow">
+                                        <div class="img-wrapper"><img src="@coverImages?.Url()" alt="@HtmlUtils.GetImageAlt(coverImages)"></div>
+                                        <p class="category-label text-white">@contentType?.Parent?.Name</p>
+                                        <div class="card-body">
+                                            <p class="date">@contentType?.UpdateDate.Day/@contentType?.UpdateDate.Month/@contentType?.UpdateDate.Year</p>
+                                            <h3 class="h5 card-title only-title">@contentType?.Value("titoloHero")</h3>
+                                            <a title="Read more" href="@contentType?.Url()" class="more" data-link-type="article" data-link="@contentType?.Value("titoloHero")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                        </div>
+                                    </div>
+                                    break;
+                                case "Family":
+                                    <div class="box">
+                                        <h6 class="box-title">@contentType?.Value("titoloFamily")</h6>
+                                        <p>@contentType?.Value("abstractFamily")</p>
+                                        <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloFamily")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                    </div>
+                                    break;
+                                case "Mercato":
+                                    <div class="box">
+                                        <h6 class="box-title">@contentType?.Value("titoloHeroMercato")</h6>
+                                        <p>@contentType?.Value("abstractCardMercato")</p>
+                                        <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloHeroMercato")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                    </div>
+                                    break;
+                                case "Soluzione":
+                                    <div class="box">
+                                        <h6 class="box-title">@contentType?.Value("titoloHeroSoluzione")</h6>
+                                        <p>@contentType?.Value("abstractSoluzione")</p>
+                                        <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloHeroSoluzione")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                    </div>
+                                    break;
+                                case "ConsumatoriProdotto":
+                                case "Contatto":
+                                    <div class="box">
+                                        <h6 class="box-title">@contentType?.Value("titoloCard")</h6>
+                                        <p>@contentType?.Value("descrizioneCard")</p>
+                                        <a title="View more" href="@contentType?.Url()" class="more" data-link-type="page" data-link="@contentType?.Value("titoloCard")" data-link-destination="@contentType?.Url()" data-link-section="@settings?.AsideTitle">@Umbraco.GetDictionaryValue("aside_read_more")</a>
+                                    </div>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        </aside>
+                    }
+                </div>
+            </div>
+            @if ((bool)content.AddCtaAndDownload)
+            {
+                <div class="row justify-content-center">
+                    <div class="col text-center">
+                        @if (content.Ctas != null)
+                        {
+                            <a title="@content.Ctas.Name" href="@content.Ctas.Url" target="@content.Ctas.Target" class="more big-more me-3 me-lg-5" data-link-type="cta" data-link="@content.Ctas.Name" data-section="@content.Title">@content.Ctas.Name</a>
+                        }
+                        @if (content.Downloads != null && content.Downloads.Url != null)
+                        {
+                            <a title="@content.Downloads.Name" href="@content.Downloads.Url" target="@content.Downloads.Target" class="download big-download ms-lg-3" download data-link-type="download" data-link="@Regex.Matches(content.Downloads.Url, @pattern, RegexOptions.IgnoreCase).FirstOrDefault()" data-section="@content.Title">@content.Downloads.Name</a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        @if ((bool)content.HasBoxSmall)
+        {
+            <div class="container-lg">
+                <div class="row justify-content-center pt-lg-4 mt-lg-2">
+                    <div class="col">
+                        <h3 class="h4 text-center">@content.BlockListTitle</h3>
+                        <div class="icon-labels">
+                            @if (content != null && content.BoxSmallList != null && content.BoxSmallList.Any())
+                            {
+                                foreach (var item in content.BoxSmallList)
+                                {
+                                    var itemContent = (ContentModels.BlockBoxSmall)item.Content;
+                                    if (string.IsNullOrEmpty(itemContent.Link?.Url))
+                                    {
+                                        <span><img src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">@itemContent.Text</span>
+                                    }
+                                    else
+                                    {
+                                        var label = string.IsNullOrEmpty(itemContent.Link?.Name) ? itemContent.Text : itemContent.Link.Name;
+                                        <a title="@HtmlUtils.GetImageAlt(itemContent.Icon)" href="@itemContent.Link?.Url" target="@itemContent.Link?.Target" data-link-type="cta" data-link="@label" class="small-box-link"><img src="@itemContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Icon)">@label</a>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+}

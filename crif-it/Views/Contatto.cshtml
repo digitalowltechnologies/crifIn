@@ -1,0 +1,32 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Contatto>
+@{
+	Layout = "Master.cshtml";
+
+	var mSDynamics365Script = (Model.GetProperty("mSDynamics365Script")?.GetValue());
+
+}
+@if(!Model.NascondiBreadcrumb){
+	<section class="consumer-heading breadcrumb-only">
+		<div class="container-lg">
+			<div class="caption">
+				@await (Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem))
+			</div>
+		</div>
+	</section>
+}
+@Html.GetBlockListHtml(Model.BlocchiContatto)
+
+@if(!string.IsNullOrEmpty(Model.CapturedFormId))
+{
+	<script>
+		$('form').attr('id', '@Model.CapturedFormId');
+	</script>
+}
+
+@if (@mSDynamics365Script != null)
+{
+	@Html.Raw(@mSDynamics365Script)
+}

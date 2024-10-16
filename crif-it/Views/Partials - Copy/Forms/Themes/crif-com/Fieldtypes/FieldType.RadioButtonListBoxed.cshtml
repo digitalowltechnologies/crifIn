@@ -1,0 +1,24 @@
+@model Umbraco.Forms.Web.Models.FieldViewModel
+@using Umbraco.Forms.Web
+@{
+    var i = 0;
+}
+<div class="@Html.GetFormFieldClass(Model.FieldTypeName) request-type mb-5 justify-content-start " id="@Model.Id" data-umb="@Model.Id">
+    @foreach (Umbraco.Forms.Web.Models.PrevalueViewModel pv in Model.PreValues)
+    {
+        i++;
+        <div class="form-check ps-0">
+            <input class="form-check-input" type="radio" name="@Model.Id" id="@string.Concat(Model.Id,"_",i)" data-umb="@string.Concat(Model.Id, "_", i)" value="@pv.Value"
+            @if (Model.Mandatory)
+            {
+                <text>data-val="true" data-val-required="@Model.RequiredErrorMessage" data-rule-required="true" data-msg-required="@Model.RequiredErrorMessage"</text>
+            }
+            @if (Model.ContainsValue(pv.Value))
+            {
+                <text>checked="checked"</text>
+            }>
+            <label class="form-check-label" for="@string.Concat(Model.Id,"_",i)"> @pv.Caption </label>
+        </div>
+    }
+</div>
+

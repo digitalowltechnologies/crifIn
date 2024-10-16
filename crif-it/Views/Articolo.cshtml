@@ -1,0 +1,292 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Articolo>
+@using Crif.It.Models;
+@using Umbraco.Cms.Core.Models;
+@using Crif.It.Utils;
+@using System.Web;
+@using Umbraco.Cms.Core.Services;
+@using Umbraco.Extensions;
+@inject IMediaService MediaService
+@inject IRelationService RelationService
+
+@{
+	Layout = "Master.cshtml";
+	var articles = Model?.Root()?.DescendantsOrSelf()?.Where(x => x.ContentType.Alias == "articolo");
+	var orderedArticles = articles?.OrderByDescending(articles => articles.Value("dataCustom"));
+	var articoliRelativi = Model?.SiblingsAndSelf()?.OrderByDescending(articles => articles.Value("dataCustom"));
+
+	var mediaServices = MediaService;
+	var relationService = RelationService;
+	var allMedia = mediaServices.GetRootMedia();
+	var usedImgs = new List<string>();
+	foreach (IMedia media in allMedia)
+	{
+		if (media.ContentType.Alias == "Folder")
+		{
+			var folder = Umbraco.Media(media.Id)?.Children();
+			@if (folder != null && folder.Any())
+			{
+				if (folder.Count() == 1 && folder.First().ContentType.Alias == "Image")
+				{
+					var relation = relationService?.AreRelated(Model.Id, folder.First().Id);
+					if(relation != null && relation == true)
+					{
+						usedImgs.Add(folder.First().Url(mode: UrlMode.Absolute));
+					}
+				} else
+				{
+					foreach (var imgs in folder)
+					{
+						if(imgs.ContentType.Alias == "Image")
+						{
+							var relation = relationService?.AreRelated(Model.Id, imgs.Id);
+							if(relation != null && relation == true)
+							{
+								usedImgs.Add(imgs.Url(mode: UrlMode.Absolute));
+							}
+						}
+					}
+				}
+			}
+		} else if (media.ContentType.Alias == "Image")
+		{
+			var relation = relationService?.AreRelated(Model.Id, media.Id);
+			if (relation!= null && relation == true)
+			{
+				usedImgs.Add(Umbraco.Media(media.Id)?.Url(mode: UrlMode.Absolute));
+			}
+		}
+	}
+}
+<div class="share-bar sticky-top">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12">
+				<div class="social-wrapper">
+					<a title="LinkedIn" href="https://www.linkedin.com/share?text=@Model.Url()" target="_blank" class="social linkedin">LinkedIn</a>
+					<a title="Whatsapp" href="https://web.whatsapp.com/send?text=@Model.Url()" data-action="share/whatsapp/share" target="_blank" class="social whatsapp">Whatsapp</a>
+					<a title="Twitter" href="https://twitter.com/share?text=@Model.Url()" target="_blank" class="social twitter">Twitter</a>
+					<a title="Facebook" href="https://www.facebook.com/sharer/sharer.php?u=@Model.Url()" target="_blank" class="social facebook">Facebook</a>
+					<div title="Copy link" href="" data-url="@Model.Url()" class="social link">Copy link</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<section class="KE-heading">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12 banner">
+				@await(Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem))
+				<div class="image-wrapper">
+					<img src="@Model.SfondoHero?.Url()" alt="@HtmlUtils.GetImageAlt(Model.SfondoHero)">
+				</div>
+				<div class="pos-relative">
+					<div class="post-navigation d-none d-xl-flex">
+						@for (var i = 0; i < articoliRelativi?.Count(); i++)
+						{
+							if (articoliRelativi.ElementAt(i).Name == Model.Name)
+							{
+								if (i - 1 >= 0)
+								{
+									<a title="prev" href="@articoliRelativi.ElementAt(i - 1).Url()" class="prev"></a>
+								}
+								else
+								{
+									<a title="prev" href="#" class="prev disabled-"></a>
+								}
+								if (i + 1 < articoliRelativi.Count())
+								{
+									<a title="next" href="@articoliRelativi.ElementAt(i + 1).Url()" class="next"></a>
+								}
+								else
+								{
+									<a title="next" href="#" class="next disabled-"></a>
+								}
+								break;
+							}
+						}
+					</div>
+				</div>
+				<div class="caption">
+					<h1 class="h1">
+						@Model.TitoloHero
+					</h1>
+					<div class="meta">
+						<div class="tags">
+							<span class="category">@Model.Parent?.Name</span>
+							@if (Model.TrendTopic != null)
+							{
+								foreach (var trend in Model.TrendTopic)
+								{
+									<span class="accent">@trend.Name</span>
+								}
+
+							}
+						</div>
+						<div class="published">
+							@Umbraco.GetDictionaryValue("last_update_article") @Model.DataCustom.ToString("dd/MM/yyyy")
+							<div class="post-navigation d-flex d-xl-none">
+								@for (var i = 0; i < articoliRelativi?.Count(); i++)
+								{
+									if (articoliRelativi.ElementAt(i).Name == Model.Name)
+									{
+										if (i - 1 >= 0)
+										{
+											<a title="prev" href="@articoliRelativi.ElementAt(i - 1).Url()" class="prev"></a>
+										}
+										else
+										{
+											<a title="prev" href="#" class="prev disabled-"></a>
+										}
+										if (i + 1 < articoliRelativi.Count())
+										{
+											<a title="next" href="@articoliRelativi.ElementAt(i + 1).Url()" class="next"></a>
+										}
+										else
+										{
+											<a title="next" href="#" class="next disabled-"></a>
+										}
+										break;
+									}
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+@if (!string.IsNullOrEmpty(Model.TestoIniziale))
+{
+	<section class="text-content">
+		<div class="container-lg">
+			<div class="row justify-content-center">
+				<div class="col testo-iniziale">
+					@Model.TestoIniziale
+				</div>
+			</div>
+		</div>
+	</section>
+}
+@if (Model.Body != null && !string.IsNullOrEmpty(Model.Body.ToString()))
+{
+	<section class="text-content">
+		<div class="container-lg">
+			<div class="row justify-content-center">
+				<div class="col">
+					@Html.Raw(Model.Body)
+				</div>
+			</div>
+		</div>
+	</section>
+}
+@Html.GetBlockListHtml(Model?.Blocchi)
+<section class="pt-3 pb-0 py-lg-5">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12">
+				<ul class="pagination justify-content-center mb-5">
+					@for (var i = 0; i < articoliRelativi?.Count(); i++)
+					{
+						if (articoliRelativi.ElementAt(i).Name == Model?.Name)
+						{
+							if (i - 1 >= 0)
+							{
+								<li class="page-item">
+									<a title="@Umbraco.GetDictionaryValue("previous_article")" href="@articoliRelativi.ElementAt(i - 1).Url()" class="page-link">@Umbraco.GetDictionaryValue("previous_article")</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled-">
+									<a title="@Umbraco.GetDictionaryValue("previous_article")" class="page-link">@Umbraco.GetDictionaryValue("previous_article")</a>
+								</li>
+							}
+							if (i + 1 < articoliRelativi.Count())
+							{
+								<li class="page-item">
+									<a title="@Umbraco.GetDictionaryValue("next_article")" class="page-link" href="@articoliRelativi.ElementAt(i + 1).Url()">@Umbraco.GetDictionaryValue("next_article")</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled-">
+									<a title="@Umbraco.GetDictionaryValue("next_article")" class="page-link">@Umbraco.GetDictionaryValue("next_article")</a>
+								</li>
+							}
+							break;
+						}
+					}
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
+@if (Model != null && Model.MostraAltriContenuti && orderedArticles != null && orderedArticles.Any())
+{
+	int count = 1;
+	<section class="vertical-cards-block bg pb-80">
+		<div class="container-lg">
+			@if (!string.IsNullOrEmpty(Model.TitoloAltriContenuti))
+			{
+				<div class="row justify-content-center">
+					<div class="col-12">
+						<h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloAltriContenuti</h2>
+					</div>
+				</div>
+			}
+			<div class="row g-large">
+
+				@foreach (Articolo art in orderedArticles)
+				{
+					if (count == 4)
+					{
+						break;
+					}
+					if (art.Name != Model.Name)
+					{
+						@(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData){ {"list", "related" },{"section",@Model.TitoloAltriContenuti} }))
+						count++;
+					}
+				}
+			</div>
+		</div>
+	</section>
+}
+@Html.GetBlockListHtml(Model?.AltriBlocchi)
+
+<script type="application/ld+json">
+	{
+	"@@context": "https://schema.org",
+	"@@type": "@Model?.ContentType.Alias",
+	"mainEntityOfPage": {
+	"@@type": "WebPage",
+	"@@id": "@Model?.Url(mode: UrlMode.Absolute)"
+	},
+	"headline": "@Model?.TitoloHero",
+	"image": [
+	@for (int i = 0; i < usedImgs.Count; i++)
+	{
+		if( i == usedImgs.Count -1)
+		{
+			@Html.Raw('\"' + usedImgs[i] + '\"')
+		} else
+		{
+			@Html.Raw('\"' + usedImgs[i] + '\"' + ", ")
+		}
+	}
+	],
+	"datePublished": "@Model?.CreateDate",
+	"dateModified": "@Model?.UpdateDate",
+	"publisher": {
+	"@@type": "Organization",
+	"name": "CRIF",
+	"logo": {
+	"@@type": "ImageObject",
+	"url": "@Model?.Root()?.Url(mode: UrlMode.Absolute)assets/img/logo-crif.svg"
+	}
+	}
+	}
+</script>

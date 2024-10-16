@@ -1,0 +1,121 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockRecensioniClientiConLoghi content = (ContentModels.BlockRecensioniClientiConLoghi)Model.Content;
+    ContentModels.BlockRecensioniClientiConLoghiSettings settings = (ContentModels.BlockRecensioniClientiConLoghiSettings)Model.Settings;
+}
+<section class="business-reviews" id="@settings.AnchorID">
+    @if (content.TitoloRecensioni != "")
+    {
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="h2 text-center mb-0 pb-0 pb-lg-5">@content.TitoloRecensioni</h2>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="container-lg">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 px-lg-4">
+                @if (content.RecensioniClienti != null && content.RecensioniClienti.Any())
+                {
+                    <div class="swiper business-reviews-carousel pt-3 pe-3 pe-lg-0">
+                        <div class="swiper-wrapper">
+                            <!-- slides -->
+                            @foreach (var item in content.RecensioniClienti)
+                            {
+                                ContentModels.BlockRecensioneClienteConLogo recensione = (ContentModels.BlockRecensioneClienteConLogo)item.Content;
+                                <div class="swiper-slide">
+                                    <div class="custom-card recensione-cliente shadow">
+                                        <div class="card-header">
+                                            @if (recensione.FotoCliente != null)
+                                            {
+                                                <div class="avatar">
+                                                    <img src="@recensione?.FotoCliente?.Url()" alt="@HtmlUtils.GetImageAlt(recensione?.FotoCliente)">
+                                                </div>
+                                            }
+                                            <div class="author">
+                                                @if (recensione?.NomeCliente != "")
+                                                {
+                                                    <p class="name">@recensione?.NomeCliente</p>
+                                                }
+                                                @if (recensione?.AziendaCliente != "")
+                                                {
+                                                    <p class="company">@recensione?.AziendaCliente</p>
+                                                }
+                                            </div>
+                                            @if (recensione?.LogoAzienda != null)
+                                            {
+                                                <div class="company-logo ms-auto">
+                                                    <img src="@recensione?.LogoAzienda.Url()" alt="@HtmlUtils.GetImageAlt(recensione?.LogoAzienda)">
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="card-body">
+                                            <p>@recensione?.Recensione</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <!-- pagination -->
+                        <div class="swiper-pagination"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    @{
+        if (settings.AutoPlay == true)
+        {
+            @:var swiper = new Swiper(".business-reviews-carousel", {
+            @:loop: true,
+            @:slidesPerView: 1,
+            @:spaceBetween: 16,
+            @:autoplay: { disableOnInteraction: false },
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:	},
+            @:breakpoints: {
+            @:992: {
+            @:loop: true,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:	},
+            @:},
+            @:});
+        }
+        else
+        {
+            @:var swiper = new Swiper(".business-reviews-carousel", {
+            @:loop: false,
+            @:slidesPerView: 1,
+            @:spaceBetween: 16,
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:},
+            @:breakpoints: {
+            @:992: {
+            @:loop: false,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:},
+            @:},
+            @:});
+
+        }
+    }
+
+</script>

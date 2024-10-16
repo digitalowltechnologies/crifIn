@@ -1,0 +1,64 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockCardSoluzioni content = (ContentModels.BlockCardSoluzioni)Model.Content;
+	ContentModels.BlockCardSoluzioniSettings settings = (ContentModels.BlockCardSoluzioniSettings)Model.Settings;
+}
+<section class="minicards-block bg" data-section="our-solutions" id="@settings.AnchorID">
+	<div class="container-lg">
+		@if (content.TitoloSezione != "")
+		{
+			<div class="row justify-content-center">
+				<div class="col-7 col-lg-12">
+					<h3 class="h3 text-center pb-lg-5 mb-lg-4">@content.TitoloSezione</h3>
+				</div>
+			</div>
+		}
+		@if (content.MostrareSingoleSoluzioni && content.ContenutoSoluzioni != null && content.ContenutoSoluzioni.Any())
+		{
+			<div class="row g-mega g-overflow">
+				@foreach (ContentModels.Soluzione solution in content.ContenutoSoluzioni)
+				{
+					<div class="col-12 col-lg-6 solution">
+						<div class="custom-card soluzioni shadow fade-in-box">
+							<div class="img-wrapper">
+								<img src="@solution.ImmagineHeroSoluzione?.Url()" alt="@HtmlUtils.GetImageAlt(solution.ImmagineHeroSoluzione)">
+							</div>
+							<div class="card-body">
+								<h4 class="h3 card-title pb-1">@solution.TitoloHeroSoluzione</h4>
+								<p>@HtmlUtils.TextCut(solution.AbstractSoluzione, 150)</p>
+								<a title="@Umbraco.GetDictionaryValue("solution_read_more")" href="@solution.Url()" class="stretched-link more" data-link-type="page" data-link="@solution.TitoloHeroSoluzione" data-link-destination="@solution.Url()" data-link-section="@content.TitoloSezione">@Umbraco.GetDictionaryValue("solution_read_more")</a>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+		else if (content.ContenutoCategoria != null)
+		{
+			var soluzioni = content?.ContenutoCategoria?.Children()?.Where(x => x.ContentType.Alias == "soluzione");
+			if (soluzioni != null && soluzioni.Any())
+			{
+				<div class="row g-mega g-overflow">
+					@foreach (ContentModels.Soluzione solution in soluzioni)
+					{
+						<div class="col-12 col-lg-6 solution">
+							<div class="custom-card soluzioni shadow fade-in-box">
+								<div class="img-wrapper">
+									<img src="@solution.ImmagineHeroSoluzione?.Url()" alt="@HtmlUtils.GetImageAlt(solution.ImmagineHeroSoluzione)">
+								</div>
+								<div class="card-body">
+									<h4 class="h3 card-title pb-1">@solution.TitoloHeroSoluzione</h4>
+									<p>@HtmlUtils.TextCut(solution.AbstractSoluzione, 150)</p>
+									<a title="@Umbraco.GetDictionaryValue("solution_read_more")" href="@solution.Url()" class="stretched-link more" data-link-type="page" data-link="@solution.TitoloHeroSoluzione" data-link-destination="@solution.Url()" data-link-section="@content?.TitoloSezione">@Umbraco.GetDictionaryValue("solution_read_more")</a>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		}
+	</div>
+</section>

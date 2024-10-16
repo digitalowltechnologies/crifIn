@@ -1,0 +1,173 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockKeyPoint content = (ContentModels.BlockKeyPoint)Model.Content;
+    ContentModels.BlockKeyPointSettings settings = (ContentModels.BlockKeyPointSettings)Model.Settings;
+    var bg = (settings.NoBackground) ? "" : "lightGreyBg2";
+    var oldbg = (settings.NoBackground) ? "bg-white" : "";
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (settings?.AnchorID == "PortfolioReview")
+    {
+        <section class="pageSection @bg">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(content.Title))
+                {
+                    <h2 class="title text-center mb-0">@content.Title</h2>
+                }
+                <div class="row justify-content-center text-center text-md-start">
+                    <di class="col-12 col-md-11">
+                        @if (content.KeyPoints != null && content.KeyPoints.Any())
+                        {
+                            foreach (var item in content.KeyPoints)
+                            {
+                                var itemContent = (ContentModels.BlockTextAndImage)item.Content;
+                                @if (itemContent.ImagePosition == "left")
+                                {
+                                    <div class="d-md-flex align-items-center animateThis slideTop">
+                                        @if (itemContent?.Image?.Url() != null)
+                                        {
+                                            <div class="roundIconCard mt-md-4 me-md-5">
+                                                <img src="@itemContent.Image?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Image)" class="" />
+                                            </div>
+                                        }
+                                        <div class="mx-3 mx-md-0">
+                                            @Html.Raw(itemContent.Text)
+                                        </div>
+                                    </div>
+
+                                }
+                            }
+
+
+                        }
+
+                    </di>
+                </div>
+
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="pageSection @(bg)" id="@settings?.AnchorID">
+            <div class="container">
+                <div class="row">
+                    @if (content.KeyPoints != null && content.KeyPoints.Any())
+                    {
+                        foreach (var item in content.KeyPoints)
+                        {
+                            var itemContent = (ContentModels.BlockTextAndImage)item.Content;
+                            @if (itemContent.ImagePosition == "right")
+                            {
+                                <div class="col-12 col-md-6">
+                                    @if (!string.IsNullOrEmpty(@itemContent.Title))
+                                    {
+                                        <h2 class="title ms-0">@itemContent.Title</h2>
+                                    }
+                                    @Html.Raw(itemContent.Text)
+                                    @if (!string.IsNullOrEmpty(@itemContent?.CallToAction?.Url))
+                                    {
+                                        <a title="@itemContent?.CallToAction?.Name" href="@itemContent?.CallToAction?.Url" target="@itemContent?.CallToAction?.Target" data-link-type="cta" data-link="@itemContent?.CallToAction?.Name" data-section="@content.Title">@itemContent?.CallToAction?.Name</a>
+                                    }
+                                </div>
+                                @if (itemContent?.Image?.Url() != null)
+                                {
+                                    <div class="col-12 col-md-6">
+                                        <img src="@itemContent.Image?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Image)" class="fitImg animateThis slideRight" />
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                @if (itemContent?.Image?.Url() != null)
+                                {
+                                    <div class="col-12 col-md-6">
+                                        <img src="@itemContent.Image?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Image)" class="fitImg animateThis slideRight" />
+                                    </div>
+                                }
+                                <div class="col-12 col-md-6">
+                                    @if (!string.IsNullOrEmpty(@itemContent.Title))
+                                    {
+                                        <h2 class="title ms-0">@itemContent.Title</h2>
+                                    }
+                                    @Html.Raw(itemContent.Text)
+                                    @if (!string.IsNullOrEmpty(@itemContent?.CallToAction?.Url))
+                                    {
+                                        <a title="@itemContent?.CallToAction?.Name" href="@itemContent?.CallToAction?.Url" target="@itemContent?.CallToAction?.Target" data-link-type="cta" data-link="@itemContent?.CallToAction?.Name" data-section="@content.Title">@itemContent?.CallToAction?.Name</a>
+                                    }
+                                </div>
+                            }
+                        }
+
+
+                    }
+
+                </div>
+            </div>
+        </section>
+    }
+}
+else
+{
+    <section class="mixed-content @(oldbg) " id="@settings?.AnchorID">
+        <div class="container-lg">
+            @if (!string.IsNullOrEmpty(content.Title))
+            {
+                <div class="row pb-4">
+                    <div class="col-12">
+                        <h2 class="h2 text-center">@content.Title</h2>
+                    </div>
+                </div>
+            }
+            @if (content.KeyPoints != null && content.KeyPoints.Any())
+            {
+                foreach (var item in content.KeyPoints)
+                {
+                    var itemContent = (ContentModels.BlockTextAndImage)item.Content;
+                    @if (itemContent.ImagePosition == "right")
+                    {
+                        <div class="content-row right">
+                            <div class="caption-text">
+                                <h3 class="h3">@itemContent.Title</h3>
+                                @Html.Raw(itemContent.Text)
+                                @if (!string.IsNullOrEmpty(@itemContent?.CallToAction?.Url))
+                                {
+                                    <a title="@itemContent?.CallToAction?.Name" href="@itemContent?.CallToAction?.Url" target="@itemContent?.CallToAction?.Target" data-link-type="cta" data-link="@itemContent?.CallToAction?.Name" data-section="@content.Title">@itemContent?.CallToAction?.Name</a>
+                                }
+                            </div>
+                            @if (itemContent?.Image?.Url() != null)
+                            {
+                                <div class="d-none d-lg-block key-point-img pop-fade-in">
+                                    <img src="@itemContent.Image?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Image)">
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="content-row left">
+                            @if (itemContent.Image?.Url() != null)
+                            {
+                                <div class="d-none d-lg-block key-point-img pop-fade-in">
+                                    <img src="@itemContent.Image?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent.Image)">
+                                </div>
+                            }
+                            <div class="caption-text">
+                                <h3 class="h3">@itemContent.Title</h3>
+                                @Html.Raw(itemContent.Text)
+                                @if (!string.IsNullOrEmpty(@itemContent?.CallToAction?.Url))
+                                {
+                                    <a title="@itemContent?.CallToAction?.Name" href="@itemContent?.CallToAction?.Url" target="@itemContent?.CallToAction?.Target" data-link-type="cta" data-link="@itemContent?.CallToAction?.Name" data-section="@content.Title">@itemContent?.CallToAction?.Name</a>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </section>
+}
+

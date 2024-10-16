@@ -1,0 +1,13 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MembershipAffirmations>
+@{
+    var ma_children = Model.Children();
+
+    if(ma_children!=null){
+        var latest = ma_children.FirstOrDefault();
+        @(await Html.PartialAsync("MembershipAffirmationsSubpage",latest));
+    }  
+
+}

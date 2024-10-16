@@ -1,0 +1,304 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockBackgroundBox content = (ContentModels.BlockBackgroundBox)Model.Content;
+	ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+	var bgType = (!string.IsNullOrEmpty(content.Background?.Url())) ? "background:#FAFAFA url(" + content.Background?.Url() + ") center no-repeat;background-size: cover;" : "";
+	//var backgroud = settings.
+}
+@if (settings != null && settings.NewTemplate)
+{
+@if (content.CountryListLayout)
+{
+	<section class="countries-list" style="@bgType" id="@settings?.AnchorID">
+		<div class="container-lg">
+			<div class="row justify-content-center">
+				<!-- desktop -->
+				<div class="col-12 pb-lg-5 list-desktop d-none d-lg-block">
+					@if (content.CountryList != null && content.CountryList.Any())
+					{
+						<ul>
+							@foreach (var item in content.CountryList)
+							{
+								var itemContent = (ContentModels.BlockCityList)item.Content;
+								<li>
+									<h5 class="h5">@itemContent.CountryName</h5>
+									@if (itemContent.CityName != null && itemContent.CityName.Any())
+									{
+										foreach (var city in itemContent.CityName)
+										{
+											<p>@city</p>
+										}
+									}
+
+								</li>
+							}
+						</ul>
+					}
+				</div>
+				<!-- mobile -->
+
+				<div class="col-12 pb-0 pb-lg-5 list-mobile d-block d-lg-none">
+					<div class="swiper countries-carousel">
+						<div class="swiper-wrapper">
+							@if (content.CountryList != null && content.CountryList.Any())
+							{
+								// split into arrays of no more than three
+								var countryList = content.CountryList;
+								var chunks = countryList.Chunk(3);
+								foreach (var chunk in chunks)
+								{
+									<div class="swiper-slide">
+										<ul>
+											@foreach (var item in chunk)
+											{
+												var itemContent = item.Content;
+												var cityName = itemContent.Value("cityName");
+												if (cityName != null)
+												{
+												IEnumerable<string> cities = (IEnumerable<string>)cityName;
+												<li>
+													<h5 class="h5">@itemContent.Value("countryName")</h5>
+													@foreach (var city in cities)
+													{
+														<p>@city</p>
+													}
+												</li>
+												}
+											}
+										</ul>
+									</div>
+								}
+							}
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+}
+else
+{
+	<!-- ********* -->
+	<section class="pt-5 pb-3 whyCrifSection lightGreyBg2" style="@bgType" id="@settings?.AnchorID">
+		<div class="container pt-5 pb-3">
+			<div class="row justify-content-center text-center">
+				<div class="col col-md-10">
+					@if (!string.IsNullOrEmpty(content.Title))
+					{
+						<h2 class="title">@content.Title</h2>
+					}
+					<p class="bigFont mx-auto mb-4">
+						@Html.Raw(content.Text)
+					</p>
+					@if (!string.IsNullOrEmpty(@content.CallToAction?.Url))
+					{
+						<a title="@content.CallToAction?.Name" href="@content.CallToAction?.Url" target="@content.CallToAction?.Target" class="arrowBtn" data-link-type="internal-link" data-link="@content.CallToAction?.Name" data-section="@content.Title">@content.CallToAction?.Name</a>
+					}
+					@if (content.DisplayCounterCards)
+					{
+						<div class="row counters mx-md-5 mt-5">
+							@if (content.CardCounterList != null && content.CardCounterList.Any())
+							{
+								foreach (var item in content.CardCounterList)
+								{
+									var itemContent = (ContentModels.BlockSingleCounter)item.Content;
+									<div class="col-12 col-md-4">
+										<div class="counterCard">
+											<div class="counterNum">@itemContent.SignBefore<span>@itemContent.Title</span>@itemContent.SignAfter</div>
+											<p>@itemContent.Text</p>
+										</div>
+									</div>
+								}
+							}
+						</div>
+					}
+
+					@if (content.DisplayPartnerList)
+					{
+						<div class="container-lg">
+							<div class="row pt-lg-5">
+								<div class="col-12">
+									<h3 class="h3 text-center lighter">@content.PartnerListTitle</h3>
+								</div>
+							</div>
+							<div class="row pb-lg--5">
+								<div class="col-12">
+									<div class="swiper partners-carousel">
+										<div class="swiper-wrapper">
+											<!-- slides -->
+											@if (content.PartnerLogoList != null && content.PartnerLogoList.Any())
+											{
+												foreach (var item in content.PartnerLogoList)
+												{
+													var itemContent = (ContentModels.BlockPartnerLogo)item.Content;
+													<div class="swiper-slide">
+														<img src="@itemContent?.Logo?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent?.Logo)" class="img-fluid">
+													</div>
+												}
+											}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					}
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ************** -->
+
+	}
+}
+else
+{
+	@if (content.CountryListLayout)
+	{
+		<section class="countries-list" style="@bgType" id="@settings?.AnchorID">
+			<div class="container-lg">
+				<div class="row justify-content-center">
+					<!-- desktop -->
+					<div class="col-12 pb-lg-5 list-desktop d-none d-lg-block">
+						@if (content.CountryList != null && content.CountryList.Any())
+						{
+							<ul>
+								@foreach (var item in content.CountryList)
+								{
+									var itemContent = (ContentModels.BlockCityList)item.Content;
+									<li>
+										<h5 class="h5">@itemContent.CountryName</h5>
+										@if (itemContent.CityName != null && itemContent.CityName.Any())
+										{
+											foreach (var city in itemContent.CityName)
+											{
+												<p>@city</p>
+											}
+										}
+
+									</li>
+								}
+							</ul>
+						}
+					</div>
+					<!-- mobile -->
+
+					<div class="col-12 pb-0 pb-lg-5 list-mobile d-block d-lg-none">
+						<div class="swiper countries-carousel">
+							<div class="swiper-wrapper">
+								@if (content.CountryList != null && content.CountryList.Any())
+								{
+									// split into arrays of no more than three
+									var countryList = content.CountryList;
+									var chunks = countryList.Chunk(3);
+									foreach (var chunk in chunks)
+									{
+										<div class="swiper-slide">
+											<ul>
+												@foreach (var item in chunk)
+												{
+													var itemContent = item.Content;
+													var cityName = itemContent.Value("cityName");
+													if (cityName != null)
+													{
+														IEnumerable<string> cities = (IEnumerable<string>)cityName;
+														<li>
+															<h5 class="h5">@itemContent.Value("countryName")</h5>
+															@foreach (var city in cities)
+															{
+																<p>@city</p>
+															}
+														</li>
+													}
+												}
+											</ul>
+										</div>
+									}
+								}
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</section>
+	}
+	else
+	{
+		<section class="why-crif" style="@bgType" id="@settings?.AnchorID">
+			<div class="container-lg">
+				<div class="row justify-content-center">
+					<div class="col-12 col-lg-10 text-center pb-lg-5">
+						@if (!string.IsNullOrEmpty(content.Title))
+						{
+							<h2 class="h2">@content.Title</h2>
+						}
+						@Html.Raw(content.Text)
+						@if (!string.IsNullOrEmpty(@content.CallToAction?.Url))
+						{
+							<a title="@content.CallToAction?.Name" href="@content.CallToAction?.Url" target="@content.CallToAction?.Target" class="more big-more" data-link-type="internal-link" data-link="@content.CallToAction?.Name" data-section="@content.Title">@content.CallToAction?.Name</a>
+						}
+					</div>
+				</div>
+			</div>
+
+			@if (content.DisplayCounterCards)
+			{
+				<div class="container-lg px-mega pt-3 pb-4 pt-lg-4 mb-2">
+					<div class="row gx-mega">
+						@if (content.CardCounterList != null && content.CardCounterList.Any())
+						{
+							foreach (var item in content.CardCounterList)
+							{
+								var itemContent = (ContentModels.BlockSingleCounter)item.Content;
+								<div class="col-4">
+									<div class="counter shadow">
+										<p class="counter-number">
+											@itemContent.SignBefore<span>@itemContent.Title</span>@itemContent.SignAfter
+										</p>
+										<p class="counter-label">@itemContent.Text</p>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				</div>
+			}
+
+			@if (content.DisplayPartnerList)
+			{
+				<div class="container-lg">
+					<div class="row pt-lg-5">
+						<div class="col-12">
+							<h3 class="h3 text-center lighter">@content.PartnerListTitle</h3>
+						</div>
+					</div>
+					<div class="row pb-lg--5">
+						<div class="col-12">
+							<div class="swiper partners-carousel">
+								<div class="swiper-wrapper">
+									<!-- slides -->
+									@if (content.PartnerLogoList != null && content.PartnerLogoList.Any())
+									{
+										foreach (var item in content.PartnerLogoList)
+										{
+											var itemContent = (ContentModels.BlockPartnerLogo)item.Content;
+											<div class="swiper-slide">
+												<img src="@itemContent?.Logo?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent?.Logo)" class="img-fluid">
+											</div>
+										}
+									}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		</section>
+	}
+
+}

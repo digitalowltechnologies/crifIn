@@ -1,0 +1,17 @@
+﻿@model Crif.It.Models.Solutions
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Solutions>
+
+<div class="col-12 col-lg-6 solution">
+    <div class="custom-card-soluzioni shadow fade-in-box">
+        <div class="img-wrapper">
+            <img src="@Model.HeroBackground?.Url()" alt="@HtmlUtils.GetImageAlt(Model.HeroBackground)">
+        </div>
+        <div class="card-body">
+            <h4 class="h3 card-title pb-1">@Model.HeroTitle</h4>
+            @*<p>@HtmlUtils.TextCut(Model.SolutionAbstract, 200)</p>*@
+            <a title="@Umbraco.GetDictionaryValue("solution_read_more")" href="@Model.Url()" class="stretched-link more" data-link-type="internal-link" data-link="@Model.HeroTitle" data-section="other solutions">@Umbraco.GetDictionaryValue("solution_read_more")</a>
+        </div>
+    </div>
+</div>

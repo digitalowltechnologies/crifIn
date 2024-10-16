@@ -1,0 +1,101 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+    ContentModels.BlockRecensioniClienti content = (ContentModels.BlockRecensioniClienti)Model.Content;
+    var settings = (ContentModels.BlockRecensioniClientiSettings)Model.Settings;
+}
+<section class="reviews" id="@settings.AnchorID">
+    @if (!content.TitoloRecensioni.IsNullOrWhiteSpace())
+    {
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="h2 text-center mb-0 pb-0 pb-lg-5">@content.TitoloRecensioni</h2>
+                </div>
+            </div>
+        </div>
+    }
+    @if (content.Recensioni != null && content.Recensioni.Any())
+    {
+        <div class="container-lg">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8 px-lg-4">
+                    <div class="swiper reviews-carousel pt-3 pe-3 pe-lg-0">
+                        <div class="swiper-wrapper">
+                            <!-- slides -->
+                            @foreach (var slide in content.Recensioni)
+                            {
+                                ContentModels.BlockRecensioneCliente recensione = (ContentModels.BlockRecensioneCliente)slide.Content;
+                                <div class="swiper-slide">
+                                    <div class="custom-card shadow">
+                                        <div class="card-body">
+                                            <figure>
+                                                <blockquote >
+                                                    @recensione.Recensione
+                                                </blockquote>
+                                                <figcaption>@recensione.NomeCliente</figcaption>
+                                            </figure>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <!-- pagination -->
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+<script>
+
+    @{
+        if (settings.AutoPlay == true)
+        {
+            @:var swiper = new Swiper(".reviews-carousel", {
+            @:loop: true,
+            @:slidesPerView: 1,
+            @:spaceBetween: 16,
+            @:autoplay: { disableOnInteraction: false },
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:	},
+            @:breakpoints: {
+            @:992: {
+            @:loop: true,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:	},
+            @:},
+            @:});
+        }
+        else
+        {
+            @:var swiper = new Swiper(".reviews-carousel", {
+            @:loop: false,
+            @:slidesPerView: 1,
+            @:spaceBetween: 16,
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:},
+            @:breakpoints: {
+            @:992: {
+            @:loop: false,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:},
+            @:},
+            @:});
+
+        }
+    }
+
+</script>

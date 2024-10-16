@@ -1,0 +1,26 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Services>
+@{
+	Layout = "Master.cshtml";
+	var singleServices = Model.Children()?.Where(x=> x.ContentType.Alias == "service");
+}
+<section class="cards-block" data-section="services">
+	<div class="container-lg">
+		<div class="row justify-content-center">
+			<div class="col-7 col-lg-12">
+				<h1 class="h2 text-center pb-lg-5 mb-lg-4">@Model.ServiceTitle</h1>
+			</div>
+		</div>
+		<div class="row g-mega g-overflow">
+		@if (singleServices != null && singleServices.Any())
+		{
+			foreach (Service singleService in singleServices)
+			{
+			@(	await Html.PartialAsync("CardService", singleService))
+			}
+		}
+		</div>
+	</div>
+</section>
+@Html.GetBlockListHtml(Model.Blocks)

@@ -1,0 +1,34 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockYearNews content = (ContentModels.BlockYearNews)Model.Content;
+	var bg = content.GreyBackground ? "bg" : "";
+}
+<section class="history-year @bg" id="y-@content.Year">
+	<div class="container-lg">
+		<div class="row pt-lg-2 pt-lg-0">
+			<div class="col-12">
+				<h2 class="h2 pb-lg-4">@content.Year</h2>
+			</div>
+		</div>
+		@if (content.YearNews != null)
+		{
+			<div class="row">
+				<div class="col-12">
+					@foreach (var singleNews in content.YearNews)
+					{
+						var newsContent = (ContentModels.BlockSingleNews)singleNews.Content;
+						<div class="entry">
+							<img class="pop-fade-in" src="@newsContent?.SingleNewsImage?.Url()" alt="@HtmlUtils.GetImageAlt(newsContent?.SingleNewsImage)">
+							<div class="caption">
+								<h3 class="h3 pb-lg-4">@newsContent?.SingleNewsTitle</h3>
+								 @Html.Raw(newsContent?.SingleNewsDescription)
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+</section>

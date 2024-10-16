@@ -1,0 +1,50 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using System;
+@using System.Text.RegularExpressions;
+@{
+    ContentModels.BlockVideo content = (ContentModels.BlockVideo)Model.Content;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+    string pattern = "[ \\w-]+?(?=\\.)";
+}
+<section class="video-block" id="@settings?.AnchorID">
+    <div class="container-lg">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="pos-relative ratio ratio-16x9">
+                    @if (content.IsYoutubeVideo && content.YoutubeVideoID != "")
+                    {
+                        <iframe src="https://www.youtube.com/embed/@content.YoutubeVideoID?enablejsapi=1" title="@content.YoutubeVideoID" frameborder="0" allowTransparency="true" allowfullscreen></iframe>
+                    }
+                    else if(content.Video != null)
+                    {
+                        <video class="video" poster="@content.PosterImage?.Url()" style="object-fit: cover;" data-title="@Regex.Matches(@content.Video.Url(), @pattern, RegexOptions.IgnoreCase).FirstOrDefault()">
+                            <source src="@content.Video?.Url()" type="video/mp4">
+                        </video>
+                        <button class="play-video">Riproduci video</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (content != null && content.Video != null)
+{
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "VideoObject",
+        "name": "@content.Video?.Name",
+        "description": "",
+        "thumbnailUrl": "@content.PosterImage?.Url()"
+        ],
+        "uploadDate": "@content.Video?.CreateDate",
+        "interactionStatistic": {
+        "@@type": "InteractionCounter",
+        "interactionType": { "@@type": "WatchAction" },
+        "userInteractionCount":
+        }
+        }
+    </script>
+}

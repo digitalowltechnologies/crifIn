@@ -1,0 +1,104 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+    ContentModels.BlockNavigazioneInternaCategoriaMercato content = (ContentModels.BlockNavigazioneInternaCategoriaMercato)Model.Content;
+    var currentPage = Umbraco.AssignedContentItem;
+}
+
+<section class="internal-navigation dark special-sticky">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12">
+                <nav>
+                    <ul class="internal-menu">
+                    @if( content.LinkInterni != null && content.LinkInterni.Any())
+                    {
+                        var current = "current";
+                        foreach (var item in content.LinkInterni)
+                        {
+                            var itemContent = (ContentModels.BlockInternalLink)item.Content;
+                            var anchorID = "";
+                                if (itemContent.UseAnchorID)
+                                {
+                                    <li class="nav-item internal-link @current"><a title="@itemContent.InternalLinkLabel" href="#@itemContent.BlockAnchorID" class="nav-link" data-link-type="filter" data-link-destiantion="@currentPage.Url()#@itemContent.BlockAnchorID" data-link-filterCategory="undefined" data-link-filterScroll="@itemContent.InternalLinkLabel">@itemContent.InternalLinkLabel</a></li>
+                                    current = "";
+                                }
+                                else
+                                {
+                                    switch (itemContent.BlockSelector)
+                                    {
+                                        case "Success Stories":
+                                            anchorID = "#success-stories";
+                                            break;
+                                        case "Related Resources":
+                                            anchorID = "#related-resources";
+                                            break;
+                                        case "Solutions - Service":
+                                            anchorID = "#solutions";
+                                            break;
+                                        case "Use Case - Industry":
+                                            anchorID = "#cases";
+                                            break;
+                                        case "News & Events":
+                                            anchorID = "#news";
+                                            break;
+                                        case "Trend Topics":
+                                            anchorID = "#trend-topics";
+                                            break;
+                                        case "Prodotti - Altri Prodotti":
+                                            anchorID = "#altri-prodotti";
+                                            break;
+                                        default:
+                                            anchorID = "#";
+                                            break;
+                                    }
+                                    <li class="nav-item internal-link @current"><a title="@itemContent.InternalLinkLabel" href="@anchorID" class="nav-link"  data-link-type="filter" data-link-destiantion="@currentPage.Url()#@anchorID" data-link-filterCategory="undefined" data-link-filterScroll="@itemContent.InternalLinkLabel">@itemContent.InternalLinkLabel</a></li>
+                                    current = "";
+                                }
+
+                        }        
+                    }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+if ($('.internal-navigation.special-sticky')) {
+	$('.internal-navigation.special-sticky li.nav-item.internal-link ').each(function() {
+		$(this).click(function(event) {
+            event.preventDefault();
+			//$(this).addClass('current')
+			//$('.internal-navigation.special-sticky li.nav-item.internal-link ').not(this).removeClass('current')
+            var anchor = $(this).children(":first").attr("href");
+            if ($(anchor) != null && $(anchor).offset() != undefined) {
+				$('html, body').animate({scrollTop: $(anchor).offset().top -180 }, 'slow');
+			}
+		})
+	})
+
+	$(window).scroll(function() {
+		// This is then function used to detect if the element is scrolled into view
+		function elementScrolled(elem) {
+			var docViewTop = $(window).scrollTop();
+			var docViewBottom = docViewTop + $(window).height();
+            var elemTop = 0;
+			 if (elem != null && $(elem).offset() != undefined) {
+                elemTop = $(elem).offset().top;
+             }
+			return ((elemTop <= docViewBottom) && (elemTop >= docViewTop));
+		}
+		$('.internal-navigation.special-sticky li.nav-item.internal-link ').each(function() {
+			var target = $(this).children().attr("href")
+			if (elementScrolled(target)) {
+				$(this).addClass('current')
+				$('.internal-navigation.special-sticky li.nav-item.internal-link ').not(this).removeClass('current')
+				return false;
+			}
+
+		});
+	});
+}
+</script>

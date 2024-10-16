@@ -1,0 +1,50 @@
+@using Umbraco.Forms.Core.Services;
+@using Microsoft.AspNetCore.Http;
+@using Umbraco.Cms.Web.Common;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Forms.Web.Models.FormViewModel>
+@{
+    Dictionary<string, string> keywords = new Dictionary<string, string>();
+    foreach (string key in Context.Session.Keys)
+    {
+        if(key.StartsWith("form."))
+        {
+            keywords.Add(key.Replace("form.", ""), Context.Session.GetString(key)?? "");
+        }
+    }
+
+    foreach(string key in keywords.Keys)
+    {
+        Context.Session.Remove("form." + key);
+    }
+
+    var home = Umbraco.AssignedContentItem.Root();
+
+    string formName = Model.FormName.ToLower().Replace(" ", "_");
+}
+<section id="submitted-form" style="padding: 0px;">
+    <div class="container-lg">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 text-center pb-lg-5">
+                <h2 class="h2">@Umbraco.GetDictionaryValue("thank_you_submitted", "Thank you")</h2>
+                <p><span class="big-text">@Umbraco.GetDictionaryValue(Model.MessageOnSubmit)</span></p>
+                <a title="Back Home" href="@home?.Url()" class="more big-more">
+                    @Umbraco.GetDictionaryValue("back_home", "Back to home")</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@await Html.PartialAsync("Forms/Themes/default/ScrollToFormScript")
+
+<script>
+    dataLayer.push({
+        'event': 'form_submit',
+        'formName': '@formName',
+        @for(var i = 0; i<keywords.Keys.Count; i++)
+        {
+            var k = keywords.Keys.ElementAt(i);
+            string newLabel = k;
+            <text>'@newLabel': '@keywords[k]'</text> if (i + 1 != keywords.Keys.Count) { <text>,</text> }
+            }
+    });
+</script>

@@ -1,0 +1,24 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Contatto>
+@model Crif.It.Models.Contatto
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@{
+	string? dataSection = "";
+	if (ViewData.ContainsKey("section"))
+	{
+		dataSection = (string?)ViewData["section"];
+	}
+}
+
+<div class="col-12 col-lg-6">
+    <div class="custom-card interest shadow fade-in-box card-contatto">
+        <div class="card-body">
+            <div class="icon-wrapper">
+                <img src="@Model.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(Model.IconaCard)">
+            </div>
+            <h3 class="h3 card-title">@Model.TitoloCard</h3>
+            <p>@Model.DescrizioneCard</p>
+            <a title="@Model.LabelLink" href="@Model.Url()" class="more" data-link-type="page" data-link="@Model.TitoloCard" data-link-destination="@Model.Url()" data-link-section="@dataSection">@Model.LabelLink</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MembershipAffirmationsSubpage>
+@{
+    Layout = "Master.cshtml";
+    var ma_children = Model.SiblingsAndSelf();
+}
+
+@if (Model.Parent != null)
+
+{
+    Crif.It.Models.MembershipAffirmations parentME = (Crif.It.Models.MembershipAffirmations)Model.Parent;
+    <section class="textonly-heading pb-lg-3">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12 banner">    
+                    <div class="caption">
+                        @await(Html.PartialAsync("Breadcrumb", Model))
+                        <h1 class="h1 fade-in-box">@parentME.MembershipAffirmationsTitle</h1>
+                        <p class="big-text fade-in-box">@parentME.MembershipAffirmationsDescription</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (ma_children != null && ma_children.Any())
+    {
+        <section class="internal-navigation sticky-top">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <nav>
+                            <ul class="internal-menu justify-content-start">
+                                @foreach (MembershipAffirmationsSubpage ma_child in ma_children)
+                                {
+                                    var items = 0;
+                                    var blocks = ma_child.MembershipAffirmationsSubpageBlocks;
+                                    if(blocks!=null && blocks.Any())
+                                    {
+                                        foreach(Umbraco.Cms.Core.Models.Blocks.BlockListItem block in blocks)
+                                        {
+                                            if(block.Content.GetType().Name == "BlockKeyPoint" && block.Content.HasValue("keyPoints"))
+                                            {
+                                                Umbraco.Cms.Core.Models.Blocks.BlockListModel? kp = (Umbraco.Cms.Core.Models.Blocks.BlockListModel?)block.Content.Value("keyPoints");
+                                                items += kp.Count;
+                                            }
+                                        }
+                                    }
+                                    string counter = items != 0 ? "(" + @items + ")" : "";
+                                    var current = (ma_child.Name == Model.Name) ? "current" : "";
+                                    <li class="nav-item @current"><a title="@ma_child.Name" href="@ma_child.Url()" class="nav-link">@ma_child.Name @counter</a></li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+}
+
+@Html.GetBlockListHtml(Model.MembershipAffirmationsSubpageBlocks)

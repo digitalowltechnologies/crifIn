@@ -1,0 +1,81 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+    ContentModels.BlockForm content = (ContentModels.BlockForm)Model.Content;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+    var grayBackground = content.IsGrayBackGround ? "lightGreyBg2" : "";
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (content.FormDisplay == "Contact")
+    {
+        <section class="pageSection pb-0 @grayBackground">
+            <div class="container">
+                <div class="contact-form">
+                    @if (!content.TitoloForm.IsNullOrWhiteSpace())
+                    {
+                        <h3 class="title ms-0 ms-md-auto">@content.TitoloForm</h3>
+                    }
+                    @await Umbraco.RenderMacroAsync("renderUmbracoForm", new { FormGuid = content.Form, FormTheme = content.Theme, ExcludeScripts = "1" })
+                </div>
+            </div>
+        </section>
+    }
+    else if (content.FormDisplay == "NewsLetter")
+    {
+        <section class="pageSection pt-0 @grayBackground">
+            <div class="container newsletter">
+                <div class="row justify-content-center px-md-5">
+                    <div class="col-md-5 pe-md-5">
+                        @if (!content.TitoloForm.IsNullOrWhiteSpace())
+                        {
+                            <h4 class="">@content.TitoloForm</h4>
+                        }
+                        <p class="mb-0">@content.FormSubtitle</p>
+                    </div>
+                    <div class="col-md-7">
+                        @await Umbraco.RenderMacroAsync("renderUmbracoForm", new { FormGuid = content.Form, FormTheme = content.Theme, ExcludeScripts = "1" })
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="pageSection @grayBackground">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-5">
+                        @if (!content.TitoloForm.IsNullOrWhiteSpace())
+                        {
+                            <h2 class="title ms-0 ms-md-auto">@content.TitoloForm</h2>
+                        }
+                        <p>
+                            @content.FormSubtitle
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-7">
+                        @await Umbraco.RenderMacroAsync("renderUmbracoForm", new { FormGuid = content.Form, FormTheme = content.Theme, ExcludeScripts = "1" })
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    }
+}
+else
+{
+    <section class="contact-form bg pt-120 pb-120">
+        <div class="container-lg overflow-hidden">
+            @if (!content.TitoloForm.IsNullOrWhiteSpace())
+            {
+                <div class="row pt-2 pt-lg-0">
+                    <div class="col-12">
+                        <h2 class="h2 text-center pb-lg-5">@content.TitoloForm</h2>
+                    </div>
+                </div>
+            }
+            @await Umbraco.RenderMacroAsync("renderUmbracoForm", new { FormGuid = content.Form, FormTheme = content.Theme, ExcludeScripts = "1" })
+        </div>
+    </section>
+}

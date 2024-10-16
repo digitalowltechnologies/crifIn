@@ -1,0 +1,89 @@
+﻿@* @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.BlockFeatureBlog> *@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System;
+@using System.Text.RegularExpressions;
+@{
+    ContentModels.BlockFeatureBlog content = (ContentModels.BlockFeatureBlog)Model.Content;
+    var featurearticle = Model?.Content.FeatureArticle;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (content != null)
+    {
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-between">
+
+                    <div class="col-12 col-md-7 col-lg-5">
+
+                        <h2 class="title ms-0">
+                            Trending Topics
+                        </h2>
+                    </div>
+                    <div class="col col-md-auto">
+                        <a href="/blog" class="arrowBtn mt-4">Discover More</a>
+                    </div>
+                </div>
+                <div class="customSwiper swiper-container pb-4 pb-md-5">
+                    <div class="swiper-wrapper">
+                        @foreach (var artcile in featurearticle)
+                        {
+                            <div class="swiper-slide px-2">
+                                <div class="blogCard boxShadow border">
+                                    <img src="@artcile.SfondoHero.LocalCrops.Src" class="blogImg" alt="">
+                                    <div class="p-3">
+                                        <small class="blogDate">@artcile?.Parent.CreateDate.ToString("dd/MM/yyyy")</small>
+                                        <a class="blogTitle" href="blog/@artcile?.Parent.UrlSegment/@artcile.UrlSegment">
+                                            @HtmlUtils.TextCut(@artcile.Name, 30)
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="swiper-pagination customPagination"></div>
+                </div>
+            </div>
+        </section>
+    }
+}
+else
+{
+    @if (content != null)
+    {
+        //var featurearticle = content.FeatureArticle;
+        <section class="pageSection animateThis slideTop">
+            <div class="container popular-blog">
+                <div class="blogsSwiper swiper-container pb-4 pb-md-5">
+                    <div class="swiper-wrapper pt-3">
+                        @foreach (var artcile in featurearticle)
+                        {
+                        //var image = artcile.
+                            <div class="swiper-slide px-2 px-md-3">
+                                <div class="row align-items-center justify-content-between">
+                                    <div class="col-md-6">
+                                        <img src="@artcile.SfondoHero.LocalCrops.Src" alt="" width="100%">
+                                    </div>
+                                    <div class="col-md-6 ps-md-4">
+                                        <h6 class="text-capitalize mt-3">Popular Blog</h6>
+                                        <h1>@artcile.Name</h1>
+
+                                        <p>
+                                        </p>
+                                        <div class="mt-4">
+                                            <a href="@artcile?.Parent.UrlSegment/@artcile.UrlSegment" class="orangeBtn">Read More</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="swiper-pagination customPagination"></div>
+                </div>
+            </div>
+        </section>
+    }
+}

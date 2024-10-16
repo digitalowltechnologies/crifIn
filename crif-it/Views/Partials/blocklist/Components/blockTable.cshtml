@@ -1,0 +1,97 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockTable content = (ContentModels.BlockTable)Model.Content;
+	ContentModels.BlockTableSettings settings = (ContentModels.BlockTableSettings)Model.Settings;
+	var noBorder = settings.HideRowsLabel ? "no-border": "";
+	var bg = settings.GreyBackground ? "bg" : "";
+}
+<section class="advantages-table pt-0 pt-lg-5 @bg" id="@settings.AnchorID">
+	<div class="overflow-auto">
+		<div class="container-lg">
+			@if (!content.TableTitle.IsNullOrWhiteSpace() || content.TableSubtitle != null)
+			{
+				<div class="row justify-content-center">
+					<div class="col-12 col-lg-8">
+						<div class="header">
+							@if (!content.TableTitle.IsNullOrWhiteSpace())
+							{
+								<h2 class="h2 mb-3 mb-lg-4 text-center">@content.TableTitle</h2>
+							}
+							<div class="big-text text-center">
+								@Html.Raw(content.TableSubtitle)
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+			<div class="row pt-3 pt-lg-4">
+				<div class="col-12">
+					<table class="custom-table">
+						<thead>
+							<tr class="@noBorder">
+								<th scope="col"></th>
+								@if (content.ColumnsName != null && content.ColumnsName.Any())
+								{
+									foreach (var clm in content.ColumnsName)
+									{
+										<th scope="col" class="bg-blue">@clm</th>
+									}
+								}
+							</tr>
+						</thead>
+						<tbody>
+							@if (content.TableBody != null && content.TableBody.Any())
+							{
+								foreach (var row in content.TableBody)
+								{
+									ContentModels.BlockTableRow rowContent = (ContentModels.BlockTableRow)row.Content;
+									<tr class="@noBorder">
+										@if (settings.HideRowsLabel)
+										{
+											<th scope="row" class="@noBorder"></th>
+										}
+										else
+										{
+											<th scope="row">@rowContent.RowLabel</th>
+										}
+
+										@if (rowContent.RowEntries != null && rowContent.RowEntries.Any())
+										{
+											foreach (var rowItem in rowContent.RowEntries)
+											{
+												ContentModels.BlockSingleTableEntry rowItemContent = (ContentModels.BlockSingleTableEntry)rowItem.Content;
+												@if (rowItemContent.IsIconField)
+												{
+													<td><img src="@rowItemContent?.SingleIcon?.Url()" alt="@HtmlUtils.GetImageAlt(rowItemContent?.SingleIcon)"></td>
+												}
+												else
+												{
+													<td>@Html.Raw(rowItemContent.TextContent)</td>
+												}
+											}
+										}
+									</tr>
+								}
+							}
+						</tbody>
+						@if (content.FinalCtas != null && content.FinalCtas.Any())
+						{
+							<tfoot>
+								<tr class="">
+									<th scope="row" class="border-0"></th>
+									@foreach (var cta in content.FinalCtas)
+									{
+										<td><a href="@cta.Url" target="@cta.Target" class="btn btn-secondary" data-link-type="cta" data-link="@cta?.Name" data-link-destination="@cta?.Url" data-link-section="@content.TableTitle">@cta?.Name</a></td>
+									}
+								</tr>
+							</tfoot>
+						}
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+

@@ -1,0 +1,60 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Servicess>
+@{
+	Layout = "Master.cshtml";
+	var families = Model.Children()?.Where(x => x.ContentType.Alias == "family");
+}
+@if (Model.TitoloServizi != "")
+{
+	<div class="container-lg">
+		<div class="row justify-content-center">
+			<div class="col-7 col-lg-12">
+				<h1 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloServizi</h1>
+			</div>
+		</div>
+	</div>
+}
+<section class="cards-block" data-section="servizi">
+	<div class="container-lg">
+		<div class="row g-mega g-overflow">
+			@if (families != null && families.Any())
+			{
+				foreach (Family family in families)
+				{
+					var categorie = family?.Children()?.Where(x => x.ContentType.Alias == "category");
+					<div class="col-12 col-lg-6 service">
+						<div class="custom-card shadow">
+							<div class="img-wrapper">
+								<img src="@family?.ImmagineFamily?.Url()" alt="@HtmlUtils.GetImageAlt(family?.ImmagineFamily)">
+							</div>
+							<div class="card-body">
+								<div class="icon-wrapper"><img src="@family?.IconaFamily?.Url()" alt="@HtmlUtils.GetImageAlt(family?.IconaFamily)"></div>
+								<h2 class="h3 card-title">@family?.TitoloFamily</h2>
+								<p>@HtmlUtils.TextCut(family?.AbstractFamily)</p>
+								<a title="Read more" href="@family?.Url()" class="more" data-link-type="page" data-link="@family?.TitoloFamily" data-link-destination="@family?.Url()" data-link-section="@Model.TitoloServizi">@Umbraco.GetDictionaryValue("services_read_more")</a>
+							</div>
+							@if (categorie != null && categorie.Any())
+							{
+								<div>
+									<button class="card-dropdown-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#card-@family?.Id-dropdown" aria-expanded="false" aria-controls="card-@family?.Id-dropdown">@Umbraco.GetDictionaryValue("category_accordion_label")</button>
+								</div>
+								<div class="card-dropdown collapse" id="card-@family?.Id-dropdown">
+									<ul>
+										@foreach (var categoria in categorie)
+										{
+											<li><a title="@categoria.Name" href="@categoria.Url()" data-link-type="page" data-link="@categoria.Name" data-link-destination="@categoria.Url()" data-link-section="@Model.TitoloServizi">@categoria.Name</a></li>
+										}
+									</ul>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
+</section>
+
+@Html.GetBlockListHtml(Model.BlocchiServizi)

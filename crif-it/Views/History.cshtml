@@ -1,0 +1,11 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    var decades = Model.Children();
+
+    if(decades!=null){
+        var latest = decades.OrderByDescending(decades => decades.Name).FirstOrDefault();
+        @(await Html.PartialAsync("Decade",latest));
+    }  
+
+}

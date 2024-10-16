@@ -1,0 +1,22 @@
+﻿@using Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@{
+    string? url = ViewData.ContainsKey("url") ? (string?)ViewData["url"] : "";
+    string? category = ViewData.ContainsKey("category") ? (string?)ViewData["category"] : "";
+    string? dataSection = ViewData.ContainsKey("section") ? (string?)ViewData["section"] : "";
+    string? linkTarget = ViewData.ContainsKey("target") ? (string?)ViewData["target"] : "_self";
+    string? linkName = ViewData.ContainsKey("name") ? (string?)ViewData["name"] : "";
+    string? linkTitle = ViewData.ContainsKey("title") ? (string?)ViewData["title"] : "";
+    string? cssClass = ViewData.ContainsKey("css") ? (string?)ViewData["css"] : "";
+
+}
+@if(url!="" && url!=null){
+    var contentAlias = UmbracoContext?.Content?.GetByRoute(url)?.GetTemplateAlias();
+    if(contentAlias == "Articolo" || contentAlias == "ArticoloStorieDiSuccesso")
+    {
+        <a title="@linkName" href="@url" target="@linkTarget" class="@cssClass" data-link-type="article" data-link-category="@category" data-link="@linkTitle" data-link-destination="@url" data-link-section="@dataSection">@linkName</a>
+    } else
+    {
+        <a title="@linkName" href="@url" target="@linkTarget" class="@cssClass" data-link-type="page" data-link="@linkTitle" data-link-destination="@url" data-link-section="@dataSection">@linkName</a>
+    }
+}

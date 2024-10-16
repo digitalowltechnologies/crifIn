@@ -1,0 +1,133 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockFullwidthBanner? content = (ContentModels.BlockFullwidthBanner?)Model.Content;
+    ContentModels.BlockGeneralBlockSettings? settings = (ContentModels.BlockGeneralBlockSettings?)Model.Settings;
+}
+@if(settings != null && settings.NewTemplate)
+{
+    @if (@settings?.AnchorID == "HalfBanner")
+    {
+        <section class="pageSection">
+            <div class="container">
+                <div class="infoSection">
+                    <div class="infoDetail px-3 px-lg-5 py-5">
+                        @if (!string.IsNullOrEmpty(content?.Title))
+                        {
+                            <h2 class="title colorWhite ms-0">@content?.Title</h2>
+                        }
+
+                        @Html.Raw(content?.Text)
+                        <button class="orangeBtn mt-4" href="@content?.CallToAction?.Url">@content?.CallToAction?.Name</button>
+                    </div>
+                    <div class="infoImg">
+                        <img src="@content?.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Image)" class="animateThis slideLeft in-view" />
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else if (@settings?.AnchorID == "HalfBannerLeft")
+    {
+        <section>
+            <div class="lightGreyBg infoSection colorFont">
+                <div class="infoImg" style="right: auto;left: 0;">
+                    <img src="@content?.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Image)" class="animateThis slideLeft" style="object-position: right;" />
+                </div>
+                <div class="infoDetail px-3 px-lg-5 py-5 my-xl-5" style="float: right;">
+                    @if (!string.IsNullOrEmpty(content?.Title))
+                    {
+                        <h2 class="title ms-0">@content?.Title</h2>
+                    }
+                    @Html.Raw(content?.Text)
+
+                    <button class="orangeBtn mt-4" href="@content?.CallToAction?.Url">@content?.CallToAction?.Name</button>
+                </div>
+            </div>
+        </section>
+    }
+    else if (@settings?.AnchorID == "FullBannerLeft")
+    {
+        <section class="pageSection">
+            <div class="container">
+                <div class="row justify-content-center justify-content-md-between">
+                    <div class="col-10 col-lg-5 mb-4 mb-md-0">
+                        <img src="@content?.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Image)" class="animateThis fadeGrow w-100" />
+                    </div>
+                    <div class="col-12 col-lg-6 text-center text-lg-start">
+                        @if (!string.IsNullOrEmpty(content?.Title))
+                        {
+                            <h2 class="title ms-lg-0">@content?.Title</h2>
+                        }
+                        @Html.Raw(content?.Text)
+                        <button class="orangeBtn mt-lg-4 mx-auto ms-lg-0" href="@content?.CallToAction?.Url">@content?.CallToAction?.Name</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    }
+    else if (@settings?.AnchorID == "FullBanner")
+    {
+        <section class="innerBanner bannerGradient leadershipBanner" style="background-image: url('@content?.Image?.Url()');">
+            <div class="container innerBannerContent">
+                <div>
+                    @if (!string.IsNullOrEmpty(content?.Title))
+                    {
+                        <h1 class="innerBannerTitle">@content?.Title</h1>
+                    }
+                    @Html.Raw(content?.Text)
+
+                    @await (Html.PartialAsync("BreadcrumbNew", Umbraco.AssignedContentItem))
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+
+        <section class="innerBanner sideImgBanner smallBanner mb-0">
+            <img src="" class="trianglePatch animateThis slideLeft animateDelay" />
+            <div class="container innerBannerContent">
+                <div>
+                    @if (!string.IsNullOrEmpty(content?.Title))
+                    {
+                        <h1 class="innerBannerTitle">@content?.Title</h1>
+                    }
+                    <div class="innerBannerText">
+                        <p>@Html.Raw(content?.Text)</p>
+                    </div>
+                    @await (Html.PartialAsync("BreadcrumbNew", Umbraco.AssignedContentItem))
+                </div>
+            </div>
+            <img src="@content?.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Image)" class="bannerSideImg animateThis slideLeft" />
+            <!-- <img src="images/trans-patch-small.png" class="trianglePatch animateThis slideLeft animateDelay1"/> -->
+        </section>
+    }
+}
+else
+{
+    <section class="blue-hero" data-section="full-width-banner" id="@settings?.AnchorID">
+        <div class="container-lg h-100">
+            <div class="row h-100">
+                <div class="col-12 banner">
+                    <div class="img-wrapper">
+                        <img src="@content?.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Image)">
+                    </div>
+                    <div class="caption">
+                        @if (!string.IsNullOrEmpty(content?.Title))
+                        {
+                            <h2 class="h2 white pb-2 pb-lg4">@content?.Title</h2>
+                        }
+                        @Html.Raw(content?.Text)
+                        <a title="@content?.CallToAction?.Name" href="@content?.CallToAction?.Url" class="more d-inline" data-link-type="cta" data-link="@content?.CallToAction?.Name" data-link-destination="@content?.CallToAction?.Url" data-link-section="@content?.Title">@content?.CallToAction?.Name</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+

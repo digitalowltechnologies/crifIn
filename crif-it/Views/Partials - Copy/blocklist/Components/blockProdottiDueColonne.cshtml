@@ -1,0 +1,32 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+	ContentModels.BlockProdottiDueColonne content = (ContentModels.BlockProdottiDueColonne)Model.Content;
+	var settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+	var centerText = content?.ContenutoColonne?.Count == 1 ? "d-flex justify-content-center" : "";
+}
+@if (content?.ContenutoColonne != null && content.ContenutoColonne.Any())
+{
+	<section class="sic">
+		<div class="container-lg">
+			<div class="row g-mega g-overflow @centerText">
+				@foreach (var colonna in content.ContenutoColonne)
+				{
+					var contentCol = (ContentModels.BlockTextAndLink)colonna.Content;
+					<div class="col-12 col-lg-6">
+						@if (contentCol.Title != "")
+						{
+							<h2 class="h2">@contentCol.Title</h2>
+						}
+						@Html.Raw(contentCol.Text)
+						@if (contentCol.CallToAction != null)
+						{
+							<a href="@contentCol.CallToAction.Url" class="btn btn-primary btn-large px-3 restricted-cta" data-link-type="cta" data-link="@contentCol?.CallToAction?.Name" data-link-destination="@contentCol?.CallToAction?.Url" data-link-section="@contentCol?.Title">@contentCol?.CallToAction.Name</a>
+						}
+
+					</div>
+				}
+			</div>
+		</div>
+	</section>
+}

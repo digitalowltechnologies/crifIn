@@ -1,0 +1,47 @@
+﻿@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockReportCard content = (ContentModels.BlockReportCard)Model.Content;
+}
+
+@if (content != null)
+{
+
+
+    <section class="pageSection" id="commercial">
+        <div class="container text-center">
+            <div class="titleSection">
+                @if (!string.IsNullOrEmpty(content.Title))
+                {
+                    <h2 class="title">@content.Title</h2>
+                }
+                <p>
+                    @content.Description
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                @foreach (var report in content.BlockList)
+                {
+                    var listContent = (ContentModels.BlockCardProduct1)report.Content;
+                    <div class="col-12 col-md-6 col-lg-4 mt-4">
+                        <div class="iconCard blueCard border bgWhite colorFont boxShadow h-auto animateThis slideTop pb-md-4">
+                            <div class="cardTop">
+                                <h3>@listContent.Title</h3>
+                                <img src="@listContent.Icon?.Url()" alt="" class="me-0" />
+                            </div>
+                            <div class="cardBtm">
+                                <p>
+                                    @listContent.Text
+                                </p>
+                                <div class="hiddenContent">
+                                    @listContent.Innertext
+                                </div>
+                                <button class="readMoreBtn">+</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

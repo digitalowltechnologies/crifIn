@@ -1,0 +1,199 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@using ContentModels = Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<NewsEdEventi>
+@{
+    Layout = "NewMaster.cshtml";
+    var newseventi = Model.Children();
+    var filter = "All";
+    if (Context.Request.Query["filter"].ToString() != "")
+    {
+        filter = Context.Request.Query["filter"].ToString();
+    }
+
+    IOrderedEnumerable<IPublishedContent>? articoli;
+    IOrderedEnumerable<IPublishedContent>? articoliall;
+    if (filter == "All")
+    {
+        articoli = Model.DescendantsOfType("Articolo").OrderByDescending(x => x.Value("dataCustom"));
+        articoliall = Model.DescendantsOfType("Articolo").OrderByDescending(x => x.Value("dataCustom"));
+    }
+    else
+    {
+        articoliall = Model.DescendantsOfType("Articolo").OrderByDescending(x => x.Value("dataCustom"));
+        articoli = Model.DescendantsOfType("Articolo").Where(x => x.Parent?.Name == filter).OrderByDescending(x => x.Value("dataCustom"));
+
+    }
+
+
+    var pageSize = 15;
+    if (Model.ElementiPerPagina > 0)
+    {
+        pageSize = Model.ElementiPerPagina;
+    }
+
+    var page = 1; int.TryParse(Context.Request.Query["page"], out page);
+
+    var totalPages = 1;
+    if (articoli != null && articoli.Count() > pageSize)
+    {
+        totalPages = (articoli.Count() / pageSize) + ((articoli?.Count() % pageSize > 0) ? 1 : 0);
+    }
+
+    if (page > totalPages)
+    {
+        page = totalPages;
+    }
+    else if (page < 1)
+    {
+        page = 1;
+    }
+}
+<link href="~/assets/css/blog.css" rel="stylesheet" />
+<main>
+    <section class="py-4 lightGreyBg2">
+        <div class="container">
+            <h2>@Model?.TitoloNews</h2>
+            <div class="breadcrumb">
+                <span>@await (Html.PartialAsync("BreadcrumbNew", Umbraco.AssignedContentItem))</span>
+            </div>
+        </div>
+    </section>
+    @Html.GetBlockListHtml(Model?.Blocchi)
+
+    @if (Model != null && Model.MostrareListing)
+    {
+        <section class="">
+            <div class="container">
+                <div class="read-about p-4">
+                    <h2>
+                        I want to read about
+                        <span>
+
+                            @if (articoliall != null && articoliall.Any())
+                            {
+                                // Define uniqueParentNames outside the code block
+                                var uniqueParentNames = articoliall.Select(a => a.Parent?.Name).Distinct().ToList();
+                                <select class="form-select text-lowercase" id="filter">
+                                    @if (filter == "All")
+                                    {
+                                        <option value="All" selected>everything</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="All">everything</option>
+                                    }
+
+                                    @foreach (string name in uniqueParentNames)
+                                    {
+                                        @if (filter == @name)
+                                        {
+                                            <option value="@name" selected>@name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@name">@name</option>
+                                        }
+                                    }
+                                </select>
+                            }
+                        </span>
+                    </h2>
+                </div>
+            </div>
+        </section>
+        <section class="pageSection">
+            <div class=" container blogs">
+                <div class="row">
+                    @if (articoli != null && articoli.Any())
+                    {
+
+                        @foreach (Articolo art in articoli.Skip((page - 1) * pageSize).Take(pageSize))
+                        {
+                            @(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData) { { "list", "related" }, { "section", @Model.TitoloAggiornamenti } }))
+                        }
+                    }
+                </div>
+                @if (totalPages > 1)
+                {
+                    <ul class=" row mt-5  pagination d-flex justify-content-center ">
+                        <div class="col-lg-7  d-flex justify-content-end">
+                            @(await Html.PartialAsync("PaginationNew", new PagModel { PageIndex = (int)page, TotalCount = (int)totalPages }))
+                        </div>
+                    </ul>
+                }
+            </div>
+        </section>
+    }
+    @Html.GetBlockListHtml(Model?.AltriBlocchi)
+</main>
+<script>
+    document.getElementById('filter').addEventListener('change', function () {
+        var selectedFilter = this.value;
+        var currentUrl = new URL(window.location.href);
+
+        // Clear any existing search parameters
+        currentUrl.searchParams.delete('filter'); // Remove existing "filter" key if present
+        currentUrl.search = ''; // Remove any other query string parameters
+
+        // Append the new "filter" key-value pair
+        currentUrl.searchParams.append('filter', selectedFilter);
+
+        window.location.href = currentUrl.toString();
+    });
+</script>
+@* @if (newseventi != null && newseventi.Any())
+{
+	<div class="decade-banner z-10">
+		<section class="internal-navigation mt-3 mt-lg-5">
+			<div class="container-lg">
+				<div class="row">
+					<div class="col-12">
+						<nav>
+							<ul class="internal-menu">
+								<li class="nav-item current"><a title="@Model?.Name" href="@Model?.Url()" class="nav-link" data-link-type="filter" data-link-destiantion="@Model?.Url()" data-link-filterCategory="@Umbraco.GetDictionaryValue("tutti_news_eventi")" data-link-filterScroll="undefined">@Umbraco.GetDictionaryValue("tutti_news_eventi")</a></li>
+								@foreach (var news in newseventi.OrderBy(newseventi => newseventi.Value("ordineCustom")))
+								{
+									<li class="nav-item"><a title="@news.Name" href="@news.Url()" class="nav-link" data-link-type="filter" data-link-destiantion="@news.Url()" data-link-filterCategory="@news.Name" data-link-filterScroll="undefined">@news.Name</a></li>
+								}
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+} *@
+@* @if (Model != null && Model.MostrareListing)
+{
+    <section class="vertical-cards-block bg pt-0 pt-lg-4 pb-80">
+        <div class="container-lg">
+            @if (Model.TitoloAggiornamenti != "")
+            {
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloAggiornamenti</h2>
+                    </div>
+                </div>
+            }
+            @if (articoli != null && articoli.Any())
+            {
+                <div class="row g-large">
+                    @foreach (Articolo art in articoli.Skip((page - 1) * pageSize).Take(pageSize))
+                    {
+                        @(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData) { { "list", "related" }, { "section", @Model.TitoloAggiornamenti } }))
+                    }
+                </div>
+            }
+
+            @if (totalPages > 1)
+            {
+                <div class="row pt-4 mt-2 mt-lg-0">
+                    @(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)page, TotalCount = (int)totalPages }))
+                </div>
+            }
+        </div>
+    </section>
+} *@
+

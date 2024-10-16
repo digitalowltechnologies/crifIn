@@ -1,0 +1,177 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System.Web;
+@{
+    ContentModels.BlockListCardIconaTitoloDescrizione content = (ContentModels.BlockListCardIconaTitoloDescrizione)Model.Content;
+    var settings = (ContentModels.BlockListCardIconaTitoloDescrizioneSettings)Model.Settings;
+    var background = settings.BackgroundGrigio ? "bg" : "";
+    var newbackground = settings.BackgroundGrigio ? "lightGreyBg2" : "";
+    var i = 1;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (@settings?.AnchorID == "CreditScoreSteps")
+    {
+        <section class="pageSection pt-0 @newbackground" id="@settings?.AnchorID">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(content.TitoloSezione))
+                {
+                    <h2 class="title text-center">@content.TitoloSezione</h2>
+                }
+                <div class="row mx-lg-5">
+                    @foreach (var card in content?.ListaCard)
+                    {
+                        ContentModels.BlockCardIconaTestoDescrizione cardContent = (ContentModels.BlockCardIconaTestoDescrizione)card.Content;
+                        @if (cardContent.IconaCard != null)
+                        {
+                            <div class="col-12 col-md-4">
+                                <div class="roundIconCard bigIcon">
+                                    <img src="@cardContent.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent.IconaCard)" class="animateThis fadeGrow" />
+                                    @if (!string.IsNullOrEmpty(@cardContent.TitoloCard))
+                                    {
+                                        <h5 class="">@cardContent.TitoloCard</h5>
+                                    }
+                                </div>
+                            </div>
+
+                        }
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+
+        <section class="py-5 @newbackground position-relative">
+            <div class="container" style="position: relative;z-index: 1;">
+                <div class="row">
+                    @foreach (var card in content?.ListaCard)
+                    {
+                        ContentModels.BlockCardIconaTestoDescrizione cardContent = (ContentModels.BlockCardIconaTestoDescrizione)card.Content;
+                        @if (cardContent.IconaCard == null)
+                        {
+                            <div class="col-12 col-lg-5 pe-md-5">
+                                <h2 class="title ms-0">@cardContent.TitoloCard</h2>
+                                @if (cardContent.DescrizioneCard != "")
+                                {
+                                    <p class="">@HtmlUtils.TextCut(@cardContent.DescrizioneCard)</p>
+                                }
+                                @if (cardContent.LinkCard != null)
+                                {
+
+                                    <a title="@cardContent.LinkCard.Name" href="@cardContent.LinkCard.Url" target="@cardContent.LinkCard.Target" class="orangeBtn mt-4" data-link-type="internal-link" data-link="@cardContent.TitoloCard" data-section="card-icona-testo">@cardContent.LinkCard.Name</a>
+                                }
+                            </div>
+                        }
+                    }
+                    <div class="col col-lg-7">
+                        <div class="row pb-5">
+
+                            @foreach (var card in content?.ListaCard)
+                            {
+                                ContentModels.BlockCardIconaTestoDescrizione cardContent = (ContentModels.BlockCardIconaTestoDescrizione)card.Content;
+                                @if (cardContent.IconaCard != null)
+                                {
+
+                                    <div class="col-12 col-md-6 pt-4 pt-md-0">
+                                        @if (i == 1)
+                                        {
+                                            <div class="iconCard blueCard boxShadow animateThis slideTop mt-4 mt-lg-5 mt-xl-0">
+                                                <div class="d-flex justify-content-between w-100">
+                                                    <h5 class="colorWhite">@cardContent.TitoloCard</h5>
+                                                    <img src="@cardContent.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent.IconaCard)" />
+                                                </div>
+                                                @if (cardContent.DescrizioneCard != "")
+                                                {
+                                                    <p class="mb-4">@HtmlUtils.TextCut(@cardContent.DescrizioneCard)</p>
+                                                }
+                                                @if (cardContent.LinkCard != null)
+                                                {
+
+                                                    <a title="@cardContent.LinkCard.Name" href="@cardContent.LinkCard.Url" target="@cardContent.LinkCard.Target" class="arrowBtn whiteArrowBtn" data-link-type="internal-link" data-link="@cardContent.TitoloCard" data-section="card-icona-testo">@cardContent.LinkCard.Name</a>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="iconCard blueCard boxShadow animateThis slideTop mt-4 mt-lg-5">
+                                                <div class="d-flex justify-content-between w-100">
+                                                    <h5 class="colorWhite">@cardContent.TitoloCard</h5>
+                                                    <img src="@cardContent.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent.IconaCard)" />
+                                                </div>
+                                                @if (cardContent.DescrizioneCard != "")
+                                                {
+                                                    <p class="mb-4">@HtmlUtils.TextCut(@cardContent.DescrizioneCard)</p>
+                                                }
+                                                @if (cardContent.LinkCard != null)
+                                                {
+
+                                                    <a title="@cardContent.LinkCard.Name" href="@cardContent.LinkCard.Url" target="@cardContent.LinkCard.Target" class="arrowBtn whiteArrowBtn" data-link-type="internal-link" data-link="@cardContent.TitoloCard" data-section="card-icona-testo">@cardContent.LinkCard.Name</a>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    i++;
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="blueVectorBg1 animateThis slideLeft"></div>
+            <div class="blueVectorBg2 animateThis animateDelay slideLeft "></div>
+        </section>
+    }
+}
+else
+{
+    <section class="cards-block @background" data-section="card-icona-testo">
+        <div class="container-lg">
+            @if (!string.IsNullOrEmpty(content.TitoloSezione))
+            {
+                <div class="row justify-content-center">
+                    <div class="col-7 col-lg-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@content.TitoloSezione</h2>
+                    </div>
+                </div>
+            }
+            <div class="row g-mega g-overflow">
+                @foreach (var card in content?.ListaCard)
+                {
+                    ContentModels.BlockCardIconaTestoDescrizione cardContent = (ContentModels.BlockCardIconaTestoDescrizione)card.Content;
+                    <div class="col-12 col-lg-6">
+                        <div class="custom-card industry shadow fade-in-box">
+                            <div class="card-body">
+                                @if (cardContent.IconaCard != null)
+                                {
+                                    <div class="icon-wrapper">
+                                        <img src="@cardContent.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent.IconaCard)">
+                                    </div>
+                                }
+
+                                <h3 class="h3 card-title">@cardContent.TitoloCard</h3>
+                                @if (cardContent.DescrizioneCard != "")
+                                {
+                                    <p>@HtmlUtils.TextCut(@cardContent.DescrizioneCard)</p>
+                                }
+                                @if (cardContent.LinkCard != null)
+                                {
+                                    @if (settings.CardCliccabile)
+                                    {
+                                        <a href="@cardContent.LinkCard.Url" class="stretched-link" target="@cardContent.LinkCard.Target" data-link-type="internal-link" data-link="@cardContent.TitoloCard" data-section="card-icona-testo"></a>
+                                    }
+                                    else
+                                    {
+                                        <a title="@cardContent.LinkCard.Name" href="@cardContent.LinkCard.Url" target="@cardContent.LinkCard.Target" class="more" data-link-type="internal-link" data-link="@cardContent.TitoloCard" data-section="card-icona-testo">@cardContent.LinkCard.Name</a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

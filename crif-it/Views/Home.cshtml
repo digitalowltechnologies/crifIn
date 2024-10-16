@@ -1,0 +1,156 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Home>
+@using Crif.It.Utils;
+
+@{
+    Layout = "NewMaster.cshtml";
+    var url = Model.Url(System.Threading.Thread.CurrentThread.CurrentCulture.Name, UrlMode.Absolute);
+}
+<main>
+    <!--hero banner -->
+    @*<section class="hero-slider hero-style">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="slide-inner">
+                        <div class="slide-bg-image d-none d-md-block" data-swiper-parallax="-700"
+                             data-background="images/banners/dummy-banner-1.png"></div>
+                        <div class="slide-bg-image d-md-none" data-swiper-parallax="-700"
+                             data-background="images/banners/dummy-banner-1-mob.png"></div>
+                        <div class="container">
+                            <div class="slide-title">
+                                <h2>CreditScape Vol XII</h2>
+                            </div>
+                            <div class="slide-text">
+                                <p>Expanding Outreach of Mass Market Lending September 2022</p>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="slide-btns">
+                                <p>Access more such insights in <b>CRIF's CreditScape Report</b> </p>
+                                <a href="#" class="orangeBtn d-none d-md-block">Know More</a>
+                                <a href="#" class="arrowBtn orangeArrowBtn d-md-none">Know More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="slide-inner">
+                        <div class="slide-bg-image d-none d-md-block" data-swiper-parallax="-700"
+                             data-background="@Model.HomeCoverImage?.Url()"></div>
+                        <div class="slide-bg-image d-md-none" data-swiper-parallax="-700"
+                             data-background="@Model.HomeCoverImage?.Url()"></div>
+                        <div class="container">
+                            @if (!string.IsNullOrEmpty(Model.HomeCoverTitle))
+                            {
+                                <div class="slide-title">
+                                    <h2>@Model.HomeCoverTitle</h2>
+                                </div>
+
+                                <div class="slide-text">
+                                    <p>Expanding Outreach of Mass Market Lending September 2022</p>
+                                </div>
+                            }
+                           
+                            
+                            <div class="clearfix"></div>
+                            <div class="slide-btns">
+                                <p>Access more such insights in <b>CRIF's CreditScape Report</b> </p>
+                                <a title="@Model.HomeCoverCta?.Name" href="@Model.HomeCoverCta?.Url" class="orangeBtn d-none d-md-block"
+                                   target="@Model.HomeCoverCta?.Target" data-link-type="internal-link" data-link="@Model.HomeCoverCta?.Name" data-section="@Model.HomeCoverTitle">
+                                    @Model.HomeCoverCta?.Name
+                                </a>
+
+                                <a title="@Model.HomeCoverCta?.Name" href="@Model.HomeCoverCta?.Url" class="arrowBtn orangeArrowBtn d-md-none"
+                                   target="@Model.HomeCoverCta?.Target" data-link-type="internal-link" data-link="@Model.HomeCoverCta?.Name" data-section="@Model.HomeCoverTitle">
+                                    @Model.HomeCoverCta?.Name
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="slide-inner">
+                        <div class="slide-bg-image d-none d-md-block" data-swiper-parallax="-700"
+                             data-background="images/banners/dummy-banner-2.png"></div>
+                        <div class="slide-bg-image d-md-none" data-swiper-parallax="-700"
+                             data-background="images/banners/dummy-banner-2-mob.png"></div>
+                        <div data-swiper-parallax="300" class="container">
+                            <div class="slide-title">
+                                <h2>Your Credit Score is your gateway to better opportunities </h2>
+                            </div>
+                            <div class="slide-text">
+                                <p>Check Your Free CRIF Credit Score Today!</p>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="slide-btns">
+                                <a href="./credit-score.html" class="orangeBtn d-none d-md-block">Get free Score Now</a>
+                                <a href="./credit-score.html" class="arrowBtn orangeArrowBtn d-md-none">Get free Score Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="slide-inner">
+                        <div class="slide-bg-image d-none d-md-block" data-swiper-parallax="-700"
+                             data-background="images/banners/dummy-banner-3.png"></div>
+                        <div class="slide-bg-image d-md-none" data-swiper-parallax="-700"
+                             data-background="images/banners/dummy-banner-3-mob.png"></div>
+                        <div data-swiper-parallax="300" class="container">
+                            <div class="slide-title">
+                                <h2>Wish to reduce losses due to Identity Fraud?</h2>
+                            </div>
+                            <div class="slide-text">
+                                <p>Protect your lending business against identity fraud with </p>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="slide-btns">
+                                <a href="./application-fraud-sherlol-lending.html" class="orangeBtn d-none d-md-block">Know More</a>
+                                <a href="./application-fraud-sherlol-lending.html" class="arrowBtn orangeArrowBtn d-md-none">Know More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- end swiper-wrapper -->
+            <div class="container">
+                <div class="swiper-pagination"></div>
+            </div>
+            <!-- swipper controls -->
+            <!-- <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div> -->
+        </div>
+    </section>
+*@
+
+
+@Html.GetBlockListHtml(Model.Blocks)
+</main>
+<script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "Organization",
+      "url": "https://www.crif.com/",
+      "logo": "https://www.crif.com/assets/img/logo-crif.svg"
+    }
+</script>
+
+<script type="application/ld+json">
+    {
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "url": "@url",
+    "potentialAction": {
+    "@@type": "SearchAction",
+    "target": {
+    "@@type": "EntryPoint",
+    "urlTemplate":
+    "https://www.crif.com/search-results/?s={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+    }
+    }
+</script>

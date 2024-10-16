@@ -1,0 +1,27 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<About>
+@{
+    Layout = "Master.cshtml";
+}
+<section class="internal-heading pb-lg-3">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12 banner">
+                <div class="img-wrapper">
+                    <img src="@Model.CoverImage?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverImage)">
+                    <!--<div class="parallax-img" style="background-image: url(@Model.CoverImage?.Url());"></div>-->
+                </div>
+                <div class="caption">
+                    @await(Html.PartialAsync("Breadcrumb", Model))
+                    <h1 class="h1 fade-in-box">@Model.AboutTitle</h1>
+                    <p class="big-text fade-in-box">@HtmlUtils.TextCut(Model.AboutDescription, 200)</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@Html.GetBlockListHtml(Model.Blocks)

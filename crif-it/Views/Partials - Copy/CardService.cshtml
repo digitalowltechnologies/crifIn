@@ -1,0 +1,39 @@
+﻿@model Crif.It.Models.Service
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Service>
+
+@{
+    var description = string.IsNullOrEmpty(Model.ServiceAbstract) ? Model.ServiceDescription : Model.ServiceAbstract;
+    var solutions = Model.Children()?.Where(x => x.ContentType.Alias == "solutions");
+}
+<div class="col-12 col-lg-6 service">
+    <div class="custom-card shadow">
+        <div class="img-wrapper">
+            <img src="@Model.CoverImage?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverImage)">
+        </div>
+        <div class="card-body">
+            <div class="icon-wrapper"><img src="@Model.CoverIcon?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverIcon)"></div>
+            @if (!string.IsNullOrEmpty(Model.ServiceTitle))
+            {
+                <h2 class="h3 card-title">@Model.ServiceTitle</h2>
+            }
+            <p>@HtmlUtils.TextCut(description)</p>
+            <a title="Read more" href="@Model.Url()" class="more" data-link-type="internal-link" data-link="@Model.ServiceTitle" data-section="services">@Umbraco.GetDictionaryValue("service_read_more")</a>
+        </div>
+        @if (solutions != null && solutions.Any())
+        {
+            <div>
+                <button class="card-dropdown-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#card-@Model.Id-dropdown" aria-expanded="false" aria-controls="card-@Model.Id-dropdown">@Umbraco.GetDictionaryValue("solutions_accordion_label")</button>
+            </div>
+            <div class="card-dropdown collapse" id="card-@Model.Id-dropdown">
+                <ul>
+                    @foreach (var solution in solutions)
+                    {
+                        <li><a title="@solution.Name" href="@solution.Url()" data-link-type="internal-link" data-link="@solution.Name">@solution.Name</a></li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,171 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@using ContentModels = Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<TrendTopicTag>
+@{
+	Layout = "Master.cshtml";
+	var tags = Model?.SiblingsAndSelf()?.Where(x => x.ContentType.Alias == "trendTopicTag");
+	TrendTopics? trend = (TrendTopics?)Model?.Parent;
+}
+<section class="textonly-heading pb-lg-3">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12 banner">
+				<div class="caption">
+					@await (Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem.Parent))
+					<h1 class="h1 fade-in-box">@trend?.TitoloTrend</h1>
+					<p class="big-text fade-in-box">@trend?.DescrizioneTrend</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+@if(tags!=null && tags.Any())
+{
+	<div class="decade-banner z-10">
+		<section class="internal-navigation mt-3 mt-lg-5">
+			<div class="container-lg">
+				<div class="row">
+					<div class="col-12">
+						<nav>
+							<ul class="internal-menu">
+								<li class="nav-item"><a title="@trend?.Name" href="@trend?.Url()" class="nav-link" data-link-type="filter" data-link-destiantion="@trend?.Url()" data-link-filterCategory="@Umbraco.GetDictionaryValue("tutti_trends")" data-link-filterScroll="undefined">@Umbraco.GetDictionaryValue("tutti_trends")</a></li>
+								@foreach (var tag in tags.OrderBy(tags => tags.Value("ordineCustom")))
+								{
+									var current = (tag.Name == Model?.Name) ? "current" : "";
+									<li class="nav-item @current"><a title="@tag.Name" href="@tag.Url()" class="nav-link" data-link-type="filter" data-link-destiantion="@tag.Url()" data-link-filterCategory="@tag.Name" data-link-filterScroll="undefined">@tag.Name</a></li>
+								}
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+}
+@Html.GetBlockListHtml(Model?.PrimiBlocchi)
+@if(Model!=null && Model.MostrareListing){
+	@if(Model!=null && Model.MostrareListing){
+	List<Articolo> articoli = new List<Articolo>();
+	var arts = Model.Root()?.DescendantsOfType("Articolo").Where(x => x.Value("trendTopic") != null).OrderByDescending(x => x.Value("dataCustom"));
+	if(arts!=null && arts.Any())
+	{
+			foreach(Articolo art in arts)
+			{
+				if(art.TrendTopic!=null && art.TrendTopic.Any()){
+					foreach(TrendTopicTag item in art.TrendTopic)
+					{
+						if(item.Name == Model.Name)
+						{
+							articoli.Add(art);
+						}
+					}
+				}
+			}
+			var pageSize = 9;
+		if (Model.ElementiPerPagina > 0)
+		{
+			pageSize = Model.ElementiPerPagina;
+		}
+
+		var page = 1; int.TryParse(Context.Request.Query["page"], out page);
+		var totalPages = 1;
+		if (articoli != null && articoli.Count() > pageSize)
+		{
+			totalPages = (articoli.Count() / pageSize) + ((articoli?.Count() % pageSize > 0) ? 1 : 0);
+		}
+
+		if (page > totalPages)
+		{
+			page = totalPages;
+		}
+		else if (page < 1)
+		{
+			page = 1;
+		}
+
+		<section class="vertical-cards-block bg pt-0 pt-lg-4 pb-80">
+		<div class="container-lg">
+			@if (Model.TitoloListing != "")
+			{
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloListing</h2>
+                    </div>
+                </div>
+			}
+			@if (articoli != null && articoli.Any())
+			{
+				<div class="row g-large">
+					@foreach (Articolo art in articoli.Skip((page - 1) * pageSize).Take(pageSize))
+					{
+						@(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData){ {"list", "category" },{"section",@Model.TitoloListing} }))
+					}
+				</div>
+			}
+
+			@if (totalPages > 1)
+			{
+				<div class="row pt-4 mt-2 mt-lg-0">
+					@(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)page, TotalCount = (int)totalPages }))
+				</div>
+			}
+		</div>
+	</section>
+	}
+}
+	@Html.GetBlockListHtml(Model?.AltriBlocchi)
+}
+@if(Model!=null && Model.MostrareSezioneAutomatica){
+	var categorie = Model?.Root()?.DescendantsOrSelf()?.Where(x => x.ContentType.Alias == "category");
+	if(categorie!= null && categorie.Any())
+	{
+		<section class="cards-block bg" data-section="categorie">
+			<div class="container-lg">
+				@if (Model?.TitoloSezioneAutomatica != "")
+				{
+				<div class="row justify-content-center">
+					<div class="col-7 col-lg-12">
+						<h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model?.TitoloSezioneAutomatica</h2>
+					</div>
+				</div>
+				}
+				<div class="row g-mega g-overflow">
+				@foreach (Category cat in categorie)
+				{
+					var soluzioni = cat?.Children()?.Where(x => x.ContentType.Alias == "soluzione");
+					<div class="col-12 col-lg-6 service">
+						<div class="custom-card shadow">
+							<div class="img-wrapper">
+								<img src="@cat?.ImmagineCategory?.Url()" alt="@HtmlUtils.GetImageAlt(cat?.ImmagineCategory)">
+							</div>
+							<div class="card-body">
+								<div class="icon-wrapper"><img src="@cat?.IconaCategory?.Url()" alt="@HtmlUtils.GetImageAlt(cat?.IconaCategory)"></div>
+								<h2 class="h3 card-title">@cat?.TitoloCategory</h2>
+								<p>@HtmlUtils.TextCut(cat?.AbstractCategory)</p>
+								<a title="Read more" href="@cat?.Url()" class="more" data-link-type="page" data-link="@cat?.TitoloCategory" data-link-destination="@cat?.Url()" data-link-section="@Model?.TitoloSezioneAutomatica">@Umbraco.GetDictionaryValue("family_read_more")</a>
+							</div>
+							@if (soluzioni != null && soluzioni.Any())
+							{
+								<div>
+									<button class="card-dropdown-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#card-@cat?.Id-dropdown" aria-expanded="false" aria-controls="card-@cat?.Id-dropdown">@Umbraco.GetDictionaryValue("soluzioni_accordion_label")</button>
+								</div>
+								<div class="card-dropdown collapse" id="card-@cat?.Id-dropdown">
+									<ul>
+										@foreach (var soluzione in soluzioni)
+										{
+											<li><a title="@soluzione.Name" href="@soluzione.Url()" data-link-type="page" data-link="@soluzione.Name" data-link-destination="@soluzione.Url()" data-link-section="@Model?.TitoloSezioneAutomatica">@soluzione.Name</a></li>
+										}
+									</ul>
+								</div>
+							}
+						</div>
+					</div>
+				}
+					</div>
+			</div>
+		</section>
+	}
+	@Html.GetBlockListHtml(Model?.UltimiBlocchi)
+}

@@ -1,0 +1,82 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@using ContentModels = Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Industry>
+
+<section class="cards-block bg" id="cases">
+    <div class="container-lg">
+        @if (!string.IsNullOrEmpty(Model.UsesCasesTitle))
+        {
+            <div class="row justify-content-center">
+                <div class="col-7 col-lg-12">
+                    <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.UsesCasesTitle</h2>
+                </div>
+            </div>
+        }
+        <div class="row g-mega g-overflow">
+            @if (Model.UsesCases != null && Model.UsesCases.Any())
+            {
+                var counter = 1;
+                foreach (var useCase in Model.UsesCases)
+                {
+                    ContentModels.BlockSingleUseCase useContent = (ContentModels.BlockSingleUseCase)useCase.Content;
+                    <div class="col-12 col-lg-6">
+                        <div class="custom-card use-case shadow">
+                            <div class="card-body">
+                                <div class="icon-wrapper"><img src="@useContent.UseIcon?.Url()" alt="@HtmlUtils.GetImageAlt(useContent.UseIcon)"></div>
+                                <h3 class="h3 card-title">@useContent.UseTitle</h3>
+                                <p>@useContent.UseDescription</p>
+                            </div>
+                            @if ((useContent.SolutionAnchor != null && useContent.SolutionAnchor.Any()) || (useContent.SolutionAnchorBlocks != null && useContent.SolutionAnchorBlocks.Any()))
+                            {
+                                <div>
+                                    <button class="card-dropdown-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#card-@counter-dropdown" aria-expanded="false" aria-controls="card-@counter-dropdown">@Umbraco.GetDictionaryValue("solutions_accordion_label")</button>
+                                </div>
+                                <div class="card-dropdown collapse" id="card-@counter-dropdown">
+                                    <ul>
+                                        @if (useContent.SolutionAnchor != null && useContent.SolutionAnchor.Any())
+                                        {
+                                            @foreach (var solution in useContent.SolutionAnchor)
+                                            {
+                                                <li><a title="@solution.Name" href="@solution.Url()" data-link-type="internal-link" data-link="@solution.Name" data-section="use cases">@solution.Name</a></li>
+                                            }
+                                        }
+                                        @if (useContent.SolutionAnchorBlocks != null && useContent.SolutionAnchorBlocks.Any())
+                                        {
+                                            @foreach (var solution in useContent.SolutionAnchorBlocks)
+                                            {
+                                                if (solution.Content.ContentType.Alias == "blockAtomLink")
+                                                {
+                                                    BlockAtomLink bal = (BlockAtomLink)solution.Content;
+
+                                                    if (bal.UrlPicker != null)
+                                                    {
+                                                        <li>
+                                                            <a title="@bal.UrlPicker.Name" href="@bal.UrlPicker.Url" data-link-type="internal-link" data-link="@bal.UrlPicker.Name" data-section="use cases" target="@bal.UrlPicker.Target">@bal.UrlPicker.Name</a>
+                                                        </li>
+                                                    }
+                                                }
+                                                else if (solution.Content.ContentType.Alias == "blockAtomLabel")
+                                                {
+                                                    BlockAtomLabel bal = (BlockAtomLabel)solution.Content;
+                                                    if (!string.IsNullOrEmpty(bal.Label))
+                                                    {
+                                                        <li>
+                                                            <a>@bal.Label</a>
+                                                        </li>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    counter++;
+                }
+            }
+        </div>
+    </div>
+</section>

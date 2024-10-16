@@ -1,0 +1,403 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using System;
+@using System.Text.RegularExpressions;
+@{
+    ContentModels.BlockAccordion content = (ContentModels.BlockAccordion)Model.Content;
+    ContentModels.BlockAccordionSettings settings = (ContentModels.BlockAccordionSettings)Model.Settings;
+    var layout = (settings != null && settings.IsFullwidth) ? "" : "col-lg-8";
+    var firstOpen = settings.FirstOpen;
+    var accordionID = settings?.AccordionID != "" ? settings?.AccordionID : null;
+    var IsFAQ = accordionID != null ? "lightGreyBg2" : "";
+    var counter = 1;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (content.AccordionItemList != null && content.AccordionItemList.Any())
+    {
+        <section class="pageSection @IsFAQ">
+            <div class="container accordion-tabs ">
+                @if (content.TitoloAccordion != "")
+                {
+                    <h2 class="title">@content.TitoloAccordion</h2>
+                }
+                @if (!string.IsNullOrEmpty(accordionID)) // Check if the string is not null or empty
+                {
+                    string[] splittedValues = accordionID.Split(new[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane"
+                                    type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
+                                All
+                            </button>
+                        </li>
+                        @if (splittedValues.Any()) // Check if the array is not empty
+                        {
+                            for (int i = 0; i < splittedValues.Length; i++)
+                            {
+                                string[] valueParts = splittedValues[i].Split(','); // Split each element by ','
+
+                                try
+                                {
+                                    // Access and process the values here:
+                                    int id = int.Parse(valueParts[0].TrimStart('('));
+                                    string description = valueParts[1];
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="@id" data-bs-toggle="tab" data-bs-target="#@id-pane" type="button" role="tab" aria-controls="@id-pane" aria-selected="false">
+                                            @description
+                                        </button>
+                                    </li>
+
+
+                                    // Your logic for handling values and potential errors
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Handle any parsing or processing errors within the loop
+                                }
+                            }
+                        }
+
+                    </ul>
+                    <div class="tab-content pt-5 py-4" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+                             tabindex="0">
+                            <div class="accordion mt-4 accordion-flush" id="accordionFlushExample">
+
+                                @foreach (var item in content.AccordionItemList)
+                                {
+                                    ContentModels.BlockAccordionItem itemContent = (ContentModels.BlockAccordionItem)item.Content;
+                                    //var expandable = counter == 1 ? "true" : "false";
+                                    bool ancora = (bool)Umbraco.AssignedContentItem.Url().ToString().Contains("#" + @itemContent?.AccordionAnchor) ? true : false;
+                                    var showable = (firstOpen && counter == 1) || ancora ? "show" : "collapse";
+                                    var iconShow = (firstOpen && counter == 1) || ancora ? "" : "collapsed";
+                                    var ariaExpanded = (firstOpen && counter == 1) || ancora ? true : false;
+                                    <div class="accordion-item">
+                                        <div class="accordion-header">
+                                            <button class="accordion-button @iconShow" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-Home-@counter" aria-expanded="@ariaExpanded" aria-controls="collapse-Home-@counter">
+                                                @itemContent?.AccordionTopic
+                                            </button>
+                                        </div>
+                                        <div id="collapse-Home-@counter" class="accordion-collapse collapse @showable" data-bs-parent="#accordionFlushExample">
+                                            @if (itemContent != null && itemContent.Offices != null && itemContent.Offices.Any())
+                                            {
+                                                <div class="accordion-body d-flex flex-wrap">
+                                                    @foreach (var office in itemContent.Offices)
+                                                    {
+                                                        var listContent = (ContentModels.BlockOffice)office.Content;
+
+                                                        <div class="office">
+                                                            <h3 class="h3">@listContent.Department</h3>
+
+                                                            <p>@Html.Raw(listContent.FullAddress)</p>
+                                                            <p>@Html.Raw(listContent.PhoneAndFax)</p>
+                                                            @if (!string.IsNullOrEmpty(listContent.EMail))
+                                                            {
+                                                                <a title="@listContent.EMail" href="#" class="email">@listContent.EMail</a>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="accordion-body">
+                                                    @Html.Raw(itemContent?.AccordionDescription)
+                                                </div>
+                                            }
+
+
+                                        </div>
+                                    </div>
+                                    counter++;
+                                }
+
+
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(accordionID)) // Check if the string is not null or empty
+                        {
+                            if (splittedValues.Any()) // Check if the array is not empty
+                            {
+                                for (int i = 0; i < splittedValues.Length; i++)
+                                {
+                                    string[] valueParts = splittedValues[i].Split(','); // Split each element by ','
+
+                                    try
+                                    {
+                                        // Access and process the values here:
+                                        int id = int.Parse(valueParts[0].TrimStart('('));
+                                        string description = valueParts[1];
+                                        <div class="tab-pane fade" id="@id-pane" role="tabpanel" aria-labelledby="@id-tab" tabindex="0">
+                                            <div class="accordion mt-4 accordion-flush" id="accordionFlushExample">
+
+                                                @foreach (var item in content.AccordionItemList)
+                                                {
+                                                    ContentModels.BlockAccordionItem itemContent = (ContentModels.BlockAccordionItem)item.Content;
+                                                    if (@itemContent.AccordionAnchor == id.ToString())
+                                                    {
+                                                        //var expandable = counter == 1 ? "true" : "false";
+                                                        bool ancora = (bool)Umbraco.AssignedContentItem.Url().ToString().Contains("#" + @itemContent?.AccordionAnchor) ? true : false;
+                                                        var showable = (firstOpen && counter == 1) || ancora ? "show" : "collapse";
+                                                        var iconShow = (firstOpen && counter == 1) || ancora ? "" : "collapsed";
+                                                        var ariaExpanded = (firstOpen && counter == 1) || ancora ? true : false;
+                                                        <div class="accordion-item">
+                                                            <div class="accordion-header">
+                                                                <button class="accordion-button @iconShow" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@description.Replace(" ", "")-@counter" aria-expanded="@ariaExpanded" aria-controls="collapse-@description.Replace(" ","")-@counter">
+                                                                    @itemContent?.AccordionTopic
+                                                                </button>
+                                                            </div>
+                                                            <div id="collapse-@description.Replace(" ","")-@counter" class="accordion-collapse collapse @showable" data-bs-parent="#accordionFlushExample">
+                                                                @if (itemContent != null && itemContent.Offices != null && itemContent.Offices.Any())
+                                                                {
+                                                                    <div class="accordion-body d-flex flex-wrap">
+                                                                        @foreach (var office in itemContent.Offices)
+                                                                        {
+                                                                            var listContent = (ContentModels.BlockOffice)office.Content;
+
+                                                                            <div class="office">
+                                                                                <h3 class="h3">@listContent.Department</h3>
+
+                                                                                <p>@Html.Raw(listContent.FullAddress)</p>
+                                                                                <p>@Html.Raw(listContent.PhoneAndFax)</p>
+                                                                                @if (!string.IsNullOrEmpty(listContent.EMail))
+                                                                                {
+                                                                                    <a title="@listContent.EMail" href="#" class="email">@listContent.EMail</a>
+                                                                                }
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="accordion-body">
+                                                                        @Html.Raw(itemContent?.AccordionDescription)
+                                                                    </div>
+                                                                }
+
+
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    counter++;
+                                                }
+
+
+                                            </div>
+                                        </div>
+
+                                        // Your logic for handling values and potential errors
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // Handle any parsing or processing errors within the loop
+                                    }
+                                }
+                            }
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="accordion mt-4 accordion-flush greyAccordions" id="faqs">
+                        @foreach (var item in content.AccordionItemList)
+                        {
+                            ContentModels.BlockAccordionItem itemContent = (ContentModels.BlockAccordionItem)item.Content;
+                            bool ancora = (bool)Umbraco.AssignedContentItem.Url().ToString().Contains("#" + @itemContent?.AccordionAnchor) ? true : false;
+                            var showable = (firstOpen && counter == 1) || ancora ? "show" : "collapse";
+                            var iconShow = (firstOpen && counter == 1) || ancora ? "" : "collapsed";
+                            var ariaExpanded = (firstOpen && counter == 1) || ancora ? true : false;
+
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <button class="accordion-button @iconShow" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@counter" aria-expanded="@ariaExpanded" aria-controls="collapse-@counter">
+                                        @itemContent?.AccordionTopic
+                                    </button>
+                                </div>
+                                <div id="collapse-@counter" class="accordion-collapse collapse @showable" data-bs-parent="#accordionFlushExample">
+                                    @if (itemContent != null && itemContent.Offices != null && itemContent.Offices.Any())
+                                    {
+                                        <div class="accordion-body d-flex flex-wrap">
+                                            @foreach (var office in itemContent.Offices)
+                                            {
+                                                var listContent = (ContentModels.BlockOffice)office.Content;
+
+                                                <div class="office">
+                                                    <h3 class="h3">@listContent.Department</h3>
+
+                                                    <p>@Html.Raw(listContent.FullAddress)</p>
+                                                    <p>@Html.Raw(listContent.PhoneAndFax)</p>
+                                                    @if (!string.IsNullOrEmpty(listContent.EMail))
+                                                    {
+                                                        <a title="@listContent.EMail" href="#" class="email">@listContent.EMail</a>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="accordion-body">
+                                            @Html.Raw(itemContent?.AccordionDescription)
+                                        </div>
+                                    }
+
+
+                                </div>
+                            </div>
+
+                            counter++;
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+}
+else
+{
+    <section class="details-accordion" id="@settings?.AnchorID">
+        <div class="container-lg">
+            <div class="row justify-content-center">
+                <div class="col-12 @layout">
+                    @if (content.TitoloAccordion != "")
+                    {
+                        <h1 class="h2 text-center mb-4">@content.TitoloAccordion</h1>
+                    }
+                    <div class="accordion" id="details">
+                        @if (content.AccordionItemList != null && content.AccordionItemList.Any())
+                        {
+                            counter = 1;
+                            foreach (var item in content.AccordionItemList)
+                            {
+                                ContentModels.BlockAccordionItem itemContent = (ContentModels.BlockAccordionItem)item.Content;
+                                //var expandable = counter == 1 ? "true" : "false";
+                                bool ancora = (bool)Umbraco.AssignedContentItem.Url().ToString().Contains("#" + @itemContent?.AccordionAnchor) ? true : false;
+                                var showable = (firstOpen && counter == 1) || ancora ? "show" : "collapse";
+                                var iconShow = (firstOpen && counter == 1) || ancora ? "" : "collapsed";
+                                var ariaExpanded = (firstOpen && counter == 1) || ancora ? true : false;
+                                <div class="accordion-item" id="@itemContent?.AccordionAnchor">
+                                    <h2 class="h4 accordion-header" id="heading-@accordionID-@counter">
+                                        <button class="accordion-button @iconShow" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@accordionID-@counter" aria-expanded="@ariaExpanded" aria-controls="collapse-@accordionID-@counter">
+                                            @itemContent?.AccordionTopic
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-@accordionID-@counter" class="accordion-collapse collapse @showable" aria-labelledby="heading-@accordionID-@counter" data-bs-parent="#details">
+                                        @if (itemContent != null && itemContent.Offices != null && itemContent.Offices.Any())
+                                        {
+                                            <div class="accordion-body d-flex flex-wrap">
+                                                @foreach (var office in itemContent.Offices)
+                                                {
+                                                    var listContent = (ContentModels.BlockOffice)office.Content;
+
+                                                    <div class="office">
+                                                        <h3 class="h3">@listContent.Department</h3>
+
+                                                        <p>@Html.Raw(listContent.FullAddress)</p>
+                                                        <p>@Html.Raw(listContent.PhoneAndFax)</p>
+                                                        @if (!string.IsNullOrEmpty(listContent.EMail))
+                                                        {
+                                                            <a title="@listContent.EMail" href="#" class="email">@listContent.EMail</a>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="accordion-body">
+                                                @Html.Raw(itemContent?.AccordionDescription)
+                                            </div>
+                                        }
+
+
+                                    </div>
+                                </div>
+                                counter++;
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        window.onload = function () {
+            var ancoraggio = window.location.href.split('#').pop();
+            if (ancoraggio != "") {
+                var domanda = document.getElementById(ancoraggio);
+                if (domanda != null) {
+                    var accordionItems = document.querySelectorAll(".accordion-item")
+                    accordionItems.forEach(item => {
+                        if (!item.querySelector(".accordion-button").classList.contains("collapsed") && item.getAttribute("id") != ancoraggio) {
+                            item.querySelector(".accordion-button").classList.add("collapsed")
+                            item.querySelector(".accordion-collapse").classList.add("collapse")
+                            item.querySelector(".accordion-collapse").classList.remove("show")
+                        }
+                    })
+                    domanda.querySelector(".accordion-button").classList.remove("collapsed");
+                    domanda.querySelector(".accordion-collapse").classList.remove("collapse");
+                    domanda.querySelector(".accordion-collapse").classList.add("show");
+                }
+            }
+        }
+    </script>
+    <script>
+        $('.accordion-item').click(function () {
+            $('.accordion-item').not(this).each(function () {
+                $(this).children('.accordion-header').children('.accordion-button').addClass("collapsed")
+                $(this).children('.accordion-collapse').addClass("collapse")
+                $(this).children('.accordion-collapse').removeClass("show")
+            })
+            if (!$(this).children('.accordion-collapse').hasClass("show")) {
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: $(this).offset().top - 90
+                }, 50);
+            }
+        })
+    </script>
+
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "FAQPage",
+        "mainEntity": [
+        @for (int i = 0; i < content.AccordionItemList.Count; i++)
+        {
+            ContentModels.BlockAccordionItem itemContent = (ContentModels.BlockAccordionItem)content.AccordionItemList[i].Content;
+            string? rteContent = itemContent.Value<string>("AccordionDescription");
+            if (i == content.AccordionItemList.Count - 1)
+            {
+                <text>
+                                                                                                {
+                                                                                        "@@type": "Question",
+                                                                                        "name": "@itemContent.AccordionTopic",
+                                                                                        "acceptedAnswer": {
+                                                                                        "@@type": "Answer",
+                                                                                        "text": "@Regex.Replace(rteContent, "<.*?>", String.Empty)"
+                                                                                        }
+                                                                                        }
+                </text>
+            }
+            else
+            {
+                <text>
+                                                                                                {
+                                                                                        "@@type": "Question",
+                                                                                        "name": "@itemContent.AccordionTopic",
+                                                                                        "acceptedAnswer": {
+                                                                                        "@@type": "Answer",
+                                                                                        "text": "@Regex.Replace(rteContent, "<.*?>", String.Empty)"
+                                                                                        }
+                                                                                        },
+                </text>
+            }
+        }
+        ]
+        }
+    </script>
+}

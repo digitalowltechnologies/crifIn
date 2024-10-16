@@ -1,0 +1,16 @@
+@using Umbraco.Forms.Web
+@model Umbraco.Forms.Web.Models.FieldViewModel
+@{
+    var maxLength = Model.GetSettingValue<int>("MaximumLength", 255);
+    var fieldType = Model.GetSettingValue<string>("FieldType", "text");
+    var autocompleteAttribute = Model.GetSettingValue<string>("AutocompleteAttribute", string.Empty);
+    var placeholder = (string.IsNullOrEmpty(Model.PlaceholderText) == false) ? Model.PlaceholderText : "";
+    var autocomplete = (string.IsNullOrEmpty(autocompleteAttribute) == false) ? autocompleteAttribute : "off";
+    var validate = (Model.Mandatory || Model.Validate) ? "true" : "false";
+}
+<input type="@fieldType" name="@Model.Name" id="@Model.Id" data-umb="@Model.Id"
+       class=" @Html.GetFormFieldClass(Model.FieldTypeName) formField"
+       value="@Model.ValueAsHtmlString" maxlength="@maxLength" placeholder="@placeholder" autocomplete="@autocomplete"
+       data-val="@validate" 
+       @if(Model.Mandatory){<text>"data-val-required="@Model.RequiredErrorMessage"</text>}
+       @if(Model.Validate){<text>"data-val-regex="@Model.InvalidErrorMessage"  data-val-regex-pattern="@Html.Raw(Model.Regex)"</text>}/>

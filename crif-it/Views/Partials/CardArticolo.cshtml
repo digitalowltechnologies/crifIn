@@ -1,0 +1,79 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Articolo>
+@model Crif.It.Models.Articolo
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@{
+	string? list = "main";
+	string? dataSection = "altri-contenuti";
+	if (ViewData.ContainsKey("list"))
+	{
+		list = (string?)ViewData["list"];
+	}
+	if (ViewData.ContainsKey("section"))
+	{
+		dataSection = (string?)ViewData["section"];
+	}
+}
+<div class="col-md-6 col-lg-4 p-2 p-md-3">
+	<div class="blogCard boxShadow border animateThis slideTop">
+		<img src="@Model.SfondoHero?.Url()" alt="@HtmlUtils.GetImageAlt(Model.SfondoHero)" class="blogImg">
+		<div class="p-4">
+			<div class=" blog-date-btn d-flex justify-content-between align-items-center">
+				<small class="blogDate mb-0">@Model.DataCustom.ToString("dd/MM/yy")</small>
+				@if (list != "main" && Model.Parent?.ContentType.Alias == "ricercheAcademyCategoria")
+				{
+					<a href="" class="blog-btn">@Model.Parent?.Parent?.Name</a>
+				}
+				else if (list != "main")
+				{
+					<a href="" class="blog-btn">@Model.Parent?.Name</a>
+				}
+				
+			</div>
+			@if (!string.IsNullOrEmpty(Model.TitoloHero))
+			{
+				<a href="@Model.Url()" class="blogTitle" data-link-category="@Model.Parent?.Name" data-link-type="article" data-link="@Model.TitoloHero" data-link-destination="@Model.Url()" data-link-section="@dataSection">
+					@Model.TitoloHero
+				</a>
+			}
+		</div>
+	</div>
+</div>
+@* <div class="col-12 col-lg-4">
+	<div class="custom-vertical-card shadow">
+		<div class="img-wrapper">
+			<img src="@Model.SfondoHero?.Url()" alt="@HtmlUtils.GetImageAlt(Model.SfondoHero)">
+		</div>
+		@if (list != "main" && Model.Parent?.ContentType.Alias == "ricercheAcademyCategoria")
+		{
+			<span class="category-label">@Model.Parent?.Parent?.Name</span>
+		}
+		else if (list != "main")
+		{
+			<span class="category-label">@Model.Parent?.Name</span>
+		}
+		@if (Model.Parent?.ContentType.Alias == "ricercheAcademyCategoria" && list != "category" && list != "trends")
+		{
+			<span class="ricerche-category-label">@Model.Parent?.Name</span>
+		}
+		else if (Model.TrendTopic != null && list != "category")
+		{
+			<span class="trend-label">@Model.TrendTopic.First().Name</span>
+			foreach (var trend in Model.TrendTopic)
+			{
+				<span class="trend-label">@trend.Name</span>
+			}
+		}
+		<div class="card-body">
+			<div class="meta">
+				<p class="date">@Model.DataCustom.ToString("dd/MM/yy")</p>
+			</div>
+			@if (!string.IsNullOrEmpty(Model.TitoloHero))
+			{
+				<a href="@Model.Url()" class="stretched-link" data-link-category="@Model.Parent?.Name" data-link-type="article" data-link="@Model.TitoloHero" data-link-destination="@Model.Url()" data-link-section="@dataSection">
+					<h3 class="h5 card-title only-title">@Model.TitoloHero</h3>
+				</a>
+			}
+		</div>
+	</div>
+</div> *@

@@ -1,0 +1,10 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	var catMerc = Model.Children()?.Where(x => x.ContentType.Alias == "categoriaMercato");
+	if(catMerc != null && catMerc.Any())
+	{
+		var ultimoMerc = catMerc?.OrderBy(catMerc => catMerc.Value("ordineMercato")).FirstOrDefault();
+		@(await Html.PartialAsync("CategoriaMercato",ultimoMerc));
+	}
+}

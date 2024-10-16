@@ -1,0 +1,64 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockCasiUso content = (ContentModels.BlockCasiUso)Model.Content;
+	ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+<section class="cards-block bg" id="@settings.AnchorID">
+	<div class="container-lg">
+		@if (!string.IsNullOrEmpty(content.TitoloCasiUso))
+		{
+			<div class="row justify-content-center">
+				<div class="col-7 col-lg-12">
+					<h2 class="h2 text-center pb-lg-5 mb-lg-4">@content.TitoloCasiUso</h2>
+				</div>
+			</div>
+		}
+		<div class="row g-mega g-overflow">
+			@if (content.ListaCasiUso != null && content.ListaCasiUso.Any())
+			{
+				var counter = 1;
+				foreach (var useCase in content.ListaCasiUso)
+				{
+					ContentModels.BlockCasoUso useContent = (ContentModels.BlockCasoUso)useCase.Content;
+					<div class="col-12 col-lg-6">
+						<div class="custom-card use-case casi-uso shadow">
+							<div class="card-body">
+								<div class="icon-wrapper"><img src="@useContent.IconaCasoUso?.Url()" alt="@HtmlUtils.GetImageAlt(useContent.IconaCasoUso)"></div>
+								<h3 class="h3 card-title">@useContent.TitoloCasoUso</h3>
+								<p>@useContent.DescrizioneCasoUso</p>
+							</div>
+							@if ((useContent.ListaSoluzioni != null && useContent.ListaSoluzioni.Any()) || (useContent.ListaLinkEsterni != null && useContent.ListaLinkEsterni.Any()))
+							{
+								<div>
+									<button class="card-dropdown-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#card-@counter-dropdown" aria-expanded="false" aria-controls="card-@counter-dropdown">@useContent.TitoloListaSoluzioni</button>
+								</div>
+								<div class="card-dropdown collapse" id="card-@counter-dropdown">
+									<ul>
+										@if (useContent.ListaSoluzioni != null && useContent.ListaSoluzioni.Any())
+										{
+											@foreach (var solution in useContent.ListaSoluzioni)
+											{
+												<li><a title="@solution.Name" href="@solution.Url()" data-link-type="page" data-link="@solution.Name" data-link-destination="@solution.Url()" data-link-section="content.TitoloCasiUso">@solution.Name</a></li>
+											}
+										}
+										@if (useContent.ListaLinkEsterni != null && useContent.ListaLinkEsterni.Any())
+										{
+											@foreach (var ext in useContent.ListaLinkEsterni)
+											{
+												<li><a title="@ext.Name" href="@ext.Url" data-link-type="page" data-link="@ext.Name" data-link-destination="@ext.Url" data-link-section="content.TitoloCasiUso">@ext.Name</a></li>
+											}
+										}
+
+									</ul>
+								</div>
+							}
+						</div>
+					</div>
+					counter++;
+				}
+			}
+		</div>
+	</div>
+</section>

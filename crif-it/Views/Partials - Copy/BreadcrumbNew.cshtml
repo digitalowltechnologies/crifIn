@@ -1,0 +1,31 @@
+﻿@model Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent
+
+<div class="breadcrumb breadcrumb-2">
+    @{
+        var ancestors = Model.Ancestors().Reverse();
+        <span><a href="./">Home</a></span>
+        @for (var i = 1; i < ancestors.Count(); i++)
+        {
+            if (ancestors.ElementAt(i).TemplateId != null)
+            {
+                <span><a title="@ancestors.ElementAt(i).Name" href="@ancestors.ElementAt(i).Url()">@ancestors.ElementAt(i).Name</a></span>
+            }
+        }
+        <span>@Model.Name</span>
+    }
+</div>
+
+
+@* <ul class="breadcrumb">
+    @{
+        var ancestors = Model.Ancestors().Reverse();
+        @for (var i = 1; i < ancestors.Count(); i++)
+        {
+            if(ancestors.ElementAt(i).TemplateId != null)
+            {
+                <li><a title="@ancestors.ElementAt(i).Name" href="@ancestors.ElementAt(i).Url()">@ancestors.ElementAt(i).Name</a></li>
+            }
+        }
+        <li>@Model.Name</li>
+    }
+</ul> *@

@@ -1,0 +1,17 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Industry>
+@model Crif.It.Models.Industry
+@using Crif.It.Utils;
+@using Crif.It.Models;
+
+<div class="col-12 col-lg-6">
+    <div class="custom-card industry shadow fade-in-box">
+        <div class="card-body">
+            <div class="icon-wrapper">
+                <img src="@Model.CoverIcon?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverIcon)">
+            </div>
+            <h3 class="h3 card-title">@Model.IndustryTitle</h3>
+            <p>@HtmlUtils.TextCut(@Model.IndustryDescription)</p>
+            <a title="@Umbraco.GetDictionaryValue("industry_read_more")" href="@Model.Url()" class="more" data-link-type="internal-link" data-link="@Model.IndustryTitle" data-section="industries">@Umbraco.GetDictionaryValue("industry_read_more")</a>
+        </div>
+    </div>
+</div>

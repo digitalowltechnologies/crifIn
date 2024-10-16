@@ -1,0 +1,17 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+	ContentModels.BlockQuote content = (ContentModels.BlockQuote)Model.Content;
+	ContentModels.BlockQuoteSettings settings = (ContentModels.BlockQuoteSettings)Model.Settings;
+	var paddingTop = settings.NoPaddingTop ? "padding-top:0;" : "";
+	var paddingBottom = settings.NoPaddingBottom ? "padding-bottom:0;" : "";
+}
+<section class="text-content mb-0" id="@settings.AnchorID" style="@paddingBottom @paddingTop">
+     <div class="container-lg">
+        <div class="row justify-content-center">
+			<div class="col-12">
+				<blockquote>@content.Quote</blockquote>
+			</div>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,49 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Solutions>
+@{
+    Layout = "Master.cshtml";
+    var otherSolutions = Model.Siblings()?.Where(x => x.ContentType.Alias == "solutions");
+    var siteSection = Model.AncestorOrSelf(1);
+    
+}
+<section class="internal-heading-photo pb-lg-3">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12">
+                <div class="banner">
+                    @await(Html.PartialAsync("Breadcrumb", Model))
+                    <div class="img-wrapper">
+                        <img src="@Model.HeroBackground?.Url()" alt="@HtmlUtils.GetImageAlt(Model.HeroBackground)">
+                    </div>
+                    <div class="caption">
+                        @*@await(Html.PartialAsync("Breadcrumb", Model))*@
+                        <h1 class="h1">@Model.HeroTitle</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@Html.GetBlockListHtml(Model.Blocks)
+
+@if (otherSolutions != null && otherSolutions.Any())
+{
+    <section class="minicards-block bg" id="solutions" data-section="other-solutions">
+        <div class="container-lg">
+            <div class="row justify-content-center">
+                <div class="col-7 col-lg-12">
+                    <h4 class="h2 text-center pb-lg-5 mb-lg-4">@Umbraco.GetDictionaryValue("other_solutions", "Other solutions" )</h4>
+                </div>
+            </div>
+            <div class="row g-mega g-overflow">
+                @foreach (Solutions solution in otherSolutions)
+                {
+                    @(await Html.PartialAsync("CardSolutions", solution))
+                }
+            </div>
+        </div>
+    </section>
+}
+@Html.GetBlockListHtml(Model.LatestBlocks)

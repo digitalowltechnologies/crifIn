@@ -1,0 +1,39 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System;
+@using System.Text.RegularExpressions;
+@{
+    ContentModels.BlockCtacompact content = (ContentModels.BlockCtacompact)Model.Content;
+    string pattern = "[ \\w-]+?(?=\\.)";
+}
+
+<section class="certifications-banner pb-0">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12">
+                <div class="banner">
+                    <div class="icon-wrapper">
+                        <img src="@content.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(content.Icon)">
+                    </div>
+                    <div>
+                        <h3 class=".h3 mb-1 mb-lg-3">@content.Title</h3>
+                        <p class="mb-1 mb-lg-4">@content.Description</p>
+                        @if (content.CtaContact != null)
+                       {
+                           <a title="@content.CtaContact.Name" href="@content.CtaContact.Url" target="@content.CtaContact.Target" data-link-type="cta" data-link="@content.CtaContact.Name" data-link-destination="@content.CtaContact.Url" data-link-section="@content.Title" class="mail me-2 me-lg-4">@content.CtaContact.Name</a>
+                       }
+                        @if (content.CtaStandard != null)
+                        {
+                            <a title="@content.CtaStandard.Name" href="@content.CtaStandard.Url" target="@content.CtaStandard.Target" class="more me-2 me-lg-4" data-link-type="cta" data-link="@content.CtaStandard.Name" data-link-destination="@content.CtaStandard.Url" data-link-section="@content.Title">@content.CtaStandard.Name</a>
+                        }
+                        @if (content.Download != null && content.Download.Url != null)
+                        {
+                            <a title="@content?.Download?.Name" href="@content?.Download?.Url" target="@content.Download.Target" class="download me-2 me-lg-4" download data-link-type="download" data-link="@Regex.Matches(@content.Download.Url, @pattern, RegexOptions.IgnoreCase).FirstOrDefault()" data-link-destination="@content?.Download?.Url" data-link-section="@content.Title">@content.Download.Name</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

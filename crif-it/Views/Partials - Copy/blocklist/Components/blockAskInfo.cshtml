@@ -1,0 +1,233 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System.Web;
+@{
+    ContentModels.BlockAskInfo content = (ContentModels.BlockAskInfo)Model.Content;
+    var settings = (ContentModels.BlockAskInfoSettings)Model.Settings;
+    var layout = (settings?.LayoutSelector == "dark") ? "contact-banner-dark" : "contact-banner";
+    var paddingTop = settings.NoPaddingTop ? "padding-top:0;" : "";
+    var paddingBottom = settings.NoPaddingBottom ? "padding-bottom:0;" : "";
+
+    var ctalayout = (settings?.CallToActionLayout == "link") ? "more" : "btn btn-primary btn-large";
+    ContentModels.CrifConfiguration? crifConfiguration = Umbraco.ContentAtRoot()?.FirstOrDefault()?.Siblings<ContentModels.CrifConfiguration>()?.FirstOrDefault();
+
+
+    string addParam = "";
+    if (Umbraco.AssignedContentItem.ContentType.Alias == "soluzione"
+        || Umbraco.AssignedContentItem.ContentType.Alias == "family"
+        || Umbraco.AssignedContentItem.ContentType.Alias == "category"
+        || Umbraco.AssignedContentItem.ContentType.Alias == "mercato")
+    {
+        addParam = "product=" + HttpUtility.UrlEncode(Umbraco.AssignedContentItem.Name) + "&requestType=" + HttpUtility.UrlEncode("servizi");
+    }
+    else if (Umbraco.AssignedContentItem.ContentType.Alias == "ricerche"
+        || Umbraco.AssignedContentItem.ContentType.Alias == "academy"
+        || Umbraco.AssignedContentItem.ContentType.Alias == "articolo")
+    {
+        addParam = "requestType=" + HttpUtility.UrlEncode("eventi");
+    }
+}
+@if(settings != null && settings.NewTemplate)
+{
+@if (settings?.LayoutSelector == "compact light")
+{
+    <section class="full-article p-0" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+        <div class="container-lg">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="banner">
+                        <h3 class="h3 m-0">@content.BlockTitle</h3>
+                        @{
+                            string? url = content.Link?.Url;
+                            if (!string.IsNullOrEmpty(addParam) && url != null && !url.Contains("?"))
+                            {
+                                url += "?" + addParam;
+                            }
+                            else if (!string.IsNullOrEmpty(addParam) && url != null && !(url.Contains("?product") || url.Contains("&product")))
+                            {
+                                url += "&" + addParam;
+                            }
+                        }
+                        <a title="@content.Link?.Name" href="@url" class="btn btn-primary btn-large" target="@content.Link?.Target" data-link-type="cta" data-link="@content.Link?.Name" data-link-destination="@url" data-link-section="@content.BlockTitle">@content.Link?.Name</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    if (@content.Image == null)
+    {
+        <section class="pageSection pt-0 lightGreyBg2">
+            <div class="container">
+                <div class="contact-international" id="@settings?.AnchorID">
+                    <h2 class="text-center">@content.Description</h2>
+                    @if (!string.IsNullOrEmpty(@content.Link?.Url))
+                    {
+                        string? url = content.Link?.Url;
+                        if (!string.IsNullOrEmpty(addParam) && url != null && !url.Contains("?"))
+                        {
+                            url += "?" + addParam;
+                        }
+                        else if (!string.IsNullOrEmpty(addParam) && url != null && !(url.Contains("?product") || url.Contains("&product")))
+                        {
+                            url += "&" + addParam;
+                        }
+
+                        <a title="@content.Link?.Name" href="@url" class="orangeBtn mx-auto mt-4" target="@content.Link?.Target" data-link-type="cta"
+                           data-link="@content.Link?.Name" data-link-destination="@url" data-link-section="@content.BlockTitle">
+                            @content.Link?.Name
+                        </a>
+                    }
+                </div>
+            </div>
+        </section>
+        
+    }
+    else
+    {
+        <section class="@layout" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container-lg h-100">
+                <div class="row h-100">
+                    <div class="col-12">
+                        <div class="banner shadow">
+                            <div class="img-wrapper">
+                                <img src="@content.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content.Image)">
+                            </div>
+                            <div class="caption">
+                                <h5 class="h3 pb-lg-2">@content.BlockTitle</h5>
+                                <p class="pb-lg-2 mb-2 mb-lg-4">@content.Description</p>
+                                @if (!string.IsNullOrEmpty(@content.Link?.Url))
+                                {
+                                    string? url = content.Link?.Url;
+                                    if (!string.IsNullOrEmpty(addParam) && url != null && !url.Contains("?"))
+                                    {
+                                        url += "?" + addParam;
+                                    }
+                                    else if (!string.IsNullOrEmpty(addParam) && url != null && !(url.Contains("?product") || url.Contains("&product")))
+                                    {
+                                        url += "&" + addParam;
+                                    }
+
+                                    <a title="@content.Link?.Name" href="@url" class="@ctalayout" target="@content.Link?.Target" data-link-type="cta"
+                                       data-link="@content.Link?.Name" data-link-destination="@url" data-link-section="@content.BlockTitle">
+                                        @content.Link?.Name
+                                    </a>
+                                }
+
+                                @if (crifConfiguration != null && crifConfiguration?.SocialLinks != null && @content.SocialText != "")
+                                {
+                                    <div class="social mt-1 mt-lg-3">
+                                        @content.SocialText
+                                        @foreach (ContentModels.BlockSocialLink singleLink in crifConfiguration.SocialLinks)
+                                        {
+                                            @if (singleLink.CustomSocial)
+                                            {
+                                                var imgLayout = settings?.LayoutSelector == "dark" ? singleLink.CustomSocialIconLight : singleLink.CustomSocialIconDark;
+                                                <a title="@singleLink?.CustomSocialLabel" href="@singleLink?.CustomSocialLink?.Url" class="icon @singleLink?.CustomSocialLabel" target="@singleLink?.CustomSocialLink?.Target"><img src="@imgLayout?.Url()" alt="@singleLink?.CustomSocialLabel"></a>
+                                            }
+                                            else
+                                            {
+                                                var imgName = "/assets/img/" + @singleLink?.Social + (settings?.LayoutSelector == "dark" ? "-white.svg" : ".svg");
+                                                <a title="@singleLink?.Social" href="@singleLink?.SocialLink?.Url" class="icon @singleLink?.Social" target="@singleLink?.SocialLink?.Target"><img src="@imgName" alt="@singleLink?.Social"></a>
+                                            }
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    }
+}
+else
+{
+    @if (settings?.LayoutSelector == "compact light")
+    {
+        <section class="full-article p-0" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container-lg">
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="banner">
+                            <h3 class="h3 m-0">@content.BlockTitle</h3>
+                            @{
+                                string? url = content.Link?.Url;
+                                if (!string.IsNullOrEmpty(addParam) && url != null && !url.Contains("?"))
+                                {
+                                    url += "?" + addParam;
+                                }
+                                else if (!string.IsNullOrEmpty(addParam) && url != null && !(url.Contains("?product") || url.Contains("&product")))
+                                {
+                                    url += "&" + addParam;
+                                }
+                            }
+                            <a title="@content.Link?.Name" href="@url" class="btn btn-primary btn-large" target="@content.Link?.Target" data-link-type="cta" data-link="@content.Link?.Name" data-link-destination="@url" data-link-section="@content.BlockTitle">@content.Link?.Name</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="@layout" id="@settings?.AnchorID" style="@paddingBottom @paddingTop">
+            <div class="container-lg h-100">
+                <div class="row h-100">
+                    <div class="col-12">
+                        <div class="banner shadow">
+                            <div class="img-wrapper">
+                                <img src="@content.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content.Image)">
+                            </div>
+                            <div class="caption">
+                                <h5 class="h3 pb-lg-2">@content.BlockTitle</h5>
+                                <p class="pb-lg-2 mb-2 mb-lg-4">@content.Description</p>
+                                @if (!string.IsNullOrEmpty(@content.Link?.Url))
+                                {
+                                    string? url = content.Link?.Url;
+                                    if (!string.IsNullOrEmpty(addParam) && url != null && !url.Contains("?"))
+                                    {
+                                        url += "?" + addParam;
+                                    }
+                                    else if (!string.IsNullOrEmpty(addParam) && url != null && !(url.Contains("?product") || url.Contains("&product")))
+                                    {
+                                        url += "&" + addParam;
+                                    }
+
+                                    <a title="@content.Link?.Name" href="@url" class="@ctalayout" target="@content.Link?.Target" data-link-type="cta"
+                                       data-link="@content.Link?.Name" data-link-destination="@url" data-link-section="@content.BlockTitle">
+                                        @content.Link?.Name
+                                    </a>
+                                }
+
+                                @if (crifConfiguration != null && crifConfiguration?.SocialLinks != null && @content.SocialText != "")
+                                {
+                                    <div class="social mt-1 mt-lg-3">
+                                        @content.SocialText
+                                        @foreach (ContentModels.BlockSocialLink singleLink in crifConfiguration.SocialLinks)
+                                        {
+                                            @if (singleLink.CustomSocial)
+                                            {
+                                                var imgLayout = settings?.LayoutSelector == "dark" ? singleLink.CustomSocialIconLight : singleLink.CustomSocialIconDark;
+                                                <a title="@singleLink?.CustomSocialLabel" href="@singleLink?.CustomSocialLink?.Url" class="icon @singleLink?.CustomSocialLabel" target="@singleLink?.CustomSocialLink?.Target"><img src="@imgLayout?.Url()" alt="@singleLink?.CustomSocialLabel"></a>
+                                            }
+                                            else
+                                            {
+                                                var imgName = "/assets/img/" + @singleLink?.Social + (settings?.LayoutSelector == "dark" ? "-white.svg" : ".svg");
+                                                <a title="@singleLink?.Social" href="@singleLink?.SocialLink?.Url" class="icon @singleLink?.Social" target="@singleLink?.SocialLink?.Target"><img src="@imgName" alt="@singleLink?.Social"></a>
+                                            }
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+}

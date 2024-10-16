@@ -1,0 +1,64 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Business>
+@{
+	Layout = "Master.cshtml";
+	var subcontent = Model.Children()?.Where(x => x.ContentType.Alias == "servizi" || x.ContentType.Alias == "mercati");
+}
+@if (Model.TitoloBusiness != "")
+{
+<div class="container-lg">
+	<div class="row justify-content-center">
+		<div class="col-7 col-lg-12">
+			<h1 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloBusiness</h1>
+		</div>
+	</div>
+</div>
+}
+@Html.GetBlockListHtml(Model.PrimiBlocchi)
+<section class="cards-block pt-5" data-section="business-card">
+	<div class="container-lg">
+		<div class="row g-mega g-overflow">
+			@if (subcontent != null && subcontent.Any())
+			{
+				foreach (var item in subcontent)
+				{
+					if (item.GetTemplateAlias() == "Servizi")
+					{
+						@* Servizi itemContent = (Servizi)item;
+						<div class="col-12 col-lg-6">
+							<div class="custom-card industry shadow fade-in-box">
+								<div class="card-body">
+									<div class="icon-wrapper">
+										<img src="@itemContent?.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent?.IconaCard)">
+									</div>
+									<h3 class="h3 card-title">@item?.Name</h3>
+									<p>@itemContent?.DescrizioneCard</p>
+									<a title="@Umbraco.GetDictionaryValue("services_discover")" href="@itemContent?.Url()" class="more" data-link-type="page" data-link="@item?.Name" data-link-destination="@itemContent?.Url()" data-link-section="@Model.TitoloBusiness">@Umbraco.GetDictionaryValue("services_discover")</a>
+								</div>
+							</div>
+						</div> *@
+					}
+					else if (item.GetTemplateAlias() == "Mercati")
+					{
+						Mercati itemContent = (Mercati)item;
+						<div class="col-12 col-lg-6">
+							<div class="custom-card industry shadow fade-in-box">
+								<div class="card-body">
+									<div class="icon-wrapper">
+										<img src="@itemContent?.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(itemContent?.IconaCard)">
+									</div>
+									<h3 class="h3 card-title">@item?.Name</h3>
+									<p>@itemContent?.DescrizioneCard</p>
+									<a title="@Umbraco.GetDictionaryValue("services_discover")" href="@itemContent?.Url()" class="more" data-link-type="page" data-link="@item?.Name" data-link-destination="@itemContent?.Url()" data-link-section="@Model.TitoloBusiness">@Umbraco.GetDictionaryValue("services_discover")</a>
+								</div>
+							</div>
+						</div>
+					}
+				}
+			}
+		</div>
+	</div>
+</section>
+@Html.GetBlockListHtml(Model.AltriBlocchi)

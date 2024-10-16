@@ -1,0 +1,99 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Service>
+@{
+    Layout = "Master.cshtml";
+    var solutions = Model.Children()?.Where(x => x.ContentType.Alias == "solutions");
+    var solutionsAnchor = (solutions != null && solutions.Any()) ? true : false;
+}
+<section class="internal-heading pb-lg-3">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12 banner">
+                <div class="img-wrapper">
+                    <img src="@Model.CoverImage?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverImage)">
+                    <!--<div class="parallax-img" style="background-image: url(@Model.CoverImage?.Url());"></div>-->
+                </div>
+                <div class="caption">
+                    @await(Html.PartialAsync("Breadcrumb", Model))
+                    <h1 class="h1 fade-in-box">@Model.ServiceTitle</h1>
+                    <p class="big-text fade-in-box">@HtmlUtils.TextCut(Model.ServiceDescription, 200)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@Html.GetBlockListHtml(Model.Blocks)
+
+@if (solutions != null && solutions.Any())
+{
+    <section class="minicards-block bg" id="solutions" data-section="our-solutions">
+        <div class="container-lg">
+            <div class="row justify-content-center">
+                <div class="col-7 col-lg-12">
+                    <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Umbraco.GetDictionaryValue("our_solutions", "Our solutions")</h2>
+                </div>
+            </div>
+            <div class="row g-mega g-overflow">
+                @foreach (Solutions solution in solutions)
+                {
+                    @(await Html.PartialAsync("CardSolutions", solution))
+                }
+            </div>
+        </div>
+    </section>
+}
+@if(Model.ShowRelatedArticles){
+    List<SingleNewsEvents> relatedArt = new List<SingleNewsEvents>();
+    var allArts = Model?.Root()?.DescendantsOfType("SingleNewsEvents");
+    var allArtSort = allArts?.OrderByDescending(allArts => allArts.Value("customDate"));
+
+    if (allArtSort != null)
+    {
+        foreach(SingleNewsEvents art in allArtSort)
+        {
+            if (art.SingleKnowledgeEventsRelatedServices != null)
+            {
+                foreach(var service in art.SingleKnowledgeEventsRelatedServices)
+                {
+                    if(service.Name == Model?.Name)
+                    {
+                        relatedArt.Add(art);
+                    }
+                }
+            }
+        }
+    }
+    if (relatedArt.Count() > 0)
+    {
+        int count = 1;
+	    <section class="vertical-cards-block bg pb-80">
+		    <div class="container-lg">
+                @if (!string.IsNullOrEmpty(Model?.RelatedArticlesTitle))
+                {
+                <div class="row justify-content-center">
+				    <div class="col-12">
+					    <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model?.RelatedArticlesTitle</h2>
+				    </div>
+			    </div>
+                }
+			    <div class="row g-large">
+
+				    @foreach (SingleNewsEvents art in relatedArt)
+				    {
+					    if (count == 4)
+					    {
+						    break;
+					    }
+					    @(await Html.PartialAsync("CardKnowledgeEvents", art, new ViewDataDictionary(ViewData){ {"list", "related" } }))
+					    count++;
+				    }
+			    </div>
+		    </div>
+	    </section>
+    }
+}
+
+@Html.GetBlockListHtml(Model?.LatestBlocks)

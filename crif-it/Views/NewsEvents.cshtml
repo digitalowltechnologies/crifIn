@@ -1,0 +1,118 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<NewsEvents>
+@using Crif.It.Models;
+@using Crif.It.Utils;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    Layout = "Master.cshtml";
+
+    var categories = Model.SiblingsAndSelf();
+    MenuSettings? menuSettings = (MenuSettings?)Model.Root()?.Siblings()?.Where(x => x.ContentType.Alias == "menuSettings").FirstOrDefault();
+    CrifConfiguration? crifConfiguration = (CrifConfiguration?)Model.Root()?.Siblings()?.Where(x => x.ContentType.Alias == "crifConfiguration").FirstOrDefault();
+    var singleContents = Model.Children()?.Where(x => x.ContentType.Alias == "singleNewsEvents").OrderByDescending(x => x.Value("customDate"));
+
+    var pageSize = 15;
+    if (Model.ElementsPerPage > 0)
+    {
+        pageSize = Model.ElementsPerPage;
+    }
+
+    var page = 1; int.TryParse(Context.Request.Query["page"], out page);
+    var totalPages = 1;
+    if (singleContents != null && singleContents.Count() > pageSize)
+    {
+        totalPages = (singleContents.Count() / pageSize) + ((singleContents?.Count() % pageSize > 0) ? 1 : 0);
+    }
+
+    if (page > totalPages)
+    {
+        page = totalPages;
+    }
+    else if (page < 1)
+    {
+        page = 1;
+    }
+}
+
+@if (Model.Parent != null)
+{
+    KnowledgeEvents parentKE = (KnowledgeEvents)Model.Parent;
+    <section class="textonly-heading pb-lg-3">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12 banner">
+                    <div class="caption">
+                        @await(Html.PartialAsync("Breadcrumb", Model))
+                        <h1 class="h1 fade-in-box">@parentKE.KnowledgeEventsTitle</h1>
+                        <p class="big-text fade-in-box">@parentKE.KnowledgeEventsDescription</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (categories != null && categories.Any())
+    {
+        <section class="internal-navigation sticky-top">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <nav>
+                            <ul class="internal-menu justify-content-start">
+                                <li class="nav-item"><a title="All" href="@parentKE.Url()" class="nav-link">All</a></li>
+                                @foreach (var category in categories)
+                                {
+                                    var current = (category.Name == Model.Name) ? "current" : "";
+                                    <li class="nav-item @current"><a title="@category.Name" href="@category.Url()" class="nav-link" data-link="@category.Name" data-link-type="filter">@category.Name</a></li>
+                                }
+                                @if (menuSettings != null && menuSettings.ShowSocial)
+                                {
+                                    @if (crifConfiguration != null && crifConfiguration?.SocialLinks != null)
+                                    {
+                                        <li class="nav-item">
+                                            @menuSettings.SocialLabel
+                                            @foreach (BlockSocialLink singleLink in crifConfiguration.SocialLinks)
+                                            {
+                                                var imgName = "/assets/img/" + @singleLink?.Social + ".svg";
+                                                <a title="@singleLink?.Social" href="@singleLink?.SocialLink?.Url" class="icon @singleLink?.Social"><img src="@imgName" alt="@singleLink?.Social"></a>
+                                            }
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+}
+
+@if (singleContents != null && singleContents.Any())
+{
+    <section class="vertical-cards-block bg pt-0 pt-lg-4 pb-80">
+        <div class="container-lg">
+            <div class="row pt-4 pt-lg-3 pb-3 pb-lg-4">
+                <div class="col-12 pb-lg-3">
+                    <p class="total-results">@singleContents.Count() articles</p>
+                </div>
+            </div>
+            <div class="row g-large">
+                @foreach (SingleNewsEvents singleContent in singleContents.Skip((page - 1) * pageSize).Take(pageSize))
+                {
+                    @(await Html.PartialAsync("CardKnowledgeEvents", singleContent))
+                }
+            </div>
+
+            @if (totalPages > 1)
+            {
+                <div class="row pt-4 mt-2 mt-lg-0">
+                    @(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)page, TotalCount = (int)totalPages }))
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@Html.GetBlockListHtml(Model.NewsEventsBlocks)

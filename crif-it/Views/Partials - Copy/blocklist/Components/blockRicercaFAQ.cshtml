@@ -1,0 +1,70 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+	ContentModels.BlockRicercaFaq content = (ContentModels.BlockRicercaFaq)Model.Content;
+	ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+
+<section class="search-faq bg">
+	<div class="container-lg">
+		<div class="search">
+			<div class="search-wrapper">
+				<label for="faq-search" class="form-label">@content.TitoloRicerca</label>
+				<input type="text" class="form-control faq-search-input" id="faq-search" onkeyup="myFunction()" placeholder="@content.PlaceholderRicerca">
+			</div>
+		</div>
+	</div>
+	@if(content.MessaggioErrore != "")
+	{
+		<div class="container-lg">
+			<div class="search-no-result">
+				<div class="h4 text-center pt-4 pb-1">@content.MessaggioErrore</div>
+			</div>
+		</div>
+	}
+</section>
+
+<script>
+	function myFunction() {
+		// Declare variables
+		var input, filter, questions, q, a, titles, accordions, answers, i, j, qstValue, ansValue, errorMsg, count;
+		input = document.getElementById('faq-search');
+		filter = input.value.toUpperCase();
+		questions = document.querySelectorAll(".accordion-item");
+        answers = document.querySelectorAll(".accordion-body");
+		titles = document.querySelectorAll(".details-accordion .h2");
+        accordions = document.querySelectorAll("section.details-accordion");
+		errorMsg = document.querySelector(".search-no-result");
+		count=1;
+		//Hide titles of the accordion during the search
+		for (j = 0; j < titles.length; j++) {
+			if (filter == "") {
+				titles[j].style.display = "";
+                accordions[j].style.paddingTop = "";
+				accordions[j].style.paddingBottom = "";
+			} else {
+				titles[j].style.display = "none";
+                accordions[j].style.paddingTop = "24px";
+				accordions[j].style.paddingBottom = "0px";
+			}
+
+		}	
+		// Loop through all list items, and hide those who don't match the search query
+		for (i = 0; i < questions.length; i++) {
+			q = questions[i].querySelector(".accordion-button");
+			qstValue = q.textContent || q.innerText;
+			ansValue = answers[i].textContent || answers[i].innerText;
+			if (qstValue.toUpperCase().indexOf(filter) > -1 || ansValue.toUpperCase().indexOf(filter) > -1) {
+				questions[i].style.display = "block";
+			} else {
+				questions[i].style.display = "none";
+				count ++;
+			}
+		}
+		if(count >= questions.length && errorMsg != null){
+			errorMsg.style.display= "block";
+		} else if (errorMsg != null) {
+			errorMsg.style.display = "none";
+		}
+	}
+</script>

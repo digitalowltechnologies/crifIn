@@ -1,0 +1,46 @@
+﻿@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@using Umbraco.Cms.Core.Models;
+@using Umbraco.Cms.Core;
+@{
+    GuidUdi? videoUDI = Model.GetParameterValue<GuidUdi>("video");
+    GuidUdi? posterUDI = Model.GetParameterValue<GuidUdi>("posterVideo");
+    if (videoUDI != null)
+    {
+        IPublishedContent? videoSrc = Umbraco.Media(videoUDI.Guid);
+        IPublishedContent? posterSrc = null;
+        if(posterUDI != null) 
+        {
+            Umbraco.Media(posterUDI.Guid);
+        }
+        string posterSrcUrl = (posterSrc != null) ? posterSrc.Url() : "";
+
+        if (videoSrc != null)
+        {
+            <div class="container-lg">
+                <div class="row justify-content-center pb-3">
+                    <div class="col-12">
+                        <div class="pos-relative ratio ratio-16x9 d-block">
+                            <video class="video" data-title="@videoSrc.Name" poster="@posterSrcUrl">
+                                <source src="@videoSrc.Url()" type="video/mp4" />
+                            </video>
+                            <button class="play-video">Riproduci video</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="application/ld+json">
+                {
+                  "@@context": "https://schema.org",
+                  "@@type": "VideoObject",
+                  "name": "@videoSrc.Name",
+                  "thumbnailUrl": [
+                    "@posterSrcUrl",
+                   ],
+                  "uploadDate": "@videoSrc.CreateDate.ToIsoString()",
+                  "contentUrl": "@videoSrc.Url()",
+                }
+            </script>
+        }
+    }
+}

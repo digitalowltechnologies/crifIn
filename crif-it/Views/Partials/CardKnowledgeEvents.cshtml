@@ -1,0 +1,52 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.SingleNewsEvents>
+@model Crif.It.Models.SingleNewsEvents
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@{
+    string? list = "main";
+    if (ViewData.ContainsKey("list"))
+    {
+        list = (string?)ViewData["list"];
+    }
+
+    string filename = "";
+    string url = Model.Url();
+
+    if (Model.IsApressRelease && Model.AttachmentLink != null)
+    {
+        url = Model.AttachmentLink.Url();
+        filename = url.Split("/").Last();
+    }
+
+}
+<div class="col-12 col-lg-4">
+    <div class="custom-vertical-card shadow">
+        <div class="img-wrapper">
+            <img src="@Model.SingleKnowledgeEventsCoverImage?.Url()" alt="@HtmlUtils.GetImageAlt(Model.SingleKnowledgeEventsCoverImage)">
+        </div>
+        @if (list != null && (list == "main" || list == "related"))
+        {
+            <span class="category-label">@Model.Parent?.Name</span>
+        }
+        <div class="card-body">
+            <div class="meta">
+                <p class="date">@Model.CustomDate.ToString("dd/MM/yy")</p>
+                @if (Model.SingleKnowledgeEventsCountry != "")
+                {
+                    <p class="country">@Model.SingleKnowledgeEventsCountry</p>
+                }
+            </div>
+            @if (!string.IsNullOrEmpty(Model.SingleNewsEventsTitle))
+            {
+                <a href="@url" class="stretched-link" data-category="@Model.Parent?.Name" data-link-type="article" data-link="@Model.SingleNewsEventsTitle">
+                    <h3 class="h5 card-title only-title">@Model.SingleNewsEventsTitle</h3>
+                </a>
+            }
+            @if (Model.IsApressRelease && Model.AttachmentLink != null)
+            {
+                <a title="@filename" href="@url" target="_blank" class="download">@Umbraco.GetDictionaryValue("download_press_review", "Download Press Review")</a>
+            }
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,8 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Policy>
+@{
+	Layout = "OldMaster.cshtml";
+}
+
+@Html.GetBlockListHtml(Model.Blocks)

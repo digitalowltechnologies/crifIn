@@ -1,0 +1,226 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+
+@{
+	ContentModels.BlockHighlights content = (ContentModels.BlockHighlights)Model.Content;
+	ContentModels.BlockHighlightsSettings settings = (ContentModels.BlockHighlightsSettings)Model.Settings;
+
+	var news = settings.Value<IEnumerable<IPublishedContent>>("contenutiHighlight");
+	var bg = settings.WhiteBackground ? "no-background" : "";
+
+
+}
+
+@if (settings.PopolareCardConContenuti)
+{
+	var labelCat = settings.LabelCategoria;
+	@if (news != null && news.Any())
+	{
+		<section class="news @bg" id="@settings.AnchorID">
+			<div class="container-lg">
+				@if (!content.TitoloHighlight.IsNullOrWhiteSpace())
+				{
+					<div class="row">
+						<div class="col-12">
+							<h2 class="h2 text-center mb-5">@content.TitoloHighlight</h2>
+						</div>
+					</div>
+				}
+				<div class="row">
+					<div class="col-12">
+						<div class="swiper news-carousel">
+							<div class="swiper-wrapper">
+								@foreach (var s in news)
+								{
+									@if (s.ContentType.Alias == "articolo")
+									{
+										var pickedImage = s.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("sfondoHero");
+										<div class="swiper-slide">
+											<div class="news-wrapper">
+												@if (pickedImage?.Url() != "")
+												{
+													<img src="@pickedImage?.Url()" alt="@HtmlUtils.GetImageAlt(pickedImage)">
+												}
+												else
+												{
+													<img src="/assets/img/placeholder-news@2x.png" alt='Crif.it'>
+												}
+												<div class="caption">
+													@if (labelCat != "")
+													{
+														<div class="category pb-1 pb-lg-4 text-uppercase">@labelCat</div>
+													}
+													else
+													{
+														<a class="category pb-1 pb-lg-4 text-uppercase" title="@s?.Parent?.Name" href="@s?.Parent?.Url()" data-link-type="internal-link" data-link="@s?.Name" data-section="Highlights">@s?.Parent?.Name</a>
+
+													}
+													<h3 class="h3 pb-1 pb-lg-4">@s?.Value("titoloHero")</h3>
+													@(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @s?.Url() }, { "category", @labelCat }, { "section", @content.TitoloHighlight }, { "name", @Umbraco.GetDictionaryValue("highlight_read_more") }, { "title", @s?.Value("titoloHero") }, { "css", "more" }, { "target", "_self" } }))
+												</div>
+											</div>
+										</div>
+									}
+									else if (s.ContentType.Alias == "articoloStorieDiSuccesso")
+									{
+										var pickedImage = s.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("sfondoHero");
+										<div class="swiper-slide">
+											<div class="news-wrapper">
+												@if (pickedImage?.Url() != "")
+												{
+													<img src="@pickedImage?.Url()" alt="@HtmlUtils.GetImageAlt(pickedImage)">
+												}
+												else
+												{
+													<img src="/assets/img/placeholder-news@2x.png" alt='Crif.com'>
+												}
+												<div class="caption">
+													@if (labelCat != "")
+													{
+														<div class="category pb-1 pb-lg-4 text-uppercase">@labelCat</div>
+													}
+													else
+													{
+														<a class="category pb-1 pb-lg-4 text-uppercase" title="@s?.Parent?.Name" href="@s?.Parent?.Url()" data-link-type="internal-link" data-link="@s?.Name" data-section="Highlights">@s?.Parent?.Name</a>
+
+													}
+													<h3 class="h3 pb-1 pb-lg-4">@s.Value("titoloArticolo")</h3>
+													@(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @s.Url() }, { "category", @s.Parent?.Name }, { "section", @content.TitoloHighlight }, { "name", @Umbraco.GetDictionaryValue("highlight_read_more") }, { "title", @s.Value("titoloArticolo") }, { "css", "more" }, { "target", "_self" } }))
+												</div>
+											</div>
+										</div>
+									}
+								}
+							</div>
+							@if(news.Count() > 1){
+								<!-- pagination -->
+								<div class="swiper-pagination"></div>
+
+								<!-- navigation buttons -->
+								<div class="swiper-button-prev"></div>
+								<div class="swiper-button-next"></div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	}
+}
+else
+{
+	<section class="news @bg" id="@settings.AnchorID">
+		<div class="container-lg">
+			<div class="row">
+				<div class="col-12">
+					@if (!content.TitoloHighlight.IsNullOrWhiteSpace())
+					{
+						<h2 class="h2 text-center mb-5">@content.TitoloHighlight</h2>
+					}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="swiper news-carousel">
+						<div class="swiper-wrapper">
+							@if (content != null && content.HighlightCards != null && content.HighlightCards.Any())
+							{
+								foreach (var card in content.HighlightCards)
+								{
+									var listContent = (ContentModels.BlockCardHighlight)card.Content;
+									<div class="swiper-slide">
+										<div class="news-wrapper">
+											<img src="@listContent.BackgroundImage?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.BackgroundImage)">
+											<div class="caption">
+												@if (listContent.IsCategoryClickable)
+												{
+													<a class="category pb-1 pb-lg-4 text-uppercase" title="@listContent?.CategoryLinkLabel?.Name" href="@listContent?.CategoryLinkLabel?.Url" target="@listContent?.CategoryLinkLabel?.Target" data-link-type="internal-link" data-link="@listContent?.Title" data-section="Highlights">@listContent?.CategoryLinkLabel?.Name</a>
+												}
+												else
+												{
+													<div class="category pb-1 pb-lg-4 text-uppercase">@listContent.CategoryLabel</div>
+												}
+												<h3 class="h3 pb-1 pb-lg-4">@listContent?.Title</h3>
+												@*@(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData){ {"url",@listContent.CallToAction?.Url}, {"category", "Knowledge&Events"}, {"section", "Highlights"}, {"name", @Umbraco.GetDictionaryValue("highlight_read_more")}, {"title", @listContent.Title}, {"css", "stretched-link more"}, {"target","_self"} }))*@
+												<a title="@listContent?.CallToAction?.Name" href="@listContent?.CallToAction?.Url" target="@listContent?.CallToAction?.Target" class="more" data-link-type="article" data-link="@listContent?.Title" data-link-destination="@listContent?.CallToAction?.Url" data-link-section="Highlights">@listContent?.CallToAction?.Name</a>
+											</div>
+										</div>
+									</div>
+								}
+							}
+						</div>
+						@if (content?.HighlightCards?.Count() > 1)
+						{
+							<!-- pagination -->
+							<div class="swiper-pagination"></div>
+
+							<!-- navigation buttons -->
+							<div class="swiper-button-prev"></div>
+							<div class="swiper-button-next"></div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+}
+
+<script>
+
+    @{
+        if (settings.AutoPlay == true && (news?.Count() > 1 || content?.HighlightCards?.Count() > 1))
+        {
+            @:var swiper = new Swiper(".news-carousel", {
+            @:loop: true,
+            @:slidesPerView: 1,
+            @:spaceBetween: 16,
+            @:autoplay: { disableOnInteraction: false },
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:	},
+			@:navigation: {
+			@:nextEl: '.swiper-button-next',
+			@:prevEl: '.swiper-button-prev',
+			@:},
+            @:breakpoints: {
+            @:992: {
+            @:loop: true,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:	},
+            @:},
+            @:});
+        }
+        else if( news?.Count() > 1 || content?.HighlightCards?.Count() > 1)
+        {
+            @:var swiper = new Swiper(".news-carousel", {
+            @:loop: false,
+            @:slidesPerView: 1,
+            @:spaceBetween: 16,
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:},
+			@:navigation: {
+			@:nextEl: '.swiper-button-next',
+			@:prevEl: '.swiper-button-prev',
+			@:},
+            @:breakpoints: {
+            @:992: {
+            @:loop: true,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:},
+            @:},
+            @:});
+
+        }
+    }
+
+</script>

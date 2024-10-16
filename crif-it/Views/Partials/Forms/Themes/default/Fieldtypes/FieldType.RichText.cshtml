@@ -1,0 +1,14 @@
+@model Umbraco.Forms.Web.Models.FieldViewModel
+@using Umbraco.Forms.Web
+
+@inject Umbraco.Cms.Core.Templates.HtmlLocalLinkParser htmlLocalLinkParser;
+
+@{
+    string value;
+    if (Model.AdditionalSettings.TryGetValue("Html", out value))
+    {
+        <div id="@Model.Id" data-umb="@Model.Id" class="@Html.GetFormFieldClass(Model.FieldTypeName)">
+            @Html.Raw(htmlLocalLinkParser.EnsureInternalLinks(value))
+        </div>
+    }
+}

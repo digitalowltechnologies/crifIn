@@ -1,0 +1,54 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+    ContentModels.BlockTextAndLink content = (ContentModels.BlockTextAndLink)Model.Content;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (settings.AnchorID == "withoutlink")
+    {
+        <section class="pageSection">
+            <div class="container">
+                <div class="titleSection mb-0">
+                    @if (!string.IsNullOrEmpty(content.Title))
+                    {
+                        <h2 class="title text-center">@content.Title</h2>
+                    }
+                    <div class="text-center bigFont fw-normal">
+                        @Html.Raw(content.Text)
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <div class="col-12 text-center mt-5">
+            @if (!string.IsNullOrEmpty(content.Title))
+            {
+                <h class="h2">@content.Title</h>
+            }
+            <p class="bigFont">@Html.Raw(content.Text)</p>
+            @if (!string.IsNullOrEmpty(@content?.CallToAction?.Url))
+            {
+                <a title="@content?.CallToAction?.Name" href="@content?.CallToAction?.Url" class="orangeBtn mt-4 mx-auto" data-link-type="cta" data-link="@content?.CallToAction?.Name" data-section="@content?.Title">@content?.CallToAction?.Name</a>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="container-lg" id="@settings?.AnchorID">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 text-center pb-lg-5">
+                @if (!string.IsNullOrEmpty(content.Title))
+                {
+                    <h2 class="h2">@content.Title</h2>
+                }
+                @Html.Raw(content.Text)
+                <a title="@content?.CallToAction?.Name" href="@content?.CallToAction?.Url" class="more big-more" data-link-type="cta" data-link="@content?.CallToAction?.Name" data-section="@content?.Title">@content?.CallToAction?.Name</a>
+            </div>
+        </div>
+    </div>
+}

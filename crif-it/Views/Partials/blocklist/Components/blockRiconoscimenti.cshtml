@@ -1,0 +1,115 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockRiconoscimenti content = (ContentModels.BlockRiconoscimenti)Model.Content;
+    ContentModels.BlockRiconoscimentiSettings settings = (ContentModels.BlockRiconoscimentiSettings)Model.Settings;
+
+}
+<section class="aknlowledgments" id="@settings.AnchorID">
+    @if (content.TitoloRiconoscimenti != "")
+    {
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="h2 text-center mb-0 pb-0 pb-lg-5">@content.TitoloRiconoscimenti</h2>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="container-lg">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-11 px-lg-4">
+                @if (content.CardRiconoscimenti != null && content.CardRiconoscimenti.Any())
+                {
+                    <div class="swiper aknlowledgments-carousel pt-3 pe-3 pe-lg-0">
+                        <div class="swiper-wrapper">
+                            <!-- slides -->
+                            @foreach (var item in content.CardRiconoscimenti)
+                            {
+                                ContentModels.BlockRiconoscimento riconoscimento = (ContentModels.BlockRiconoscimento)item.Content;
+                                <div class="swiper-slide">
+                                    <div class="custom-card riconoscimento shadow">
+                                        @if (riconoscimento.ImmagineRiconoscimento != null)
+                                        {
+                                            <div class="card-logo">
+                                                <img src="@riconoscimento.ImmagineRiconoscimento.Url()" alt="@HtmlUtils.GetImageAlt(riconoscimento.ImmagineRiconoscimento)">
+                                            </div>
+                                        }
+
+                                        <div class="card-body">
+                                            <h3 class="h3 mb-3">@riconoscimento?.TitoloRiconoscimento</h3>
+                                            <p>@riconoscimento?.DescrizioneRiconoscimento</p>
+                                            @if (riconoscimento?.LinkRiconoscimento != null)
+                                            {
+                                                <a href="@riconoscimento.LinkRiconoscimento.Url" target="@riconoscimento.LinkRiconoscimento.Target" class="more big-more">@riconoscimento.LinkRiconoscimento.Name</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <!-- pagination -->
+                        <div class="swiper-pagination"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+
+    @{
+        if (settings.AutoPlay == true)
+        {
+            @: var swiper = new Swiper(".aknlowledgments-carousel", {
+            @: loop: true,
+            @: slidesPerView: 1,
+            @: spaceBetween: 16,
+            @:autoplay: { disableOnInteraction: false },
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:},
+            @:breakpoints: {
+            @:    992: {
+            @:loop: true,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:   },
+            @:},
+            @:});
+
+
+        }
+        else
+        {
+            @: var swiper = new Swiper(".aknlowledgments-carousel", {
+            @: loop: false,
+            @: slidesPerView: 1,
+            @: spaceBetween: 16,           
+            @:pagination: {
+            @:el: '.swiper-pagination',
+            @:type: 'bullets',
+            @:clickable: true,
+            @:},
+            @:breakpoints: {
+            @:    992: {
+            @:loop: false,
+            @:slidesPerView: 'auto',
+            @:spaceBetween: 64,
+            @:centeredSlides: true,
+            @:   },
+            @:},
+            @:});
+        
+        }
+
+    }
+
+</script>

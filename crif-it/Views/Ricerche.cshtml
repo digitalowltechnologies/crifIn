@@ -1,0 +1,192 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@using ContentModels = Crif.It.Models;
+@using Umbraco.Cms.Core.PublishedCache;
+@inject ITagQuery _tagQuery;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Ricerche>
+@{
+    Layout = "Master.cshtml";
+    var tags = Model?.SiblingsAndSelf();
+    RicercheAcademy? parentRicerche = (RicercheAcademy?)Model?.Parent;
+    var articoli = Model?.DescendantsOfType("Articolo").OrderByDescending(x => x.Value("dataCustom"));
+    var pageSize = 15;
+    if (Model?.ElementiPerPagina > 0)
+    {
+        pageSize = Model.ElementiPerPagina;
+    }
+ 
+    var listAllTags = _tagQuery.GetAllTags();
+
+    string tagSearch = Context.Request.Query["select-tag"];
+
+}
+
+<section class="textonly-heading pb-lg-3">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12 banner">
+                <div class="caption">
+                    @await (Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem.Parent))
+                    <h1 class="h1 fade-in-box">@parentRicerche?.TitoloRA</h1>
+                    <p class="big-text fade-in-box">@parentRicerche?.DescrizioneRA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@if (tags != null && tags.Any())
+{
+    <div class="decade-banner z-10">
+        <section class="internal-navigation mt-3 mt-lg-5">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <nav>
+                            <ul class="internal-menu">
+                                <li class="nav-item"><a title="@parentRicerche?.Name" href="@parentRicerche?.Url()" class="nav-link">@Umbraco.GetDictionaryValue("tutti_news_eventi")</a></li>
+                                @foreach (var tag in tags.OrderBy(tags => tags.Value("ordineCustom")))
+                                {
+                                    var current = (tag.Name == Model?.Name) ? "current" : "";
+                                    <li class="nav-item @current"><a title="@tag.Name" href="@tag.Url()" class="nav-link">@tag.Name</a></li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+
+@{
+
+    @if (tagSearch != null && tagSearch != "")
+    {
+        var taggedContent = _tagQuery.GetContentByTag(tagSearch);
+
+        articoli = taggedContent.OrderByDescending(x => x.Value("dataCustom"));
+    }
+
+    var page = 1; int.TryParse(Context.Request.Query["page"], out page);
+    var totalPages = 1;
+    if (articoli != null && articoli.Count() > pageSize)
+    {
+        totalPages = (articoli.Count() / pageSize) + ((articoli?.Count() % pageSize > 0) ? 1 : 0);
+    }
+
+    if (page > totalPages)
+    {
+        page = totalPages;
+    }
+    else if (page < 1)
+    {
+        page = 1;
+    }
+}
+@Html.GetBlockListHtml(Model?.Blocchi)
+@if (Model != null && Model.MostrareListing)
+{
+    <section class="vertical-cards-block bg pt-0 pt-lg-4 pb-80">
+        <div class="container-lg">
+            @if (Model.TitoloAggiornamenti != "")
+            {
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloAggiornamenti</h2>
+                    </div>
+                </div>
+            }
+            @if (listAllTags != null)
+            {
+                @if (listAllTags.Count() > 0)
+                {
+                    <section id="filtered-tags-list" class="vertical-cards-block pt-0 pb-80">
+                        <div class="row pb-3 pb-lg-5">
+                            <div class="col-12">
+                                <form action="@Model?.Url()#filtered-tags-list" method="GET">
+                                    <div class="filters">
+                                        <label for="" class="form-label">@Umbraco.GetDictionaryValue("label_select_ricerche_tags")</label>
+                                        <select name="select-tag" id="filter-service-select" class="form-select">
+
+                                            <option value="">@Umbraco.GetDictionaryValue("select_tags_tutti_temi")</option>
+
+                                            @foreach (Umbraco.Cms.Core.Models.TagModel? tagModel in listAllTags)
+                                            {
+                                                @if (tagSearch != null && tagSearch != "")
+                                                {
+                                                    @if (tagModel?.Text == tagSearch)
+                                                    {
+                                                        <option value="@tagModel?.Text" selected>@tagModel?.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@tagModel?.Text">@tagModel?.Text</option>
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <option value="@tagModel?.Text">@tagModel?.Text</option>
+                                                }
+                                            }
+
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                </section>
+                }
+            }
+
+
+            @if (articoli != null && articoli.Any())
+            {
+                <div class="row g-large">
+                    @foreach (Articolo art in articoli.Skip((page - 1) * pageSize).Take(pageSize))
+                    {
+                        @(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData) { { "list", "related" },{"section",@Model.TitoloAggiornamenti} }))
+                    }
+                </div>
+            }
+
+            @if (totalPages > 1)
+            {
+                <div class="row pt-4 mt-2 mt-lg-0">
+                    @(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)page, TotalCount = (int)totalPages }))
+                </div>
+            }
+        </div>
+    </section>
+}
+@Html.GetBlockListHtml(Model?.AltriBlocchi)
+@if (Model != null && Model.MostrareCategorieRicerche)
+{
+    var categorie = Model.Children();
+    <section class="cards-block">
+        <div class="container-lg">
+            @if (Model.TitoloSezioneRicerche != "")
+            {
+                <div class="row justify-content-center">
+                    <div class="col-7 col-lg-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloSezioneRicerche</h2>
+                    </div>
+                </div>
+            }
+            <div class="row g-mega g-overflow ">
+                @if (categorie != null && categorie.Any())
+                {
+                    @foreach (RicercheAcademyCategoria cat in categorie)
+                    {
+                        @(await Html.PartialAsync("CardRicercheCategoria", cat))
+                    }
+                }
+            </div>
+        </div>
+    </section>
+}
+@Html.GetBlockListHtml(Model?.UltimiBlocchi)
+
+
+

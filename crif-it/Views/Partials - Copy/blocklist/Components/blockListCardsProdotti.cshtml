@@ -1,0 +1,303 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils
+@{
+    ContentModels.BlockListCardsProdotti content = (ContentModels.BlockListCardsProdotti)Model.Content;
+    var settings = (ContentModels.BlockListCardsProdottiSettings)Model.Settings;
+    var bg = settings.BackgroundGrey ? "lightGreyBg2" : "";
+    var bgold = settings.BackgroundGrey ? "bg" : "";
+}
+@if(settings != null && settings.NewTemplate)
+{
+@if (settings.AnchorID == "Price")
+{
+    <section class="pageSection @bg">
+        <div class="container">
+            @if (content.TitoloLista != "" || content.SottotitoloLista != "")
+            {
+                <div class="titleSection text-center">
+
+                    @if (content.TitoloLista != "")
+                    {
+                        <h2 class="title">@content.TitoloLista</h2>
+                    }
+
+                    @if (content.SottotitoloLista != "")
+                    {
+                        <p>@content.SottotitoloLista</p>
+                    }
+                </div>
+            }
+            <div class="row justify-content-center mx-lg-5">
+                @foreach (var card in content.CardsProdotti)
+                {
+                    ContentModels.BlockSingleCardProduct cardContent = (ContentModels.BlockSingleCardProduct)card.Content;
+
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="priceCard animateThis slideTop">
+                            @if (cardContent?.TitoloProdotto != "")
+                            {
+                                <h6 class="priceTitle">@cardContent?.TitoloProdotto</h6>
+                            }
+                            @if (cardContent?.SottotitoloProdotto != "")
+                            {
+                                <div class="price">@cardContent?.SottotitoloProdotto</div>
+                            }
+                            @Html.Raw(cardContent?.DescrizioneProdotto)
+                            @if (cardContent?.LinkProdotto != null)
+                            {
+                                <a href="@cardContent?.LinkProdotto?.Url" target="@cardContent?.LinkProdotto?.Target" class="orangeBtn mx-auto" data-link-type="page" data-link="@cardContent?.TitoloProdotto" data-link-destination="@cardContent?.LinkProdotto?.Url" data-link-section="@content.TitoloLista">@cardContent?.LinkProdotto?.Name</a>
+                            }
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    @if (settings.CardFullwidth)
+    {
+        <section class="other-services" id="@settings.AnchorID">
+            <div class="container-lg">
+                @if (content.TitoloLista != "" || content.SottotitoloLista != "")
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="header">
+                                @if (content.TitoloLista != "")
+                                {
+                                    <h2 class="h2 mb-3 mb-lg-4">@content.TitoloLista</h2>
+                                }
+
+                                @if (content.SottotitoloLista != "")
+                                {
+                                    <p class="big-text">@content.SottotitoloLista</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    @foreach (var card in content.CardsProdotti)
+                    {
+                        ContentModels.BlockSingleCardProduct cardContent = (ContentModels.BlockSingleCardProduct)card.Content;
+                        <div class="col-12">
+                            <div class="other-service">
+                                <div class="img-wrapper">
+                                    <img src="@cardContent?.Immagine?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.Immagine)">
+                                </div>
+                                <div class="caption">
+                                    @if (cardContent?.LogoProdotto != null)
+                                    {
+                                        <div class="offer-logo">
+                                            <img src="@cardContent?.LogoProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.LogoProdotto)">
+                                        </div>
+                                    }
+                                    @if (cardContent?.TitoloProdotto != "")
+                                    {
+                                        <h3 class="h3">@cardContent?.TitoloProdotto</h3>
+                                    }
+                                    @if (cardContent?.SottotitoloProdotto != "")
+                                    {
+                                        <p class="launch">@cardContent?.SottotitoloProdotto</p>
+                                    }
+                                    @Html.Raw(cardContent?.DescrizioneProdotto)
+                                    @if (cardContent?.LinkProdotto != null)
+                                    {
+                                        <a href="@cardContent?.LinkProdotto?.Url" target="@cardContent?.LinkProdotto?.Target" class="more" data-link-type="page" data-link="@cardContent?.TitoloProdotto" data-link-destination="@cardContent?.LinkProdotto?.Url" data-link-section="@content.TitoloLista">@cardContent?.LinkProdotto?.Name</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="custom-solutions pb-4 @bg" id="@settings.AnchorID">
+            <div class="container-lg">
+                @if (content.TitoloLista != "" || content.SottotitoloLista != "")
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="header">
+                                @if (content.TitoloLista != "")
+                                {
+                                    <h2 class="h2 mb-3 mb-lg-4">@content.TitoloLista</h2>
+                                }
+                                @if (content.SottotitoloLista != "")
+                                {
+                                    <p class="big-text">@content.SottotitoloLista</p>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row g-mega g-overflow">
+                    @foreach (var card in content.CardsProdotti)
+                    {
+                        ContentModels.BlockSingleCardProduct cardContent = (ContentModels.BlockSingleCardProduct)card.Content;
+                        <div class="col-12 col-lg-6">
+                            <div class="custom-solution">
+                                <div class="img-wrapper">
+                                    <img src="@cardContent?.Immagine?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.Immagine)">
+                                </div>
+                                <div class="caption">
+                                    @if (cardContent?.LogoProdotto != null)
+                                    {
+                                        <div class="offer-logo">
+                                            <img src="@cardContent?.LogoProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.LogoProdotto)">
+                                        </div>
+                                    }
+                                    @if (cardContent?.TitoloProdotto != "")
+                                    {
+                                        <h3 class="h3">@cardContent?.TitoloProdotto</h3>
+                                    }
+                                    @if (cardContent?.SottotitoloProdotto != "")
+                                    {
+                                        <p class="launch">@cardContent?.SottotitoloProdotto</p>
+                                    }
+                                    @Html.Raw(cardContent?.DescrizioneProdotto)
+                                    @if (cardContent?.LinkProdotto != null)
+                                    {
+                                        <a href="@cardContent?.LinkProdotto?.Url" target="@cardContent?.LinkProdotto?.Target" class="more" data-link-type="page" data-link="@cardContent?.TitoloProdotto" data-link-destination="@cardContent?.LinkProdotto?.Url" data-link-section="@content.TitoloLista">@cardContent?.LinkProdotto?.Name</a>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    }
+}
+else
+{
+    @if (settings.CardFullwidth)
+    {
+        <section class="other-services" id="@settings.AnchorID">
+            <div class="container-lg">
+                @if (content.TitoloLista != "" || content.SottotitoloLista != "")
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="header">
+                                @if (content.TitoloLista != "")
+                                {
+                                    <h2 class="h2 mb-3 mb-lg-4">@content.TitoloLista</h2>
+                                }
+
+                                @if (content.SottotitoloLista != "")
+                                {
+                                    <p class="big-text">@content.SottotitoloLista</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    @foreach (var card in content.CardsProdotti)
+                    {
+                        ContentModels.BlockSingleCardProduct cardContent = (ContentModels.BlockSingleCardProduct)card.Content;
+                        <div class="col-12">
+                            <div class="other-service">
+                                <div class="img-wrapper">
+                                    <img src="@cardContent?.Immagine?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.Immagine)">
+                                </div>
+                                <div class="caption">
+                                    @if (cardContent?.LogoProdotto != null)
+                                    {
+                                        <div class="offer-logo">
+                                            <img src="@cardContent?.LogoProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.LogoProdotto)">
+                                        </div>
+                                    }
+                                    @if (cardContent?.TitoloProdotto != "")
+                                    {
+                                        <h3 class="h3">@cardContent?.TitoloProdotto</h3>
+                                    }
+                                    @if (cardContent?.SottotitoloProdotto != "")
+                                    {
+                                        <p class="launch">@cardContent?.SottotitoloProdotto</p>
+                                    }
+                                    @Html.Raw(cardContent?.DescrizioneProdotto)
+                                    @if (cardContent?.LinkProdotto != null)
+                                    {
+                                        <a href="@cardContent?.LinkProdotto?.Url" target="@cardContent?.LinkProdotto?.Target" class="more" data-link-type="page" data-link="@cardContent?.TitoloProdotto" data-link-destination="@cardContent?.LinkProdotto?.Url" data-link-section="@content.TitoloLista">@cardContent?.LinkProdotto?.Name</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="custom-solutions pb-4 @bgold" id="@settings.AnchorID">
+            <div class="container-lg">
+                @if (content.TitoloLista != "" || content.SottotitoloLista != "")
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="header">
+                                @if (content.TitoloLista != "")
+                                {
+                                    <h2 class="h2 mb-3 mb-lg-4">@content.TitoloLista</h2>
+                                }
+                                @if (content.SottotitoloLista != "")
+                                {
+                                    <p class="big-text">@content.SottotitoloLista</p>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row g-mega g-overflow">
+                    @foreach (var card in content.CardsProdotti)
+                    {
+                        ContentModels.BlockSingleCardProduct cardContent = (ContentModels.BlockSingleCardProduct)card.Content;
+                        <div class="col-12 col-lg-6">
+                            <div class="custom-solution">
+                                <div class="img-wrapper">
+                                    <img src="@cardContent?.Immagine?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.Immagine)">
+                                </div>
+                                <div class="caption">
+                                    @if (cardContent?.LogoProdotto != null)
+                                    {
+                                        <div class="offer-logo">
+                                            <img src="@cardContent?.LogoProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(cardContent?.LogoProdotto)">
+                                        </div>
+                                    }
+                                    @if (cardContent?.TitoloProdotto != "")
+                                    {
+                                        <h3 class="h3">@cardContent?.TitoloProdotto</h3>
+                                    }
+                                    @if (cardContent?.SottotitoloProdotto != "")
+                                    {
+                                        <p class="launch">@cardContent?.SottotitoloProdotto</p>
+                                    }
+                                    @Html.Raw(cardContent?.DescrizioneProdotto)
+                                    @if (cardContent?.LinkProdotto != null)
+                                    {
+                                        <a href="@cardContent?.LinkProdotto?.Url" target="@cardContent?.LinkProdotto?.Target" class="more" data-link-type="page" data-link="@cardContent?.TitoloProdotto" data-link-destination="@cardContent?.LinkProdotto?.Url" data-link-section="@content.TitoloLista">@cardContent?.LinkProdotto?.Name</a>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+}

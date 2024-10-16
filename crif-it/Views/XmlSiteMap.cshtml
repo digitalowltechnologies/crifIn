@@ -1,0 +1,158 @@
+﻿@using Umbraco.Cms.Core.Models;
+@using Umbraco.Cms.Core.Services;
+@using Umbraco.Extensions;
+@using Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<XmlSiteMap>
+@inject IMediaService MediaService
+@inject IRelationService RelationService
+@{
+	Layout = null;
+	Context.Response.ContentType = "text/xml";
+	IPublishedContent? siteHomePage = Model.Root();
+	if (Model.StartNode != null)
+	{
+		siteHomePage = Model.StartNode;
+	}
+
+	string excludedDocumentTypeList = Model.Value<string>("excludedDocumentTypes") ?? "";
+	string[] excludedDocumentTypes = (!String.IsNullOrEmpty(excludedDocumentTypeList)) ? excludedDocumentTypeList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).ToArray() : new string[] { };
+
+	var mediaServices = MediaService;
+	var relationService = RelationService;
+	var allMedia = mediaServices.GetRootMedia();
+
+	void RenderSiteMapUrlEntry(IPublishedContent? node, string cult = "")
+	{
+		if (string.IsNullOrEmpty(cult))
+		{
+			cult = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+		}
+
+		if (node != null)
+		{
+			//var changeFreq = node.Value(cult, "searchEngineChangeFrequency", fallback: Fallback.To(Fallback.Ancestors, Fallback.DefaultValue), defaultValue: "monthly");
+			var changeFreq = node.HasValue("searchEngineChangeFrequency") ? node.Value("searchEngineChangeFrequency") : ((node.Parent != null && node.Parent.HasValue("searchEngineChangeFrequency")) ? node.Parent.Value("searchEngineChangeFrequency") : "monthly");
+			// with the relative priority, this is a per page setting only, so we're not using recursion, so we won't set Fallback.ToAncestors here and we'll default to 0.5 if no value is set
+			var priority = node.HasValue("searchEngineRelativePriority") ? node.Value("searchEngineRelativePriority") : "0.5";
+			string url = node.Url(cult, mode: UrlMode.Absolute) ?? "";
+
+			<url>
+				<loc>@url.Replace("http:", "https:")</loc>
+				<lastmod>@(string.Format("{0:s}+00:00", node.UpdateDate))</lastmod>
+				<changefreq>@changeFreq</changefreq>
+				<priority>@priority</priority>
+			</url>
+		}
+	}
+
+	void RenderSiteMapUrlEntriesForChildren(IPublishedContent? parentPage, string cult = "")
+	{
+		if (parentPage != null)
+		{
+			IEnumerable<IPublishedContent> pages = parentPage.Children;
+			if (Model.IsIndex)
+			{
+				pages = parentPage.Children.Where(x => (x.ContentType.Alias == "xmlSiteMap"));
+			}
+
+			foreach (var page in pages)
+			{
+				if (!excludedDocumentTypes.Contains(page.ContentType.Alias) && !page.Value<bool>("hideFromXmlSitemap"))
+				{
+					RenderSiteMapUrlEntry(page, cult);
+				}
+
+				if (page != null && page.Children != null && page.Children.Any(x => !x.Value<bool>("hideFromXmlSiteMap")))
+				{
+					RenderSiteMapUrlEntriesForChildren(page, cult);
+				}
+			}
+		}
+	}
+
+	void RenderMediaSiteMapUrlEntry(IMedia media)
+	{
+		if (media.ContentType.Alias == "Folder")
+		{
+			var folder = Umbraco.Media(media.Id)?.Children();
+			@if (folder != null && folder.Any())
+			{
+				if (folder.Count() == 1)
+				{
+					var relation = relationService?.IsRelated(folder.First().Id);
+					var singoloArticolo = folder.First();
+					if (singoloArticolo.Url().GetFileExtension() == ".pdf" && relation!= null && relation!=false)
+					{
+						<url>
+							<loc>@singoloArticolo.Url().Replace("http:", "https:")</loc>
+							<lastmod>@(string.Format("{0:s}+00:00", singoloArticolo?.UpdateDate))</lastmod>
+						</url>
+					}
+				}
+				else
+				{
+					foreach (var md in folder)
+					{
+						if (md.ContentType.Alias == "File" || md.ContentType.Alias == "umbracoMediaArticle")
+						{
+							var relation = relationService?.IsRelated(md.Id);
+							if (md.Url().GetFileExtension() == ".pdf" && relation != null && relation != false)
+							{
+								<url>
+									<loc>@md.Url().Replace("http:", "https:")</loc>
+									<lastmod>@(string.Format("{0:s}+00:00", md?.UpdateDate))</lastmod>
+								</url>
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (media.ContentType.Alias == "File" || media.ContentType.Alias == "umbracoMediaArticle")
+		{
+			var relation = relationService?.IsRelated(media.Id);
+			var url = media.GetValue("umbracoFile") != null ? media?.GetValue("umbracoFile")?.ToString() : string.Empty;
+			if (url?.GetFileExtension() == ".pdf" && relation != null && relation != false)
+			{
+				<url>
+					<loc>@url.Replace("http:", "https:")</loc>
+					<lastmod>@(string.Format("{0:s}+00:00", media?.UpdateDate))</lastmod>
+				</url>
+			}
+		}
+	}
+}
+
+@if (Model.IsIndex)
+{
+	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://www.google.com/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+		@{
+			if (siteHomePage != null && !Model.DocumentSitemap)
+			{
+				foreach (var cult in siteHomePage.Cultures)
+				{
+					RenderSiteMapUrlEntriesForChildren(siteHomePage, cult.Key);
+				}
+			}
+		}
+	</urlset>
+}
+else
+{
+	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://www.google.com/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+		@{
+			if (Model.DocumentSitemap)
+			{
+				foreach (var media in allMedia)
+				{
+					RenderMediaSiteMapUrlEntry(media);
+				}
+			}
+			else
+			{
+				RenderSiteMapUrlEntry(siteHomePage);
+				RenderSiteMapUrlEntriesForChildren(siteHomePage);
+			}
+		}
+	</urlset>
+}

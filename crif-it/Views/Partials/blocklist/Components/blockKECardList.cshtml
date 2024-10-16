@@ -1,0 +1,328 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockKecardList content = (ContentModels.BlockKecardList)Model.Content;
+    ContentModels.BlockKecardListSettings settings = (ContentModels.BlockKecardListSettings)Model.Settings;
+}
+@if(settings != null && settings.NewTemplate)
+{
+    <!-- *********** -->
+  <section class="py-5">
+    <div class="container">
+        <div class="row justify-content-between">
+        <div class="col-12 col-md-7 col-lg-5">
+          @if (!string.IsNullOrEmpty(content.CardListTitle))
+                        {
+                            <h2 class="title ms-0">@content.CardListTitle</h2>
+                        }
+        </div>
+        <div class="col col-md-auto">
+          <a href="./blogs.html" class="arrowBtn mt-4">Discover More</a>
+        </div>
+      </div>
+      <div class="customSwiper swiper-container pb-4 pb-md-5">
+        <div class="swiper-wrapper">
+            @if (content != null && content.CardList != null && content.CardList.Any())
+                                {
+                                    foreach (var card in content.CardList)
+                                    {
+                                        var listContent = (ContentModels.BlockKecard)card.Content;
+                                        
+                                         <div class="swiper-slide px-2 px-md-3">
+            <div class="blogCard boxShadow border">
+              <img src="@listContent.CardImage?.Url()" class="blogImg" alt="@HtmlUtils.GetImageAlt(listContent.CardImage)">
+              <div class="p-4">
+                  @if (listContent?.CardDate != DateTime.MinValue)
+                                                        {
+                                                            <small class="blogDate">@listContent?.CardDate.ToString("dd/MM/yy")</small>
+                                                        }
+
+            <a href="@listContent?.CardLink?.Url" class="blogTitle" data-link-type="internal-link" data-link="@listContent?.CardTitle" data-section="@content.CardListTitle">
+                                                        @listContent?.CardTitle
+                                                    </a>
+              </div>
+            </div>
+          </div>
+
+                                    }
+                                }
+        </div>
+        <div class="swiper-pagination customPagination"></div>
+      </div>
+   </div>
+  </section>
+}
+else
+{
+    @if (content.Abilita == false)
+{
+    @if (settings.IsCarousel)
+    {
+        <section class="trends">
+            <div class="container-lg">
+                <div class="row justify-content-center pb-lg-5 mb-lg--4">
+                    <div class="col-7 col-lg-12 text-center">
+                        @if (!string.IsNullOrEmpty(content.CardListTitle))
+                        {
+                            <h2 class="h2">@content.CardListTitle</h2>
+                        }
+                        @{
+                            string? subtitle = content.CardListSubtitle;
+                            if (subtitle != "")
+                            {
+                                <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="swiper kecards-carousel pt-3 pe-3 pe-lg-0">
+                            <div class="swiper-wrapper">
+                                @if (content != null && content.CardList != null && content.CardList.Any())
+                                {
+                                    foreach (var card in content.CardList)
+                                    {
+                                        var listContent = (ContentModels.BlockKecard)card.Content;
+                                        <!-- slides -->
+                                        <div class="swiper-slide cards-list">
+                                            <!--<div class="col-12 col-lg-8">-->
+                                            <div class="custom-vertical-card shadow">
+                                                <div class="img-wrapper">
+                                                    <img src="@listContent.CardImage?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.CardImage)">
+                                                </div>
+                                                @if (listContent.CardCategory != "")
+                                                {
+                                                    <span class="category-label">@listContent.CardCategory</span>
+                                                }
+                                                <div class="card-body">
+                                                    <div class="meta">
+                                                        @if (!string.IsNullOrEmpty(listContent?.AlternativeText))
+                                                        {
+                                                            <p class="date">@listContent?.AlternativeText</p>
+                                                        }
+                                                        else if (listContent?.CardDate != DateTime.MinValue)
+                                                        {
+                                                            <p class="date">@listContent?.CardDate.ToString("dd/MM/yy")</p>
+                                                        }
+                                                    </div>
+                                                    <a href="@listContent?.CardLink?.Url" class="stretched-link" data-link-type="internal-link" data-link="@listContent?.CardTitle" data-section="@content.CardListTitle">
+                                                        <h3 class="h5 card-title only-title">@listContent?.CardTitle</h3>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--</div>-->
+                                    }
+                                }
+                            </div>
+                            <!-- pagination -->
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="cards-block">
+            <div class="container-lg">
+                <div class="row justify-content-center">
+                    <div class="col-7 col-lg-12 text-center pb-lg-5 mb-lg--4">
+                        @if (!string.IsNullOrEmpty(content.CardListTitle))
+                        {
+                            <h2 class="h2">@content.CardListTitle</h2>
+                        }
+                        @{
+                            string? subtitle = content.CardListSubtitle;
+                            if (subtitle != "")
+                            {
+                                <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                            }
+                        }
+                    </div>
+                    <div class="row g-large">
+                        @if (content != null && content.CardList != null && content.CardList.Any())
+                        {
+                            foreach (var card in content.CardList)
+                            {
+                                var listContent = (ContentModels.BlockKecard)card.Content;
+                                <div class="col-12 col-lg-4 cards-list">
+                                    <div class="custom-vertical-card shadow fade-in-box">
+                                        <div class="img-wrapper"><img src="@listContent.CardImage?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.CardImage)"></div>
+                                        @if (listContent.CardCategory != "")
+                                        {
+                                            <span class="category-label">@listContent.CardCategory</span>
+                                        }
+                                        <div class="card-body">
+                                            <div class="meta">
+                                                @if (!string.IsNullOrEmpty(listContent?.AlternativeText))
+                                                {
+                                                    <p class="date">@listContent?.AlternativeText</p>
+                                                }
+                                                else if (listContent?.CardDate != DateTime.MinValue)
+                                                {
+                                                    <p class="date">@listContent?.CardDate.ToString("dd/MM/yy")</p>
+                                                }
+
+                                                @if (listContent?.CardCountry != "")
+                                                {
+                                                    <p class="country">@listContent?.CardCountry</p>
+                                                }
+                                            </div>
+                                            <a href="@listContent?.CardLink?.Url" class="stretched-link" data-link-type="internal-link" data-link="@listContent?.CardTitle" data-section="@content.CardListTitle">
+                                                <h3 class="h5 card-title only-title">@listContent?.CardTitle</h3>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+}
+
+@if (content?.Abilita == true)
+{
+    List<IPublishedContent> listArt = new List<IPublishedContent>();
+
+    if (content.CardListTypologies != null)
+    {
+        List<IPublishedContent> listArtFromCat = new List<IPublishedContent>();
+        foreach (var iP in content.CardListTypologies)
+        {
+            if (iP.ContentType.Alias != "articolo" && iP.ContentType.Alias != "articoloStorieDiSuccesso")
+            {
+                if (iP.ContentType.Alias == "storieDiSuccesso")
+                {
+                    listArtFromCat = iP.DescendantsOfType("articoloStorieDiSuccesso").OrderByDescending(articles => articles.Value("dataCustom")).ToList();
+                } else
+                {
+                    listArtFromCat = iP.DescendantsOfType("articolo").OrderByDescending(articles => articles.Value("dataCustom")).ToList();
+                }
+  
+                /* take only the last 3 articolo from category*/     
+                for (int indArtCat = 0; indArtCat < listArtFromCat.Count; indArtCat++)
+                {
+                    listArt.Add(listArtFromCat[indArtCat]);
+
+                    if (indArtCat == 2)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                listArt.Add(iP);
+            }
+        }
+    }
+
+    @if (settings.IsCarousel)
+    {
+        <section class="trends">
+            <div class="container-lg">
+                <div class="row justify-content-center pb-lg-5 mb-lg--4">
+                    <div class="col-7 col-lg-12 text-center">
+                        @if (!string.IsNullOrEmpty(content.AutoCardListTitle))
+                        {
+                            <h2 class="h2">@content.AutoCardListTitle</h2>
+                        }
+                        @{
+                            string? subtitle = content.AutoCardListSubtitle;
+                            if (subtitle != "")
+                            {
+                                <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="swiper kecards-carousel pt-3 pe-3 pe-lg-0">
+                            <div class="swiper-wrapper">
+                                @if (listArt.Count>0)
+                                {
+                                    foreach (var art in listArt)
+                                    {
+                                        if(art.ContentType.Alias == "articoloStorieDiSuccesso")
+                                        {
+                                        <!-- slides -->
+                                        <div class="swiper-slide cards-list">
+
+                                            @(await Html.PartialAsync("CardArticoloStorieSuccessoSwiper", art, new ViewDataDictionary(ViewData) { { "list", "related" }, { "section", @content.AutoCardListTitle } }))
+                                            
+                                        </div> 
+                                        } else
+                                        {
+                                        <!-- slides -->
+                                        <div class="swiper-slide cards-list">
+
+                                            @(await Html.PartialAsync("CardArticoloSwiper", art, new ViewDataDictionary(ViewData) { { "list", "related" }, { "section", @content.AutoCardListTitle } }))
+                                            
+                                        </div>
+                                        }
+                                    }
+                                }
+                            </div>
+                            <!-- pagination -->
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="cards-block">
+            <div class="container-lg">
+                <div class="row justify-content-center">
+                    <div class="col-7 col-lg-12 text-center pb-lg-5 mb-lg--4">
+                        @if (!string.IsNullOrEmpty(content.AutoCardListTitle))
+                        {
+                            <h2 class="h2">@content.AutoCardListTitle</h2>
+                        }
+                        @{
+                            string? subtitle = content.AutoCardListSubtitle;
+                            if (subtitle != "")
+                            {
+                                <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                            }
+                        }
+                    </div>
+                    <div class="row g-large">
+                        @if (listArt.Count()>0)
+                        {
+                            foreach (var art in listArt)
+                            {
+                                if(art.ContentType.Alias == "articoloStorieDiSuccesso")
+                                {
+                                    @(await Html.PartialAsync("cardStorieSuccesso", art, new ViewDataDictionary(ViewData) { { "list", "main" },{"section",@content?.AutoCardListTitle} }))
+                                } else
+                                {
+                                    @(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData) { { "list", "related" }, { "section", @content?.AutoCardListTitle }}))
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+}
+
+
+}

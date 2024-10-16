@@ -1,0 +1,145 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System;
+@{
+	ContentModels.BlockContatto content = (ContentModels.BlockContatto)Model.Content;
+	ContentModels.BlockContattoSettings settings = (ContentModels.BlockContattoSettings)Model.Settings;
+}
+@if (settings.LayoutContatto == "Grey")
+{
+	<section class="customer-contact bg" id="@settings.AnchorID">
+		<div class="container-lg">
+			<div class="row">
+				<div class="col d-flex">
+					<div class="img-wrapper d-none d-lg-block">
+						<img src="@content?.ImmagineContatto?.Url()" alt="@HtmlUtils.GetImageAlt(content?.ImmagineContatto)">
+					</div>
+					<div class="caption">
+						<h2 class="h3">@content?.TitoloContatto</h2>
+						@if (content?.CardContatto != null)
+						{
+							foreach (var item in content.CardContatto)
+							{
+								ContentModels.BlockCardContact card = (ContentModels.BlockCardContact)item.Content;
+								<div class="custom-card shadow">
+									<div class="card-body">
+										<div class="icon-wrapper"><img src="@card?.IconaContatto?.Url()" alt="@HtmlUtils.GetImageAlt(card?.IconaContatto)"></div>
+										<h3 class="h3 card-title">@card?.TitoloCardContatto</h3>
+										@Html.Raw(card?.DescrizioneCardContatto)
+									</div>
+								</div>
+							}
+
+						}
+					</div>
+				</div>
+			</div>
+			@if (content?.UsareInformazioni != null && content.UsareInformazioni)
+			{
+				<div class="row">
+					@if (content.InformazioniContatto != null)
+					{
+						foreach (var item in content.InformazioniContatto)
+						{
+							ContentModels.BlockInfoContatto info = (ContentModels.BlockInfoContatto)item.Content;
+							<div class="col contact-detail pt-1 pt-lg-5">
+								<h4 class="h5">@info.TitoloInfo</h4>
+								@if (info.InfoEmail)
+								{
+									<a href="mailto: @info.ContenutoInfo" class="mail mail-rev">@info.ContenutoInfo</a>
+								}
+								else
+								{
+									<p class="big-text">@info.ContenutoInfo</p>
+								}
+								<p class="">@info.DescrizioneInfo</p>
+							</div>
+						}
+					}
+				</div>
+			}
+			else
+			{
+				<div class="row">
+					<div class="col pt-1 pt-lg-5">
+						@Html.Raw(content?.DescrizioneContatto)
+						@if (content?.CtaContatto != null)
+						{
+							<a href="@content?.CtaContatto?.Url" target="@content?.CtaContatto?.Target" data-link-type="cta" data-link="@content?.CtaContatto?.Name" data-section="@content?.TitoloContatto" class="more">@content?.CtaContatto?.Name</a>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	</section>
+}
+else
+{
+	<section class="customer-contact" id="@settings.AnchorID">
+		<div class="container-lg">
+			<div class="row">
+				<div class="col d-flex flex-row-reverse">
+					<div class="img-wrapper d-none d-lg-block">
+						<img src="@content?.ImmagineContatto?.Url()" alt="@HtmlUtils.GetImageAlt(content?.ImmagineContatto)">
+					</div>
+					<div class="caption">
+						<h2 class="h3">@content?.TitoloContatto</h2>
+
+						@if (content?.CardContatto != null)
+						{
+							foreach (var item in content.CardContatto)
+							{
+								ContentModels.BlockCardContact card = (ContentModels.BlockCardContact)item.Content;
+								<div class="custom-card shadow">
+									<div class="card-body">
+										<div class="icon-wrapper"><img src="@card?.IconaContatto?.Url()" alt="@HtmlUtils.GetImageAlt(card?.IconaContatto)"></div>
+										<h3 class="h3 card-title">@card?.TitoloCardContatto</h3>
+										@Html.Raw(card?.DescrizioneCardContatto)
+									</div>
+								</div>
+							}
+
+						}
+					</div>
+				</div>
+			</div>
+			@if (content?.UsareInformazioni != null && content.UsareInformazioni)
+			{
+				<div class="row">
+					@if (content.InformazioniContatto != null)
+					{
+						foreach (var item in content.InformazioniContatto)
+						{
+							ContentModels.BlockInfoContatto info = (ContentModels.BlockInfoContatto)item.Content;
+							<div class="col contact-detail pt-1 pt-lg-5">
+								<h4 class="h5">@info.TitoloInfo</h4>
+								@if (info.InfoEmail)
+								{
+									<a href="mailto: @info.ContenutoInfo" class="mail mail-rev">@info.ContenutoInfo</a>
+								}
+								else
+								{
+									<p class="big-text">@info.ContenutoInfo</p>
+								}
+								<p class="">@info.DescrizioneInfo</p>
+							</div>
+						}
+					}
+				</div>
+			}
+			else
+			{
+				<div class="row">
+					<div class="col pt-1 pt-lg-5">
+						@Html.Raw(content?.DescrizioneContatto)
+						@if (content?.CtaContatto != null)
+						{
+							<a href="@content?.CtaContatto?.Url" target="@content?.CtaContatto?.Target" data-link-type="cta" data-link="@content?.CtaContatto?.Name" data-section="@content?.TitoloContatto" class="more">@content?.CtaContatto?.Name</a>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	</section>
+}

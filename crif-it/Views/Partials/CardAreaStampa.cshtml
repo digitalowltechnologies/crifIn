@@ -1,0 +1,30 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.Articolo>
+@model Crif.It.Models.Articolo
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@{
+	string? dataSection = "altri-contenuti";
+	if (ViewData.ContainsKey("section"))
+	{
+		dataSection = (string?)ViewData["section"];
+	}
+}
+
+<div class="col-12 col-lg-4">
+	<div class="custom-vertical-card shadow">
+		<div class="img-wrapper">
+			<img src="@Model.SfondoHero?.Url()" alt="@HtmlUtils.GetImageAlt(Model.SfondoHero)">
+		</div>
+		<div class="card-body">
+			<div class="meta">
+				<p class="date">@Model.DataCustom.ToString("dd/MM/yy")</p>
+			</div>
+			@if (!string.IsNullOrEmpty(Model.TitoloHero))
+			{
+				<a href="@Model.Url()" class="stretched-link" data-link-category="@Model.Parent?.Name" data-link-type="article" data-link="@Model.TitoloHero" data-link-destination="@Model.Url()" data-link-section="@dataSection">
+					<h3 class="h5 card-title only-title">@Model.TitoloHero</h3>
+				</a>
+			}
+		</div>
+	</div>
+</div>

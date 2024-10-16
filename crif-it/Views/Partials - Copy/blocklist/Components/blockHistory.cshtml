@@ -1,0 +1,51 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System.Web;
+@{
+	ContentModels.BlockHistory content = (ContentModels.BlockHistory)Model.Content;
+	var settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+<section class="history pt-120 pb-120" id="@settings?.AnchorID">
+	<div class="container-lg">
+		@if(!string.IsNullOrEmpty(content.HistoryTitle))
+		{
+		<div class="row pb-lg-5">
+			<div class="col-12">
+				<h2 class="h2 text-center white">@content.HistoryTitle</h2>
+			</div>
+		</div>
+		}
+		<div class="row">
+			<div class="col-12">
+				<h3 class="h3 white pb-lg-4">@content.HistorySubtitle</h3>
+				@if(content.Histories != null && content.Histories.Any())
+				{
+					foreach (var story in content.Histories)
+					{
+						var storyContent = (ContentModels.BlockHistoryAbstract)story.Content;
+						<div class="entry">
+							<div class="img-wrapper d-none d-lg-block">
+								<img src="@storyContent.HistoryImage?.Url()" alt="@HtmlUtils.GetImageAlt(storyContent.HistoryImage)">
+							</div>
+							<div class="date">
+								<h4 class="h4">@storyContent.HistoryYear</h4>
+							</div>
+							<div class="caption">
+								<h5 class="h5 white">@storyContent.HistoryTitle</h5>
+								<p>@storyContent.HistoryDescription</p>
+							</div>
+						</div>
+
+					}
+				}
+				@if (content.HistoryCta != null)
+				{
+					<a title="@content.HistoryCta?.Name" href="@content.HistoryCta?.Url" target="@content.HistoryCta?.Target" class="more mt-5 mt-lg-4" data-link-type="cta" data-link="@content.HistoryCta?.Name" data-section="@content.HistoryTitle">
+						@content.HistoryCta?.Name
+					</a>
+				}
+			</div>
+		</div>
+	</div>
+</section>

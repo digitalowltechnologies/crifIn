@@ -1,0 +1,51 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ConsumatoriCategoriaProdotti>
+@{
+    Layout = "Master.cshtml";
+    var altriProdotti = Model.Children()?.Where(x => x.ContentType.Alias == "consumatoriProdotto");
+    var url = Model.Url(System.Threading.Thread.CurrentThread.CurrentCulture.Name, UrlMode.Absolute);
+}
+<main class="innerpage" isbreadcrum="@Model.NascondiBreadcrumb">
+    @* @if (!Model.NascondiBreadcrumb)
+    {
+    <section class="consumer-heading breadcrumb-only">
+    <div class="container-lg">
+    <div class="caption">
+    @await (Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem))
+    </div>
+    </div>
+    </section>
+    } *@
+
+
+
+    @Html.GetBlockListHtml(Model.Blocks)
+    @if (Model.MostraAltriProdotti)
+    {
+        var bg = Model.BackgroundGrigio ? "bg" : "";
+        <section id="altri-prodotti" class="cards-block @bg" data-section="altri-prodotti">
+            <div class="container-lg">
+                @if (!string.IsNullOrEmpty(Model.TitoloAltriProdotti))
+                {
+                    <div class="row justify-content-center">
+                        <div class="col-7 col-lg-12">
+                            <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloAltriProdotti</h2>
+                        </div>
+                    </div>
+                }
+                <div class="row g-mega g-overflow">
+                    @if (altriProdotti != null && altriProdotti.Any())
+                    {
+                        foreach (ConsumatoriProdotto prodotto in altriProdotti)
+                        {
+                            @(await Html.PartialAsync("CardProdotti", prodotto, new ViewDataDictionary(ViewData) { { "section", @Model.TitoloAltriProdotti } }))
+                        }
+                    }
+                </div>
+            </div>
+        </section>
+        @Html.GetBlockListHtml(Model.BlocchiSuccessivi)
+    }
+</main>

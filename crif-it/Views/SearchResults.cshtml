@@ -1,0 +1,146 @@
+﻿@using Crif.It.Utils;
+@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<SearchResults>
+@{
+    Layout = "Master.cshtml";
+    var searchParam = Context.Request.Query["s"];
+    int.TryParse(Context.Request.Query["page"].ToString(), out int currentPage);
+    currentPage = currentPage < 1 ? 1 : currentPage;
+    var totalResults = Model.TotalResults;
+    var totalPages = Model.TotalPages;
+
+    var resultsPerPage = 10;
+
+    if (Model.ResultsPerPage > 0)
+    {
+        resultsPerPage = Model.ResultsPerPage;
+    }
+
+    var currentResults = (currentPage - 1) * resultsPerPage + resultsPerPage;
+    if (currentResults > totalResults) currentResults = totalResults;
+
+    string activeTotal = "";
+    string activeArticles = "";
+    string activePages = "";
+
+    string typeSearch = Context.Request.Query["type"];
+
+    if (typeSearch == "articolo") 
+    {
+        activeArticles = "current";
+    }
+    else if (typeSearch == "pagina")
+    {
+        activePages = "current";
+    }
+    else
+    {
+        activeTotal = "current";
+    }
+
+    var query = Context.Request.Query;
+
+    string queryTipo = "?";
+    string queryPage = "?";
+
+    if (query.ContainsKey("s"))
+    {
+        queryTipo += "s=" + query["s"];
+        queryPage += "s=" + query["s"];
+    }
+
+    if (query.ContainsKey("type"))
+    {
+        queryPage += "&type=" + query["type"];
+    }
+}
+
+<section class="search-heading pb-0">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12 banner">
+                <form action="@Model.Url()" class="inline-search filled-in">
+                    <label for="terms" class="big-text">@Model.PageTitle</label>
+                    <input type="text" placeholder="Ad esempio riguardo servizi, soluzioni, news" name="s" value="@searchParam" id="terms">
+                    <button type="submit">Search</button>
+                    <button type="reset">Reset</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="internal-navigation sticky-top">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12">
+                <nav>
+                    <ul class="internal-menu justify-content-start">
+                        <li class="nav-item @activeTotal">
+                            <a class="nav-link" href="@queryTipo">@Umbraco.GetDictionaryValue("all_results", "Tutti i risultati")</a>
+                        </li>
+                        <li class="nav-item @activeArticles">
+                            <a class="nav-link" href="@queryTipo&type=articolo">@Umbraco.GetDictionaryValue("articles", "Articoli")</a>
+                        </li>
+                        <li class="nav-item @activePages">
+                            <a class="nav-link" href="@queryTipo&type=pagina">@Umbraco.GetDictionaryValue("pages", "Pagine")</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="text-content results">
+    <div class="container-lg">
+        <div class="row justify-content-center">
+            <div class="col">
+                <p class="results-number mb-0 mb-lg-4">
+                    <strong>@currentResults</strong> @Umbraco.GetDictionaryValue("of", "di") @totalResults @Umbraco.GetDictionaryValue("results", "risultati")
+                </p>
+                
+                @if (Model.Results != null && Model.Results.Any())
+                {
+                    foreach (var result in Model.Results)
+                    {
+                        IPublishedContent? p = Umbraco.Content(result.Id);
+                        if(p!= null)
+                        {
+                            string? metaDesc = (string?)p.GetProperty("metaDescription")?.GetValue();
+
+                            <div class="result">
+                                <h2 class="result-title">
+                                    <a href="@p.Url()" title="@p.Name"> @p.Name </a>
+                                </h2>
+                                <p class="mb-lg-4">@Html.Raw(HtmlUtils.HighlightText(searchParam, metaDesc))</p>
+                                @if (p != null)
+                                {
+                                    <div class="meta">
+                                        @if (p.ContentType.Alias == "articolo" || p.ContentType.Alias == "articoloStorieDiSuccesso")
+                                        {
+                                            <span class="post-type">@Umbraco.GetDictionaryValue("Article", "Articolo")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="post-type">@Umbraco.GetDictionaryValue("Page", "Pagina")</span>
+                                        }
+                                        <span class="category">@HtmlUtils.GetCategory(p.ContentType.Alias)</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                }
+
+                @if(totalPages > 1)
+                {
+                    @(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)currentPage, TotalCount = (int)totalPages }))
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@Html.GetBlockListHtml(Model.BlockList)

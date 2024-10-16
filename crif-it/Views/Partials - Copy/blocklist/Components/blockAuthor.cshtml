@@ -1,0 +1,23 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockAuthor content = (ContentModels.BlockAuthor)Model.Content;
+	ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+<section class="author pt-80 pb-0" id="@settings.AnchorID">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12">
+				<div class="about bg">
+					<div class="img-wrapper"><img src="@content.AuthorImage?.Url()" alt=""@HtmlUtils.GetImageAlt(content.AuthorImage)"></div>
+					<div class="caption">
+						<p class="label text-uppercase">@content.BlockAuthorLabel</p>
+						<p class="name">@content.AuthorName</p>
+						<p>@content.AuthorBio </p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

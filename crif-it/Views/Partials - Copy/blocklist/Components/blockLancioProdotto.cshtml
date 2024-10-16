@@ -1,0 +1,168 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System.Web;
+@{
+	ContentModels.BlockLancioProdotto content = (ContentModels.BlockLancioProdotto)Model.Content;
+	var settings = (ContentModels.BlockLancioProdottoSettings)Model.Settings;
+	var spacingTop = settings.NoSpacingTop ? "pt-0 mt-0" : "";
+	var spacingBottom = settings.NoSpacingBottom ? "pb-0 mb-0" : "";
+}
+
+@if (@settings?.AnchorID == "BoardList")
+{
+<section class="pageSection">
+	<div class="container">
+			@if (content.DisplayTitoloSezione)
+			{
+				@if (content.TitoloSezione != "")
+				{
+					<h2 class="title text-center">@content.TitoloSezione</h2>
+				}
+			}
+			
+		<div class="row">
+			<div class="col-12 col-lg-6">
+				<div class="directorCard zoomImgWrp">
+					<div class="directorImg zoomImg">
+						<img src="@content?.ImmagineLancioProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(content?.ImmagineLancioProdotto)">
+					</div>
+					<div class="directorInfo">
+						@if (content?.TitoloLancioProdotto != "")
+						{
+							<h5 class="mb-0">@content?.TitoloLancioProdotto</h5>
+						}
+						@if (content?.SottotitoloLancioProdotto != "")
+						{
+							<span class="directorPos">@content?.SottotitoloLancioProdotto</span>
+						}
+						<div class="directorBrief">
+								@Html.Raw(content?.DescrizioneLancioProdotto)
+						</div>
+						<a href="#leadership" data-bs-toggle="modal" class="arrowBtn">Full profile</a>
+						@if (content?.CTalancioProdotto != null)
+						{
+							<div class="customer-solution-cta">
+								@foreach (var cta in content?.CTalancioProdotto)
+								{
+									<a title="@cta?.Name" href="@cta?.Url" target="@cta?.Target" class="btn btn-secondary btn-large px-2" data-link-type="cta" data-link="@cta?.Name" data-link-destination="@cta?.Url" data-link-section="@content?.TitoloLancioProdotto">@cta?.Name</a>
+								}
+							</div>
+						}
+					
+					</div>
+				</div>
+			</div>
+			
+		</div>
+</section>
+}
+else{
+<section class="consumer-solutions @spacingTop @spacingBottom" id="@settings?.AnchorID">
+	@if (content.DisplayTitoloSezione)
+	{
+		<div class="header">
+			<div class="container-lg">
+				<div class="row">
+					<div class="col-12">
+						@if (content.TitoloSezione != "")
+						{
+							<h2 class="h2 mt-5 mb-3 mb-lg-4">@content.TitoloSezione</h2>
+						}
+						@if (content.SottotitoloSezione != "")
+						{
+							<p class="big-text">@content.SottotitoloSezione</p>
+						}
+
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+	@if (settings?.LayoutLancioProdotto == "Layout Bianco")
+	{
+		<div class="consumer-solution right @spacingBottom">
+			<div class="img-wrapper"><img src="@content?.ImmagineLancioProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(content?.ImmagineLancioProdotto)"></div>
+			<div class="container-lg h-100">
+				<div class="row h-100 align-items-center">
+					<div class="col-12 col-lg-7">
+						<div class="caption">
+							@if (content?.TitoloLancioProdotto != "")
+							{
+								<h3 class="h2">@content?.TitoloLancioProdotto</h3>
+							}
+							@if (content?.SottotitoloLancioProdotto != "")
+							{
+								<p class="launch">@content?.SottotitoloLancioProdotto</p>
+							}
+							@Html.Raw(content?.DescrizioneLancioProdotto)
+							@if (content?.CTalancioProdotto != null)
+							{
+								<div class="customer-solution-cta">
+									@foreach (var cta in content?.CTalancioProdotto)
+									{
+										<a title="@cta?.Name" href="@cta?.Url" target="@cta?.Target" class="btn btn-secondary btn-large px-2" data-link-type="cta" data-link="@cta?.Name" data-link-destination="@cta?.Url" data-link-section="@content?.TitoloLancioProdotto">@cta?.Name</a>
+									}
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+	else
+	{
+		<div class="consumer-solution bg-blue @spacingBottom">
+			<div class="img-wrapper"><img src="@content?.ImmagineLancioProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(content?.ImmagineLancioProdotto)"></div>
+			<div class="container-lg h-100">
+				<div class="row h-100 align-items-center justify-content-end custom-spacing">
+					<div class="col-12 col-lg-7">
+						<div class="caption">
+							@if (content?.TitoloLancioProdotto != "")
+							{
+								<h3 class="h2">@content?.TitoloLancioProdotto</h3>
+							}
+							@if (content?.SottotitoloLancioProdotto != "")
+							{
+								<p class="launch">@content?.SottotitoloLancioProdotto</p>
+							}
+							@Html.Raw(content?.DescrizioneLancioProdotto)
+							@if (content?.CTalancioProdotto != null)
+							{
+								<div class="customer-solution-cta">
+									@foreach (var cta in content?.CTalancioProdotto)
+									{
+										<a title="@cta?.Name" href="@cta?.Url" target="@cta?.Target" class="btn btn-primary btn-large px-2" data-link-type="cta" data-link="@cta?.Name" data-link-destination="@cta?.Url" data-link-section="@content?.TitoloLancioProdotto">@cta?.Name</a>
+									}
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+
+	@if (content.DisplayCta)
+	{
+		<div class="footer">
+			<div class="container-lg">
+				<div class="row">
+					<div class="col-12">
+						@if (content.TitoloCta != "")
+						{
+							<p>@content.TitoloCta</p>
+						}
+
+						<a title="@content?.BottoneCta?.Name" href="@content?.BottoneCta?.Url" taget="@content?.BottoneCta?.Target" class="btn btn-primary btn-large" data-link-type="cta" data-link="@content?.BottoneCta?.Name" data-link-destination="@content?.BottoneCta?.Url" data-link-section="@content?.TitoloLancioProdotto">@content?.BottoneCta?.Name</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+</section>
+
+}
+
+

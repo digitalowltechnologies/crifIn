@@ -1,0 +1,24 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.ConsumatoriProdotto>
+@model Crif.It.Models.ConsumatoriProdotto
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@{
+	string? dataSection = "altri-contenuti";
+	if (ViewData.ContainsKey("section"))
+	{
+		dataSection = (string?)ViewData["section"];
+	}
+}
+
+<div class="col-12 col-lg-6">
+	<div class="custom-card industry shadow fade-in-box">
+		<div class="card-body">
+			<div class="icon-wrapper">
+				<img src="@Model.IconaCard?.Url()" alt="@HtmlUtils.GetImageAlt(Model.IconaCard)">
+			</div>
+			<h3 class="h3 card-title">@Model.TitoloCard</h3>
+			<p>@HtmlUtils.TextCut(@Model.DescrizioneCard)</p>
+			<a title="@Umbraco.GetDictionaryValue("card_prodotto_read_more")" href="@Model.Url()" class="more" data-link-type="page" data-link="@Model.TitoloCard" data-link-destination="@Model.Url()" data-link-section="@dataSection">@Umbraco.GetDictionaryValue("card_prodotto_read_more")</a>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,593 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockListCards content = (ContentModels.BlockListCards)Model.Content;
+    ContentModels.BlockListCardsSettings settings = (ContentModels.BlockListCardsSettings)Model.Settings;
+    var isFeature = false;
+    var background = settings.IsGreyBackground ? "lightGreyBg2" : "";
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (content.DisplaySection == "Credit Score Type")
+    {
+        @if (content != null && content.CardList != null && content.CardList.Any())
+        {
+
+
+            <section class="pageSection lightGreyBg2">
+                <div class="container">
+                    @if (!string.IsNullOrEmpty(content.TitleSection))
+                    {
+                        <h2 class="title text-center">@content.TitleSection</h2>
+                    }
+                    else if (!string.IsNullOrEmpty(content.SubtitleSection))
+                    {
+                        <h2 class="title text-center">@content.SubtitleSection</h2>
+                    }
+
+                    <div class="row g-4 g-xl-5">
+                        @foreach (var card in content.CardList)
+                        {
+                            var listContent = (ContentModels.BlockCardProduct)card.Content;
+                            <div class="col-12 col-md-6">
+                                <div class="iconCard blueCard bgWhite bgBlue border boxShadow animateThis slideTop">
+                                    <div class="cardTop">
+                                        <h3 class="colorWhite">@listContent.Title</h3>
+                                        <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" />
+                                    </div>
+                                    <p class="cardBtm">
+                                        @listContent.Text
+                                    </p>
+                                    <a href="@listContent.CallToAction?.Url" class="arrowBtn whiteArrowBtn text-end">
+                                        @listContent.CallToAction?.Name
+                                    </a>
+                                </div>
+                            </div>
+                        }
+
+
+                    </div>
+                </div>
+            </section>
+        }
+    }
+    else if (content.DisplaySection == "feature")
+    {
+        @if (content != null && content.CardList != null && content.CardList.Any())
+        {
+            @if (!string.IsNullOrEmpty(content.TitleSection))
+            {
+                <!-- Banner Btm -->
+                <section class="py-5 lightGreyBg">
+                    <div class="container">
+                        <div class="row justify-content-center featuresSection">
+                            @foreach (var card in content.CardList)
+                            {
+                                var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                <div class="col-6 col-lg-3">
+                                    <div class="iconCard">
+                                        <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" class="" />
+                                        <div>
+                                            <h6 class="mb-0 iconTitle">@listContent.Title</h6>
+                                            <p class="mb-0 iconInfo">@listContent.Text</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+
+            }
+
+        }
+    }
+    else if (content.DisplaySection == "ServiceQuickLinks")
+    {
+        @if (content != null && content.CardList != null && content.CardList.Any())
+        {
+            @if (!string.IsNullOrEmpty(content.TitleSection))
+            {
+                isFeature = true;
+                <!-- Banner Btm -->
+                <!-- *********** -->
+                <section class="pt-5 pb-4 lightGreyBg2">
+                    <div class="container">
+                        <div class="row justify-content-center text-center serviceQuickLinks">
+                            @foreach (var card in content.CardList)
+                            {
+                                var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                <div class="col-12 col-sm-4 vertDivider">
+                                    <div class="iconCardVert mb-0">
+                                        <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" />
+                                        <h5 class="mb-0">@listContent.Title</h5>
+                                        <p>@listContent.Text</p>
+                                        <button class="orangeBtn">Know More</button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+
+            }
+
+        }
+    }
+    else if (content.DisplaySection == "Consumer Grievance")
+    {
+        @if (content != null && content.CardList != null && content.CardList.Any())
+        {
+            @if (!string.IsNullOrEmpty(content.TitleSection))
+            {
+                isFeature = true;
+                <section class="pt-5">
+                    <div class="container">
+                        <div class="row">
+                            @foreach (var card in content.CardList)
+                            {
+                                var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                <div class="col-12 col-md-6">
+                                    <div class="iconCardVert faqCard animateThis slideTop">
+                                        <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" />
+                                        <div class="pe-lg-5">
+                                            <h4>@listContent.Title</h4>
+                                            <p>@listContent.Text</p>
+                                            <a href="@listContent.CallToAction?.Url" class="orangeBtn mt-4">
+                                                @listContent.CallToAction?.Name
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+
+            }
+
+        }
+    }
+    else if (content.DisplaySection == "Credit Report")
+    {
+        @if (content != null && content.CardList != null && content.CardList.Any())
+        {
+            @if (!string.IsNullOrEmpty(content.TitleSection))
+            {
+                isFeature = true;
+                <section class="pageSection @background" id="@settings?.AnchorID">
+                    <div class="container">
+                        <h2 class="title text-center">@content.SubtitleSection</h2>
+                        <div class="row">
+                            @foreach (var card in content.CardList)
+                            {
+                                var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                <div class="col col-md-6 mb-4">
+                                    <div class="iconCard blueCard border bgWhite colorFont boxShadow animateThis slideTop">
+                                        <div class="cardTop">
+                                            <h5>@listContent.Title</h5>
+                                            <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" />
+                                        </div>
+                                        <p class="cardBtm">
+                                            @listContent.Text
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </section>
+
+            }
+
+        }
+    }
+    else if (content.DisplaySection == "Help")
+    {
+        <section class="pageSection">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(content.TitleSection))
+                {
+                    <div class="titleSection">
+                        <h2 class="title text-center">@content.TitleSection</h2>
+                        <p>@content.SubtitleSection</p>
+                    </div>
+                }
+                <div class="row">
+                    @if (content != null && content.CardList != null && content.CardList.Any())
+                    {
+                        foreach (var card in content.CardList)
+                        {
+                            var listContent = (ContentModels.BlockCardProduct)card.Content;
+                            <div class="col col-md-6 col-lg-4 mb-4">
+                                <div class="blueCard centerCard bgWhite colorFont boxShadow animateThis slideTop">
+                                    <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" class="" />
+                                    <h5>@listContent.Title</h5>
+                                    <p class="cardBtm mb-4">@listContent.Text</p>
+                                    <a href="@listContent.CallToAction?.Url" class="arrowBtn">
+                                        Click
+                                        here
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+        </section>
+    }
+    else
+    {
+        @if (settings.MostrareTrendTopic)
+        {
+            if (settings.IsCarousel)
+            {
+                <!-- Trending Topics *********** -->
+                <section class="py-5">
+                    <div class="container">
+                        <div class="row justify-content-between">
+
+                            <div class="col-12 col-md-7 col-lg-5">
+                                @if (!string.IsNullOrEmpty(content.TitleSection))
+                                {
+                                    <h2 class="title ms-0">@content.TitleSection</h2>
+                                }
+                            </div>
+                            <div class="col col-md-auto">
+                                <a href="./blogs.html" class="arrowBtn mt-4">Discover More</a>
+                            </div>
+                        </div>
+                        <div class="customSwiper swiper-container pb-4 pb-md-5">
+                            <div class="swiper-wrapper">
+                                @if (settings.SelezionaTrendTopic != null && settings.SelezionaTrendTopic.Any())
+                                {
+                                    foreach (ContentModels.TrendTopicTag tt in settings.SelezionaTrendTopic)
+                                    {
+                                        <div class="swiper-slide px-2">
+                                            <div class="blogCard boxShadow border">
+                                                <img src="@tt?.ImmagineTrendTopic?.Url()" class="blogImg" alt="@HtmlUtils.GetImageAlt(tt?.ImmagineTrendTopic)">
+                                                <div class="p-3">
+                                                    <small class="blogDate">29/06/2023</small>
+                                                    <a class="blogTitle" href="@tt?.Url()">
+                                                        @HtmlUtils.TextCut(tt?.Name, 30)
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="swiper-pagination customPagination"></div>
+                        </div>
+                    </div>
+                </section>
+            }
+            else
+            {
+                <section class="cards-block" id="@settings?.AnchorID">
+                    <div class="container-lg">
+                        <div class="row justify-content-center">
+                            <div class="col-7 col-lg-12 text-center pb-lg-5 mb-lg--4">
+                                @if (!string.IsNullOrEmpty(content.TitleSection))
+                                {
+                                    <h2 class="h2">@content.TitleSection</h2>
+                                }
+                                @{
+                                    string? subtitle = content.SubtitleSection;
+                                    if (subtitle != "")
+                                    {
+                                        <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="row g-mega g-overflow">
+                            @if (settings?.SelezionaTrendTopic != null && settings.SelezionaTrendTopic.Any())
+                            {
+                                @foreach (ContentModels.TrendTopicTag tt in settings.SelezionaTrendTopic)
+                                {
+                                    <div class="col-12 col-lg-6 cards-list">
+                                        <div class="custom-card shadow fade-in-box">
+                                            <div class="img-wrapper"><img src="@tt.ImmagineTrendTopic?.Url()" alt="@HtmlUtils.GetImageAlt(tt.ImmagineTrendTopic)"></div>
+                                            <div class="card-body">
+                                                <div class="icon-wrapper"><img src="@tt.IconaTrendTopic?.Url()" alt="@HtmlUtils.GetImageAlt(tt.IconaTrendTopic)"></div>
+                                                <p class="h3 card-title">@HtmlUtils.TextCut(tt?.Name, 30)</p>
+                                                <p>@HtmlUtils.TextCut(tt?.AbstractTrendTopic, 70)</p>
+                                                @(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @tt.Url() }, { "category", "Trend Topic" }, { "section", @tt.Name }, { "name", @Umbraco.GetDictionaryValue("service_read_more") }, { "title", @tt.Name }, { "css", "stretched-link more" }, { "target", "_self" } }))
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </section>
+            }
+
+
+        }
+        else
+        {
+            @if (settings.IsCarousel)
+            {
+
+                <!-- ************** -->
+                <section class="py-5">
+                    <div class="container text-center">
+                        @if (!string.IsNullOrEmpty(content.TitleSection))
+                        {
+                            <h2 class="title">@content.TitleSection</h2>
+                        }
+                        <div class="swiper-container centeredSwiper pt-3 pb-4 pb-md-5">
+                            <div class="swiper-wrapper">
+                                @if (content != null && content.CardList != null && content.CardList.Any())
+                                {
+                                    foreach (var card in content.CardList)
+                                    {
+                                        var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                        <!-- slides -->
+                                        <div class="swiper-slide px-2 px-sm-0">
+                                            <div class="iconCard blueCard border bgWhite colorFont mb-0">
+                                                <div class="d-flex justify-content-between w-100">
+                                                    <h5>@listContent.Title</h5>
+                                                    <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" />
+                                                </div>
+                                                <p class="mb-4">
+                                                    @listContent.Text
+                                                </p>
+                                                @*@(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @listContent.CallToAction?.Url }, { "category", "" }, { "section", @content.TitleSection }, { "name", @Umbraco.GetDictionaryValue("service_read_more") }, { "title", @listContent.Title }, { "css", "stretched-link more" }, { "target", @listContent.CallToAction?.Target } }))*@
+                                                <a href="@listContent.CallToAction?.Url " class="arrowBtn">Read More</a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="swiper-pagination customPagination"></div>
+                        </div>
+                    </div>
+                </section>
+            }
+            else
+            {
+                <section class="py-5">
+                    <div class="container">
+                        <div class="row justify-content-center px-lg-2">
+                            @if (content != null && content.CardList != null && content.CardList.Any())
+                            {
+                                foreach (var card in content.CardList)
+                                {
+                                    var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                    <div class="col-12 col-md-6 py-3 animateThis slideTop">
+                                        <div class="iconCardImg boxShadow mb-0">
+                                            <div class="cardBody">
+                                                <img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)" class="iconImg" />
+                                                <h4 class="iconTitle colorBlue lineHeight2">@listContent.Title</h4>
+                                                <p class="iconInfo mb-4">@listContent.Text</p>
+                                                <a href="@listContent.CallToAction?.Url" class="arrowBtn">
+                                                    Click
+                                                    here
+                                                </a>
+                                            </div>
+                                            <div class="imgWrapper">
+                                                <img src="@listContent.BackgroundImage?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.BackgroundImage)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </section>
+            }
+        }
+    }
+}
+else
+{
+    @if (settings.MostrareTrendTopic)
+    {
+        if (settings.IsCarousel)
+        {
+            <section class="trends">
+                <div class="container-lg">
+                    <div class="row justify-content-center">
+                        <div class="col-7 col-lg-12 text-center pb-lg-5 mb-lg--4">
+                            @if (!string.IsNullOrEmpty(content.TitleSection))
+                            {
+                                <h2 class="h2">@content.TitleSection</h2>
+                            }
+                            @{
+                                string? subtitle = content.SubtitleSection;
+                                if (subtitle != "")
+                                {
+                                    <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-lg">
+                    <div class="row">
+                        <div class="col-12">
+
+                            <div class="swiper trends-carousel pt-3 pe-3 pe-lg-0">
+                                <div class="swiper-wrapper">
+                                    @if (settings.SelezionaTrendTopic != null && settings.SelezionaTrendTopic.Any())
+                                    {
+                                        foreach (ContentModels.TrendTopicTag tt in settings.SelezionaTrendTopic)
+                                        {
+                                            <!-- slides -->
+                                            <div class="swiper-slide">
+                                                <div class="custom-card shadow trend-topics">
+                                                    <div class="img-wrapper">
+                                                        <img src="@tt?.ImmagineTrendTopic?.Url()" alt="@HtmlUtils.GetImageAlt(tt?.ImmagineTrendTopic)">
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="icon-wrapper"><img src="@tt?.IconaTrendTopic?.Url()" alt="@HtmlUtils.GetImageAlt(@tt?.IconaTrendTopic)"></div>
+                                                        <p class="h3 card-title">@HtmlUtils.TextCut(tt?.Name, 30)</p>
+                                                        <p>@HtmlUtils.TextCut(tt?.AbstractTrendTopic, 70)</p>
+                                                        @(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @tt?.Url() }, { "category", "Trend Topics" }, { "section", @content.TitleSection }, { "name", @Umbraco.GetDictionaryValue("service_read_more") }, { "title", @tt.Name }, { "css", "stretched-link more" }, { "target", "_self" } }))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                                <!-- pagination -->
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="cards-block" id="@settings?.AnchorID">
+                <div class="container-lg">
+                    <div class="row justify-content-center">
+                        <div class="col-7 col-lg-12 text-center pb-lg-5 mb-lg--4">
+                            @if (!string.IsNullOrEmpty(content.TitleSection))
+                            {
+                                <h2 class="h2">@content.TitleSection</h2>
+                            }
+                            @{
+                                string? subtitle = content.SubtitleSection;
+                                if (subtitle != "")
+                                {
+                                    <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row g-mega g-overflow">
+                        @if (settings?.SelezionaTrendTopic != null && settings.SelezionaTrendTopic.Any())
+                        {
+                            @foreach (ContentModels.TrendTopicTag tt in settings.SelezionaTrendTopic)
+                            {
+                                <div class="col-12 col-lg-6 cards-list">
+                                    <div class="custom-card shadow fade-in-box">
+                                        <div class="img-wrapper"><img src="@tt.ImmagineTrendTopic?.Url()" alt="@HtmlUtils.GetImageAlt(tt.ImmagineTrendTopic)"></div>
+                                        <div class="card-body">
+                                            <div class="icon-wrapper"><img src="@tt.IconaTrendTopic?.Url()" alt="@HtmlUtils.GetImageAlt(tt.IconaTrendTopic)"></div>
+                                            <p class="h3 card-title">@HtmlUtils.TextCut(tt?.Name, 30)</p>
+                                            <p>@HtmlUtils.TextCut(tt?.AbstractTrendTopic, 70)</p>
+                                            @(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @tt.Url() }, { "category", "Trend Topic" }, { "section", @tt.Name }, { "name", @Umbraco.GetDictionaryValue("service_read_more") }, { "title", @tt.Name }, { "css", "stretched-link more" }, { "target", "_self" } }))
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+    }
+    else
+    {
+        @if (settings.IsCarousel)
+        {
+            <section class="trends">
+                <div class="container-lg">
+                    <div class="row justify-content-center pb-lg-5 mb-lg--4">
+                        <div class="col-7 col-lg-12 text-center">
+                            @if (!string.IsNullOrEmpty(content.TitleSection))
+                            {
+                                <h2 class="h2">@content.TitleSection</h2>
+                            }
+                            @{
+                                string? subtitle = content.SubtitleSection;
+                                if (subtitle != "")
+                                {
+                                    <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-lg">
+                    <div class="row">
+                        <div class="col-12">
+
+                            <div class="swiper trends-carousel pt-3 pe-3 pe-lg-0">
+                                <div class="swiper-wrapper">
+                                    @if (content != null && content.CardList != null && content.CardList.Any())
+                                    {
+                                        foreach (var card in content.CardList)
+                                        {
+                                            var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                            <!-- slides -->
+                                            <div class="swiper-slide cards-list">
+                                                <div class="custom-card shadow">
+                                                    <div class="img-wrapper">
+                                                        <img src="@listContent.BackgroundImage?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.BackgroundImage)">
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="icon-wrapper"><img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)"></div>
+                                                        <p class="h3 card-title">@listContent.Title</p>
+                                                        <p>@listContent.Text</p>
+                                                        @(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @listContent.CallToAction?.Url }, { "category", "" }, { "section", @content.TitleSection }, { "name", @Umbraco.GetDictionaryValue("service_read_more") }, { "title", @listContent.Title }, { "css", "stretched-link more" }, { "target", @listContent.CallToAction?.Target } }))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                                <!-- pagination -->
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="cards-block">
+                <div class="container-lg">
+                    <div class="row justify-content-center">
+                        <div class="col-7 col-lg-12 text-center pb-lg-5 mb-lg--4">
+                            @if (!string.IsNullOrEmpty(content.TitleSection))
+                            {
+                                <h2 class="h2">@content.TitleSection</h2>
+                            }
+                            @{
+                                string? subtitle = content.SubtitleSection;
+                                if (subtitle != "")
+                                {
+                                    <p><span class="paragraph text-center pb-lg-3">@subtitle</span></p>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row g-mega g-overflow">
+                        @if (content != null && content.CardList != null && content.CardList.Any())
+                        {
+                            foreach (var card in content.CardList)
+                            {
+                                var listContent = (ContentModels.BlockCardProduct)card.Content;
+                                <div class="col-12 col-lg-6 cards-list">
+                                    <div class="custom-card shadow fade-in-box">
+                                        <div class="img-wrapper"><img src="@listContent.BackgroundImage?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.BackgroundImage)"></div>
+                                        <div class="card-body">
+                                            <div class="icon-wrapper"><img src="@listContent.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Icon)"></div>
+                                            <p class="h3 card-title">@listContent.Title</p>
+                                            <p>@listContent.Text</p>
+                                            @(await Html.PartialAsync("LinkSettings", new ViewDataDictionary(ViewData) { { "url", @listContent.CallToAction?.Url }, { "category", "" }, { "section", @content.TitleSection }, { "name", @Umbraco.GetDictionaryValue("service_read_more") }, { "title", @listContent.Title }, { "css", "stretched-link more" }, { "target", @listContent.CallToAction?.Target } }))
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+
+    }
+}

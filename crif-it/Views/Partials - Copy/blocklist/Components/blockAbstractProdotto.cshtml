@@ -1,0 +1,41 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+	ContentModels.BlockAbstractProdotto content = (ContentModels.BlockAbstractProdotto)Model.Content;
+	var settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+
+<section class="consumer-promo" id="@settings.AnchorID">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12">
+				<div class="promo">
+					<div class="img-wrapper">
+						<img src="@content?.Immagine?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Immagine)">
+					</div>
+					<div class="caption">
+						@if (content?.LogoProdotto != null)
+						{
+							<div class="offer-logo">
+								<img src="@content?.LogoProdotto?.Url()" alt="@HtmlUtils.GetImageAlt(content?.LogoProdotto)">
+							</div>
+						}
+						@if (!content.Titolo.IsNullOrWhiteSpace())
+						{
+							<h3 class="h3">@content.Titolo</h3>
+						}
+						@if (!content.DescrizioneProdotto.IsNullOrWhiteSpace())
+						{
+							<p>@content.DescrizioneProdotto</p>
+						}
+						@if (content.CTaprodotto != null)
+						{
+							<a href="@content.CTaprodotto.Url" target="@content.CTaprodotto.Target" class="external-link big-external-link" data-link-type="page" data-link="@content.Titolo" data-link-destination="@content.CTaprodotto.Url" data-link-section="@content.Titolo">@content.CTaprodotto.Name</a>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

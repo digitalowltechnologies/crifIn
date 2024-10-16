@@ -1,0 +1,69 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models.Blocks;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MenuSettings>
+@{
+    Layout = "Master.cshtml";
+}
+<div class="mobile-country-page">
+	<div class="container">
+		<div class="row text-left">
+			<div class="col-7">
+				<h1 class="h3 my-3 mx-1">@Model.MobileCountryPageTitle</h1>
+			</div>
+		</div>
+	</div>
+</div>
+<section class="country-menu pt-0">
+	<div class="container">
+		<p class="mobile-country-label mb-1">@Model?.GlobalLabel</p>
+		<a title="@Model?.GlobalLink?.Name" href="@Model?.GlobalLink?.Url" target="@Model?.GlobalLink?.Target" class="btn btn-outline">@Model?.GlobalLink?.Name</a>
+	</div>
+	@if (Model != null && Model.ContinentAndCountries != null)
+	{
+		foreach (BlockListItem item in Model.ContinentAndCountries)
+		{
+			BlockMenuCountries continent = (BlockMenuCountries)item.Content;
+			var colLayout = continent?.CountriesSettings?.Count > 11 ? "double-column" : "";
+			<div class="container">
+				<p class="mobile-country-label mt-4 mb-1">@continent?.CountriesContinent</p>
+				<ul class="@colLayout mobile-country-ul pl-0">
+					@if (continent != null && continent.CountriesSettings != null)
+					{
+						foreach (BlockListItem elm in continent.CountriesSettings)
+						{
+							BlockSingleCountry country = (BlockSingleCountry)elm.Content;
+							if (country.DoubleLink)
+							{
+								<li>
+									<p class="country-disabled mb-0">
+										<img src="@country?.CountryFlag?.Url()" alt="@HtmlUtils.GetImageAlt(country?.CountryFlag)">@country?.CountryLabel
+									</p>
+									<ul class="offices">
+										@if (country != null && country.CountryLinks != null)
+										{
+											foreach (var countryLink in country.CountryLinks)
+											{
+												<li class="mx-1"><a title="@countryLink.Name" href="@countryLink.Url" target="@countryLink.Target">@countryLink.Name</a></li>
+											}
+										}
+									</ul>
+								</li>
+							}
+							else
+							{
+								<li>
+									<a title="@country?.CountryLink?.Target" class="country" href="@country?.CountryLink?.Url" target="@country?.CountryLink?.Target">
+										<img src="@country?.CountryFlag?.Url()" alt="@HtmlUtils.GetImageAlt(country?.CountryFlag)">@country?.CountryLink?.Name
+									</a>
+								</li>
+							}
+
+						}
+					}
+				</ul>
+			</div>
+		}
+	}
+</section>

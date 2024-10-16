@@ -1,0 +1,136 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+    ContentModels.BlockInternalNavigation content = (ContentModels.BlockInternalNavigation)Model.Content;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+    var currentPage = Umbraco.AssignedContentItem;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    <section class="pageSection">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-12 mt-4">
+                    <h2 class="title">Tailored Solutions for Your Success</h2>
+                    <div>
+                        @if (content.InternalLinks != null && content.InternalLinks.Any())
+                        {
+                            var current = "current";
+                            foreach (var item in content.InternalLinks)
+                            {
+                                var itemContent = (ContentModels.BlockInternalLink)item.Content;
+                                var anchorID = "";
+                                if (itemContent.UseAnchorID)
+                                {
+                                    <a title="@itemContent.InternalLinkLabel" href="#@itemContent.BlockAnchorID" class="boxBorder mx-2" data-link-type="filter" data-link-destiantion="@currentPage.Url()#@itemContent.BlockAnchorID" data-link-filterCategory="undefined" data-link-filterScroll="@itemContent.InternalLinkLabel">
+                                        @switch (@itemContent.InternalLinkLabel)
+                                        {
+                                            case "Information":
+                                                <img src="~/assets/images/icons/icon-info.svg" alt="" />
+                                                break;
+                                            case "Analytics":
+                                                <img src="~/assets/images/icons/icon-analytics.svg" alt="" />
+                                                break;
+                                            case "Solutions":
+                                                <img src="~/assets/images/icons/icon-solutions.svg" alt="" />
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        <h5>@itemContent.InternalLinkLabel</h5>
+                                    </a>
+                                    current = "";
+                                }
+
+
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <section class="internal-navigation sticky-top mt-3 mt-lg-5">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <nav>
+                        <ul class="internal-menu">
+                            @if (content.InternalLinks != null && content.InternalLinks.Any())
+                            {
+                                var current = "current";
+                                foreach (var item in content.InternalLinks)
+                                {
+                                    var itemContent = (ContentModels.BlockInternalLink)item.Content;
+                                    var anchorID = "";
+                                    if (itemContent.UseAnchorID)
+                                    {
+                                        <li class="nav-item internal-link @current"><a title="@itemContent.InternalLinkLabel" href="#@itemContent.BlockAnchorID" class="nav-link" data-link-type="filter" data-link-destiantion="@currentPage.Url()#@itemContent.BlockAnchorID" data-link-filterCategory="undefined" data-link-filterScroll="@itemContent.InternalLinkLabel">@itemContent.InternalLinkLabel</a></li>
+                                        current = "";
+                                    }
+                                    else
+                                    {
+                                        switch (itemContent.BlockSelector)
+                                        {
+                                            case "Success Stories":
+                                                anchorID = "#success-stories";
+                                                break;
+                                            case "Related Resources":
+                                                anchorID = "#related-resources";
+                                                break;
+                                            case "Solutions - Service":
+                                                anchorID = "#solutions";
+                                                break;
+                                            case "Use Case - Industry":
+                                                anchorID = "#cases";
+                                                break;
+                                            case "News & Events":
+                                                anchorID = "#news";
+                                                break;
+                                            case "Trend Topics":
+                                                anchorID = "#trend-topics";
+                                                break;
+                                            case "Prodotti - Altri Prodotti":
+                                                anchorID = "#altri-prodotti";
+                                                break;
+                                            default:
+                                                anchorID = "#";
+                                                break;
+                                        }
+                                        <li class="nav-item internal-link @current"><a title="@itemContent.InternalLinkLabel" href="@anchorID" class="nav-link" data-link-type="filter" data-link-destiantion="@currentPage.Url()#@anchorID" data-link-filterCategory="undefined" data-link-filterScroll="@itemContent.InternalLinkLabel">@itemContent.InternalLinkLabel</a></li>
+                                        current = "";
+                                    }
+
+                                }
+                            }
+                            @if (content.ExternalLinks != null && content.ExternalLinks.Any())
+                            {
+                                foreach (var item in content.ExternalLinks)
+                                {
+                                    var itemContent = (ContentModels.BlockExternalLink)item.Content;
+                                    var urlName = @itemContent.ExternalLink?.Url?.Remove(itemContent.ExternalLink.Url.Length - 1).Split("/").Last();
+                                    var currentName = Umbraco.AssignedContentItem?.Name?.ToLower().Replace(" ", "-");
+                                    var current = (urlName == currentName) ? "current" : "";
+                                    <li class="nav-item @current"><a title="@itemContent.ExternalLink?.Name" href="@itemContent.ExternalLink?.Url" class="nav-link" data-link-type="filter" data-link-destiantion="@itemContent.ExternalLink?.Url" data-link-filterCategory="@itemContent.ExternalLink?.Name" data-link-filterScroll="undefined">@itemContent.ExternalLink?.Name</a></li>
+                                }
+
+                            }
+                            @if (content.CTabutton != null)
+                            {
+                                <li class="nav-item ms-auto"><a title="@content.CTabutton.Name" href="@content.CTabutton.Url" target="@content.CTabutton.Target" class="btn btn-primary" data-link-type="cta" data-link="@content.CTabutton.Name" data-link-destination="@content.CTabutton.Url" data-link-section="sticky-bar">@content.CTabutton.Name</a></li>
+                            }
+                            else
+                            {
+                                <li class="nav-item ms-auto"></li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+}

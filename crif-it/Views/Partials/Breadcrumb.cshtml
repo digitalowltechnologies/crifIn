@@ -1,0 +1,15 @@
+﻿@model Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent
+
+ <ul class="breadcrumb">
+    @{
+        var ancestors = Model.Ancestors().Reverse();
+        @for (var i = 1; i < ancestors.Count(); i++)
+        {
+            if(ancestors.ElementAt(i).TemplateId != null)
+            {
+                <li><a title="@ancestors.ElementAt(i).Name" href="@ancestors.ElementAt(i).Url()">@ancestors.ElementAt(i).Name</a></li>
+            }
+        }
+        <li>@Model.Name</li>
+    }
+</ul>

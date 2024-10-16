@@ -1,0 +1,1136 @@
+﻿@using Crif.It.Utils;
+@using Crif.It.Models;
+@using System.Globalization;
+@using Umbraco.Cms.Core.Models.Blocks;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models;
+@using System.Web;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+
+	CultureInfo ci = new CultureInfo(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+
+	var cssVer = 5;
+
+	string? metaTitle = (string?)(Model.GetProperty("title")?.GetValue());
+	string? metaDescription = (string?)(Model.GetProperty("metaDescription")?.GetValue());
+	string? ogTitle = metaTitle;
+	var tmp = Model.GetProperty("openGraphTitle")?.GetValue();
+	if (!string.IsNullOrEmpty((string?)tmp))
+	{
+		ogTitle = (string)tmp;
+	}
+
+	string? ogDescription = metaDescription;
+	tmp = Model.GetProperty("openGraphDescription")?.GetValue();
+	if (!string.IsNullOrEmpty((string?)tmp))
+	{
+		ogDescription = (string)tmp;
+	}
+
+	string? robots = "INDEX, FOLLOW";
+	tmp = Model.GetProperty("metaRobots")?.GetValue();
+	if (!string.IsNullOrEmpty((string?)tmp))
+	{
+		robots = (string)tmp;
+	}
+
+	string ogImageUrl = "";
+	MediaWithCrops? ogImage = (MediaWithCrops?)Model.GetProperty("openGraphImage")?.GetValue();
+	if (ogImage != null)
+	{
+		ogImageUrl = ogImage.Url(null, UrlMode.Absolute);
+	}
+
+	MenuSettings? menuSettings = null;
+	if (Model.ContentType.Alias == "menuSettings")
+	{
+		menuSettings = (MenuSettings?)Model;
+	}
+	else
+	{
+		menuSettings = (MenuSettings?)Model.Root()?.Children()?.Where(x => x.ContentType.Alias == "menuSettings").FirstOrDefault();
+	}
+	CrifConfiguration? crifConfiguration = (CrifConfiguration?)Model.Root()?.Siblings()?.Where(x => x.ContentType.Alias == "crifConfiguration").FirstOrDefault();
+
+	IPublishedContent? searchPage = Model.Root()?.Children()?.Where(x => (x.ContentType.Alias == "searchResults"))?.FirstOrDefault();
+	string addParam = "";
+	if (Umbraco.AssignedContentItem.ContentType.Alias == "soluzione"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "family"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "category"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "mercato")
+	{
+		addParam = "product=" + HttpUtility.UrlEncode(Umbraco.AssignedContentItem.Name) + "&requestType=" + HttpUtility.UrlEncode("servizi");
+	}
+	else if (Umbraco.AssignedContentItem.ContentType.Alias == "ricerche"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "academy"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "articolo")
+	{
+		addParam = "requestType=" + HttpUtility.UrlEncode("eventi");
+	}
+	/*Tracciamenti per sezione Business*/
+	string? mercatiAssociati = "";
+	if (Umbraco.AssignedContentItem.ContentType.Alias == "mercato")
+	{
+		mercatiAssociati = (string?)Umbraco.AssignedContentItem?.Name;
+	}
+	else if (Umbraco.AssignedContentItem.ContentType.Alias == "articolo"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "articoloStorieDiSuccesso"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "soluzione"
+		|| Umbraco.AssignedContentItem.ContentType.Alias == "family")
+	{
+		var mercArt = (IEnumerable<IPublishedContent>?)Model.GetProperty("mercatiDiRiferimento")?.GetValue();
+		if (mercArt != null && mercArt.Any())
+		{
+			foreach (var merc in mercArt)
+			{
+				if (mercatiAssociati == "")
+				{
+					mercatiAssociati = merc.Name;
+				}
+				else
+				{
+					mercatiAssociati = mercatiAssociati + "-" + merc.Name;
+				}
+			}
+		}
+	}
+}
+<!doctype html>
+<html lang="it">
+
+<head>
+	<meta charset="utf-8">
+	<title>@metaTitle</title>
+	<meta name="description" content="@metaDescription">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="format-detection" content="telephone=no">
+	<meta property="og:url" content="@HtmlUtils.FormatUrl(HttpContextAccessor?.HttpContext?.Request)" />
+	<meta property="og:title" content="@ogTitle" />
+	<meta property="og:description" content="@ogDescription" />
+	<meta property="og:image" content="@ogImageUrl" />
+
+	@foreach (var cult in Model.Cultures)
+	{
+		CultureInfo tmpCi = new CultureInfo(cult.Key);
+		<link rel="alternate" hreflang="@tmpCi.TwoLetterISOLanguageName" href="@HtmlUtils.FormatUrl(Model.Url(cult.Key, mode: UrlMode.Absolute), true)" />
+	}
+	<link rel="alternate" hreflang="x-default" href="https://www.crif.com" />
+
+	<META NAME="ROBOTS" CONTENT="@robots">
+
+	@if (Umbraco.AssignedContentItem.GetTemplateAlias() == "Decade")
+	{
+		var decades = Umbraco.AssignedContentItem.SiblingsAndSelf();
+		var latest = decades?.OrderByDescending(decades => decades.Name).FirstOrDefault();
+
+		if (Umbraco.AssignedContentItem.Id == latest?.Id)
+		{
+			var history = Umbraco.AssignedContentItem.Parent?.Url();
+			<link rel="canonical" href="@history" />
+		}
+	}
+	else if (Umbraco.AssignedContentItem.GetTemplateAlias() == "CategoriaMercato")
+	{
+		var category = Umbraco.AssignedContentItem.Parent?.Url();
+		<link rel="canonical" href="@category" />
+	}
+	else if (Context.Request.QueryString.ToString().Contains("page"))
+	{
+		<link rel="canonical" href="@HtmlUtils.FormatUrl(Model.Url(mode: UrlMode.Absolute), true)@Context.Request.QueryString" />
+	}
+	else
+	{
+		<link rel="canonical" href="@HtmlUtils.FormatUrl(Model.Url(mode: UrlMode.Absolute), true)" />
+	}
+	@if (mercatiAssociati != "")
+	{
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			dataLayer.push({
+				'pageMarket': @Html.Raw("\'" + @mercatiAssociati + "\'"),
+			})
+		</script>
+	}
+
+	@if (crifConfiguration != null && crifConfiguration.EnableGtm)
+	{
+		<!-- Google Tag Manager -->
+		<script>
+			(function (w, d, s, l, i) {
+				w[l] = w[l] || []; w[l].push({
+					'gtm.start':
+						new Date().getTime(), event: 'gtm.js'
+				}); var f = d.getElementsByTagName(s)[0],
+					j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+						'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+			})(window, document, 'script', 'dataLayer', '@crifConfiguration.GtmCode');</script>
+		<!-- End Google Tag Manager -->
+	}
+
+	@if (crifConfiguration != null && crifConfiguration.EnableMatomo)
+	{
+		<!-- Matomo -->
+		<script>
+			var _paq = window._paq = window._paq || [];
+			/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+			_paq.push(['trackPageView']);
+			_paq.push(['enableLinkTracking']);
+			(function () {
+				var u = "@crifConfiguration.MatomoUrl";
+				_paq.push(['setTrackerUrl', u + 'matomo.php']);
+				_paq.push(['setSiteId', '@crifConfiguration.MatomoKey']);
+				var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+				g.async = true; g.src = '//cdn.matomo.cloud/crif.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g, s);
+			})();
+		</script>
+		<!-- End Matomo Code -->
+	}
+
+	@if (crifConfiguration != null && crifConfiguration.EnableUsercentrics)
+	{
+		<script id="usercentrics-cmp"
+				src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
+				data-settings-id="@crifConfiguration.UsercentricsKey" async>
+		</script>
+	}
+
+	<link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+
+	<link rel="stylesheet" href="~/assets/css/bootstrap.min.css?v=@cssVer">
+	<link rel="stylesheet" href="~/assets/css/swiper.min.css?v=@cssVer">
+	<link rel="stylesheet" href="~/assets/css/custom.min.css?v=@cssVer">
+	<link rel="stylesheet" href="~/assets/css/lightbox.min.css" />
+	<link rel="stylesheet" href="~/assets/css/RTE.css?v=@cssVer">
+	<link rel="stylesheet" href="~/assets/css/custom-crif.css?v=@cssVer">
+
+
+
+	<script src="~/assets/script/jquery.min.js?version=@cssVer"></script>
+	<script src="~/assets/script/bootstrap.bundle.min.js?version=@cssVer"></script>
+	<script src="~/assets/script/swiper.bundle.min.js?version=@cssVer"></script>
+	@*	<script src="~/assets/script/lightbox-plus-jquery.min.js?version=@cssVer"></script>*@
+	<script src="~/assets/script/jquery.waypoints.js?version=@cssVer)"></script>
+	@*<script src="~/assets/script/jquery.rcounter.js?version=@cssVer)"></script>*@
+	@*<script src="~/assets/script/dotdotdot.js?version=@cssVer"></script>
+	<script src="~/assets/script/custom-script.js?version=@cssVer"></script>*@
+
+</head>
+
+<body>
+	@if (crifConfiguration != null && crifConfiguration.EnableGtm)
+	{
+		<noscript>
+			<iframe src="https://www.googletagmanager.com/ns.html?id=@crifConfiguration.GtmCode"
+					height="0" width="0" style="display:none;visibility:hidden"></iframe>
+		</noscript>
+	}
+	<header>
+		<div class="container-lg">
+			<nav class="navbar navbar-expand-lg secondary-menu d-none d-lg-flex">
+				<ul class="navbar-nav ms-auto">
+					@if (menuSettings != null && menuSettings?.CustomLinks != null)
+					{
+						foreach (BlockExternalLink singleLink in menuSettings.CustomLinks)
+						{
+							<li class="nav-item">
+								<a class="nav-link" href="@singleLink?.ExternalLink?.Url" title="@singleLink?.ExternalLink?.Name"
+								   target="@singleLink?.ExternalLink?.Target" data-link-type="menu" data-link="@singleLink?.ExternalLink?.Name" data-category="">
+									@singleLink?.ExternalLink?.Name
+								</a>
+							</li>
+						}
+					}
+					<li class="nav-item">
+						<button class="nav-link country-toggle">
+							@Umbraco.GetDictionaryValue("country_label")
+						</button>
+						<div class="country-menu">
+							<div>
+								<p>@menuSettings?.GlobalLabel</p>
+								<a title="@menuSettings?.GlobalLink?.Name" href="@menuSettings?.GlobalLink?.Url" target="@menuSettings?.GlobalLink?.Target" class="btn btn-outline">@menuSettings?.GlobalLink?.Name</a>
+							</div>
+							@if (menuSettings != null && menuSettings.ContinentAndCountries != null)
+							{
+								foreach (BlockListItem item in menuSettings.ContinentAndCountries)
+								{
+									BlockMenuCountries continent = (BlockMenuCountries)item.Content;
+									var colLayout = continent?.CountriesSettings?.Count > 11 ? "double-column" : "";
+									<div>
+										<p>@continent?.CountriesContinent</p>
+										<ul class="@colLayout">
+											@if (continent != null && continent.CountriesSettings != null)
+											{
+												foreach (BlockListItem elm in continent.CountriesSettings)
+												{
+													BlockSingleCountry country = (BlockSingleCountry)elm.Content;
+													if (country.DoubleLink)
+													{
+														<li>
+															<p class="country">
+																<img src="@country?.CountryFlag?.Url()" alt="@HtmlUtils.GetImageAlt(country?.CountryFlag)">@country?.CountryLabel
+															</p>
+															<ul class="offices">
+																@if (country != null && country.CountryLinks != null)
+																{
+																	foreach (var countryLink in country.CountryLinks)
+																	{
+																		<li><a title="@countryLink.Name" href="@countryLink.Url" target="@countryLink.Target">@countryLink.Name</a></li>
+																	}
+																}
+															</ul>
+														</li>
+													}
+													else
+													{
+														<li>
+															<a title="@country?.CountryLink?.Target" class="country" href="@country?.CountryLink?.Url" target="@country?.CountryLink?.Target">
+																<img src="@country?.CountryFlag?.Url()" alt="@HtmlUtils.GetImageAlt(country?.CountryFlag)">@country?.CountryLink?.Name
+															</a>
+														</li>
+													}
+
+												}
+											}
+										</ul>
+									</div>
+								}
+							}
+						</div>
+					</li>
+					@*@if (Model.Cultures.Count() > 1)
+					{
+					<li class="nav-item dropdown">
+					<a title="@ci.Parent.DisplayName" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					@ci.Parent.DisplayName
+					</a>
+					<div class="dropdown-menu languages">
+					<p>Language</p>
+					<ul>
+					@foreach (var (culture, infos) in Model.Cultures)
+					{
+					CultureInfo tempCI = new CultureInfo(culture);
+					<li><a title="@tempCI.Parent.DisplayName" href="@Model.Url(culture)" class="dropdown-item country">@tempCI.Parent.DisplayName</a></li>
+					}
+					</ul>
+					</div>
+					</li>
+					}*@
+				</ul>
+			</nav>
+			@{
+				Home? homePage = (Home?)Umbraco.ContentAtRoot()?.FirstOrDefault();
+				bool isHome = Umbraco.AssignedContentItem.Name == "Home" ? true : false;
+			}
+			<nav class="navbar navbar-expand-lg primary-menu">
+				<div class="me-auto">
+					@if (isHome)
+					{
+						<h1 style="margin-bottom:0;">
+							<a title="crif-logo" class="menu-brand" href="@homePage?.Url()">
+								<img src="~/assets/img/logo-crif.svg" alt="crif-logo">
+							</a>
+						</h1>
+					}
+					else
+					{
+						<a title="crif-logo" class="menu-brand" href="@homePage?.Url()">
+							<img src="~/assets/img/logo-crif.svg" alt="crif-logo">
+						</a>
+					}
+				</div>
+				@{
+					var firstLevelPages = homePage?.Children?.Where(x => (x.ContentType.Alias != "xmlSiteMap"));
+				}
+				<ul class="navbar-nav d-none d-lg-flex">
+					@if (firstLevelPages != null)
+					{
+						foreach (IPublishedContent firstLevelPage in firstLevelPages)
+						{
+							bool hide1 = (firstLevelPage.Value("hideInMenu") != null) ? (bool)firstLevelPage.Value("hideInMenu") : false;
+							bool hideChildren1 = (firstLevelPage.Value("hideChildrenInMenu") != null) ? (bool)firstLevelPage.Value("hideChildrenInMenu") : false;
+							bool addSpecialChild1 = (firstLevelPage.Value("addSpecialChildren") != null) ? (bool)firstLevelPage.Value("addSpecialChildren") : false;
+							var specialChild1 = (firstLevelPage.Value("specialChild") != null) ? firstLevelPage.Value("specialChild") : null;
+							@*int specialLenght = specialChild1 != null ? 1 : 0;*@
+							var specialChildLabel1 = (firstLevelPage.Value("specialChildLabel") != null) ? firstLevelPage.Value("specialChildLabel") : "";
+
+							if (firstLevelPage.Children != null && firstLevelPage.Children.Any() && !hide1 && !hideChildren1)
+							{
+								@*var maxLenght = firstLevelPage.Children.Count() + specialLenght;
+					foreach (var secondlevelpage in firstLevelPage.Children)
+					{
+					if (secondlevelpage.Children != null && secondlevelpage.Children.Any())
+					{
+					if (secondlevelpage.Children.Count() > maxLenght)
+					{
+					maxLenght = secondlevelpage.Children.Count();
+
+					}
+					foreach (var thirdlevelpage in secondlevelpage.Children)
+					{
+					if (thirdlevelpage.Children != null && thirdlevelpage.Children.Count() > maxLenght)
+					{
+					maxLenght = thirdlevelpage.Children.Count();
+					}
+					}
+
+					}
+					}*@
+								var pageLink = firstLevelPage.TemplateId == null ? "#" : firstLevelPage.Url();
+								<li class="nav-item">
+									<a title="@firstLevelPage.Name" class="nav-link mega-toggle" href="@pageLink" role="button" data-link-type="menu" data-link="@firstLevelPage.Name" data-link-destination="@pageLink" data-link-section="@firstLevelPage.Name">
+										@firstLevelPage.Name
+									</a>
+
+									<div class="mega-menu">
+										<ul @*class="first-level-mega-menu"*@>
+											@foreach (IPublishedContent secondLevelPage in firstLevelPage.Children)
+											{
+												bool hide2 = (secondLevelPage.Value("hideInMenu") != null) ? (bool)secondLevelPage.Value("hideInMenu") : false;
+												bool hideChildren2 = (secondLevelPage.Value("hideChildrenInMenu") != null) ? (bool)secondLevelPage.Value("hideChildrenInMenu") : false;
+												bool addSpecialChild2 = (secondLevelPage.Value("addSpecialChildren") != null) ? (bool)secondLevelPage.Value("addSpecialChildren") : false;
+												var specialChild2 = (secondLevelPage.Value("specialChild") != null) ? secondLevelPage.Value("specialChild") : null;
+												var specialChildLabel2 = (secondLevelPage.Value("specialChildLabel") != null) ? secondLevelPage.Value("specialChildLabel") : "";
+												<li class="nav-item">
+													@if (secondLevelPage.Children != null && @secondLevelPage.Children.Any() && !hide2 && !hideChildren2)
+													{
+														<a title="@secondLevelPage.Name" class="nav-link" href="@secondLevelPage.Url()" data-link-type="menu" data-link="@secondLevelPage.Name" data-link-destination="@secondLevelPage.Url()" data-link-section="@firstLevelPage.Name - @secondLevelPage.Name">@secondLevelPage.Name</a>
+														<button class="sub-toggle noText">open second level</button>
+														<ul class="sub-menu">
+															@foreach (IPublishedContent thirdLevelPage in secondLevelPage.Children)
+															{
+																var hint3 = thirdLevelPage.GetTemplateAlias() == "ConsumatoriProdotto" ? thirdLevelPage.Value("prodottoAbstract") : thirdLevelPage.GetTemplateAlias() == "Family" ? thirdLevelPage.Value("familyAbstract") : "";
+																bool hide3 = (thirdLevelPage.Value("hideInMenu") != null) ? (bool)thirdLevelPage.Value("hideInMenu") : false;
+																bool hideChildren3 = (thirdLevelPage.Value("hideChildrenInMenu") != null) ? (bool)thirdLevelPage.Value("hideChildrenInMenu") : false;
+																<li class="nav-item">
+																	@if (thirdLevelPage.Children != null && thirdLevelPage.Children.Any() && !hide3 && !hideChildren3)
+																	{
+																		<a title="@hint3" href="@thirdLevelPage.Url()" class="nav-link" data-link-type="menu" data-link="@thirdLevelPage.Name" data-link-destination="@thirdLevelPage.Url()" data-link-section="@firstLevelPage.Name - @secondLevelPage.Name - @thirdLevelPage.Name">@thirdLevelPage.Name<span class="hint">@hint3</span></a>
+																		<button class="sub-sub-toggle noText">open third level</button>
+																		<ul class="sub-sub-menu">
+																			@foreach (var fourthLevelPage in thirdLevelPage.Children)
+																			{
+																				bool hide4 = (fourthLevelPage.Value("hideInMenu") != null) ? (bool)fourthLevelPage.Value("hideInMenu") : false;
+																				if (!hide4)
+																				{
+																					<li class="nav-item"><a title="@fourthLevelPage.Name" href="@fourthLevelPage.Url()" class="nav-link" data-link-type="menu" data-link="@fourthLevelPage.Name" data-link-destination="@fourthLevelPage.Url()" data-link-section="@firstLevelPage.Name - @secondLevelPage.Name - @thirdLevelPage.Name - @fourthLevelPage.Name">@fourthLevelPage.Name</a></li>
+																				}
+
+																			}
+																		</ul>
+																	}
+																	else if (!hide3)
+																	{
+
+																		<a title="@hint3" href="@thirdLevelPage.Url()" class="nav-link" data-link-type="menu" data-link="@thirdLevelPage.Name" data-link-destination="@thirdLevelPage.Url()" data-link-section="@firstLevelPage.Name - @secondLevelPage.Name - @thirdLevelPage.Name">@thirdLevelPage.Name<span class="hint">@hint3</span></a>
+																	}
+																</li>
+															}
+															@if (addSpecialChild2 && specialChild2 != null && specialChildLabel2 != "")
+															{
+																IPublishedContent spChild2 = (IPublishedContent)specialChild2;
+																<li><a title="@spChild2.Name" class="nav-link" href="@spChild2.Url()" data-link-type="menu" data-link="@spChild2.Name" data-link-destination="@spChild2.Url()" data-link-section="@firstLevelPage.Name - @secondLevelPage.Name - @spChild2.Name">@specialChildLabel2</a></li>
+															}
+														</ul>
+													}
+													else if (!hide2)
+													{
+														<a title="@secondLevelPage.Name" class="nav-link" href="@secondLevelPage.Url()" data-link-type="menu" data-link="@secondLevelPage.Name" data-link-destination="@secondLevelPage.Url()" data-link-section="@firstLevelPage.Name - @secondLevelPage.Name">@secondLevelPage.Name</a>
+													}
+												</li>
+											}
+											@if (addSpecialChild1 && specialChild1 != null && specialChildLabel1 != "")
+											{
+												IPublishedContent spChild1 = (IPublishedContent)specialChild1;
+												<li><a title="@spChild1.Name" class="nav-link" href="@spChild1.Url()" data-link-type="menu" data-link="@spChild1.Name" data-link-destination="@spChild1.Url()" data-link-section="@firstLevelPage.Name - @spChild1.Name">@specialChildLabel1</a></li>
+											}
+											@*@if (maxLenght > firstLevelPage.Children.Count() + specialLenght)
+								{
+								for (var i = 1; i <= maxLenght - firstLevelPage.Children.Count() - specialLenght; i++)
+								{
+								<li class="nav-link fake-link"></li>
+								}
+								}*@
+										</ul>
+										@if (menuSettings?.FeaturedCards != null)
+										{
+											foreach (BlockListItem item in menuSettings.FeaturedCards)
+											{
+												BlockFeaturedCard featuredCard = (BlockFeaturedCard)item.Content;
+												if (featuredCard?.KindOfContent?.GetType() == firstLevelPage?.GetType() && featuredCard?.FeaturedCard != null)
+												{
+													foreach (BlockListItem singleCard in featuredCard.FeaturedCard)
+													{
+														BlockCardProduct card = (BlockCardProduct)singleCard.Content;
+														<div class="featured" data-section="menu">
+															<h5 class="featured-title">@Umbraco.GetDictionaryValue("menu_featured_card")</h5>
+															<div class="custom-card">
+																<div class="img-wrapper">
+																	<img src="@card?.BackgroundImage?.Url()" alt="@HtmlUtils.GetImageAlt(card?.BackgroundImage)">
+																</div>
+																<div class="card-body">
+																	<div class="icon-wrapper">
+																		<img src="@card?.Icon?.Url()" alt="@HtmlUtils.GetImageAlt(card?.Icon)">
+																	</div>
+																	<h3 class="h3 card-title">@card?.Title</h3>
+																	<p>@card?.Text</p>
+																	@if (card?.CallToAction != null)
+																	{
+																		<a title="@card?.CallToAction?.Name" href="@card?.CallToAction?.Url" class="more" data-link-type="page" data-link="@card?.Title" data-link-destination="@card?.CallToAction?.Url" data-link-section="menu">@card?.CallToAction?.Name</a>
+																	}
+																</div>
+															</div>
+														</div>
+													}
+												}
+											}
+										}
+									</div>
+								</li>
+							}
+							else if (!hide1)
+							{
+								<li class="nav-item">
+									<a title="@firstLevelPage.ContentType.Alias" class="nav-link" href="@firstLevelPage.Url()" data-link-type="menu" data-link="@firstLevelPage.Name" data-link-destination="@firstLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias">
+										@firstLevelPage.Name
+									</a>
+								</li>
+							}
+						}
+
+					}
+				</ul>
+				@if (searchPage != null)
+				{
+					<button id="serch-lens" class="search-toggler">
+						Search
+					</button>
+				}
+				<button class="menu-toggler d-block d-lg-none">
+					Menu
+				</button>
+				@if (!string.IsNullOrEmpty(menuSettings?.CtaSettings?.Url))
+				{
+					string? url = menuSettings?.CtaSettings?.Url;
+					if (!string.IsNullOrEmpty(addParam) && url != null && !url.Contains("?"))
+					{
+						url += "?" + addParam;
+					}
+					else if (!string.IsNullOrEmpty(addParam) && url != null && !(url.Contains("?product") || url.Contains("&product")))
+					{
+						url += "&" + addParam;
+					}
+					<a title="@menuSettings?.CtaSettings?.Name" class="btn btn-primary contact-cta d-none d-lg-block" href="@url" target="@menuSettings?.CtaSettings?.Target" data-link-type="cta" data-link="@menuSettings?.CtaSettings?.Name" data-link-destination="@url" data-link-section="hearder">
+						@menuSettings?.CtaSettings?.Name
+					</a>
+				}
+
+			</nav>
+
+		</div>
+
+	</header>
+
+	@RenderBody()
+
+	<footer>
+		<div class="container-lg">
+			<div class="row">
+				<div class="col-12 col-lg-8 order-1">
+					<nav class="footer-menu">
+						<a title="@HtmlUtils.GetImageAlt(menuSettings?.FooterLogo)" class="navbar-brand" href="@homePage?.Url()">
+							<img src="@menuSettings?.FooterLogo?.Url()" class="logo" alt="@HtmlUtils.GetImageAlt(menuSettings?.FooterLogo)">
+						</a>
+
+						<ul class="menu">
+							@if (menuSettings != null && menuSettings?.FooterCustomLinks != null)
+							{
+								@foreach (BlockExternalLink singleLink in menuSettings.FooterCustomLinks)
+								{
+									<li class="nav-item">
+										<a title="@singleLink?.ExternalLink?.Name" class="nav-link" href="@singleLink?.ExternalLink?.Url" target="@singleLink?.ExternalLink?.Target">@singleLink?.ExternalLink?.Name</a>
+									</li>
+								}
+							}
+						</ul>
+					</nav>
+				</div>
+				<div class="col-12 col-lg-4 order-3 order-lg-2 mt-md-4">
+					<div class="iso">
+						@if (@menuSettings?.DNvimage?.Url() != null)
+						{
+							<img src="@menuSettings?.DNvimage?.Url()" alt="@HtmlUtils.GetImageAlt(menuSettings?.DNvimage)">
+						}
+						@menuSettings?.DNvdescription
+					</div>
+				</div>
+				<div class="col-12 col-lg-8 order-4 order-lg-3">
+					<p class="legal">@menuSettings?.Copyright</p>
+				</div>
+				@if (menuSettings != null && menuSettings.ShowSocial)
+				{
+					<div class="col-12 col-lg-4 order-2 order-lg-4">
+						@if (crifConfiguration != null && crifConfiguration?.SocialLinks != null)
+						{
+							<div class="social">
+								@menuSettings.SocialLabel
+								@foreach (BlockSocialLink singleLink in crifConfiguration.SocialLinks)
+								{
+									@if (singleLink.CustomSocial)
+									{
+										<a title="@singleLink?.CustomSocialLabel" href="@singleLink?.CustomSocialLink?.Url" class="icon @singleLink?.CustomSocialLabel"><img src="@singleLink?.CustomSocialIconDark?.Url()" alt="@singleLink?.CustomSocialLabel"></a>
+									}
+									else
+									{
+										var imgName = "/assets/img/" + @singleLink?.Social + ".svg";
+										<a title="@singleLink?.Social" href="@singleLink?.SocialLink?.Url" class="icon @singleLink?.Social"><img src="@imgName" alt="@singleLink?.Social"></a>
+									}
+								}
+							</div>
+						}
+					</div>
+				}
+			</div>
+		</div>
+	</footer>
+	<!-- search modal -->
+	@if (searchPage != null)
+	{
+		<div class="search-ovl">
+			<section>
+				<div class="container-lg border-bottom-mobile d-block  d-lg-none">
+					<div class="menu-header">
+						<div class="menu-brand">
+							<img src="~/assets/img/logo-crif.svg" alt="crif-logo">
+						</div>
+						<button class="menu-close">Close search</button>
+					</div>
+				</div>
+				<div class="container-lg">
+					<div class="search">
+						<form action="@searchPage.Url()" method="GET">
+							<div class="search-wrapper">
+								<label for="search" class="form-label">@Umbraco.GetDictionaryValue("search", "Cerca")</label>
+								<input type="text" class="form-control" id="search" name="s" placeholder="@Umbraco.GetDictionaryValue("search_label", "Cosa stai cercando" )">
+								<button type="submit">Search</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</section>
+		</div>
+	}
+
+	<!-- mobile menu -->
+	<div id="mobile-menu-ovl" class="menu-ovl">
+		<section>
+			<div class="container-fluid border-bottom">
+				<div class="menu-header">
+					<div class="menu-brand">
+						<img src="~/assets/img/logo-crif.svg" alt="crif-logo">
+					</div>
+					<button class="menu-close">Close menu</button>
+				</div>
+			</div>
+			@if (firstLevelPages != null)
+			{
+				@foreach (var firstLevelPage in firstLevelPages)
+				{
+					bool hide1 = (firstLevelPage.Value("hideInMenu") != null) ? (bool)firstLevelPage.Value("hideInMenu") : false;
+					bool hideChildren1 = (firstLevelPage.Value("hideChildrenInMenu") != null) ? (bool)firstLevelPage.Value("hideChildrenInMenu") : false;
+					bool addSpecialChild1 = (firstLevelPage.Value("addSpecialChildren") != null) ? (bool)firstLevelPage.Value("addSpecialChildren") : false;
+					var specialChild1 = (firstLevelPage.Value("specialChild") != null) ? firstLevelPage.Value("specialChild") : null;
+					var specialChildLabel1 = (firstLevelPage.Value("specialChildLabel") != null) ? firstLevelPage.Value("specialChildLabel") : "";
+					if (firstLevelPage.Children != null && firstLevelPage.Children.Any() && !hide1 && !hideChildren1)
+					{
+						<div class="container-fluid px-4 border-bottom bg-white">
+							<nav>
+								<h5 class="menu-heading"><a title="@firstLevelPage.Name" class="nav-link" href="@firstLevelPage.Url()" data-link-type="menu" data-link="@firstLevelPage.Name" data-link-destination="@firstLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias">@firstLevelPage.Name</a></h5>
+								<ul>
+									@foreach (var secondLevelPage in firstLevelPage.Children)
+									{
+										bool hide2 = (secondLevelPage.Value("hideInMenu") != null) ? (bool)secondLevelPage.Value("hideInMenu") : false;
+										bool hideChildren2 = (secondLevelPage.Value("hideChildrenInMenu") != null) ? (bool)secondLevelPage.Value("hideChildrenInMenu") : false;
+										if (secondLevelPage.Children != null && secondLevelPage.Children.Any() && !hide2 && !hideChildren2)
+										{
+											<li class="nav-item d-flex row">
+												<a title="@secondLevelPage.Name" class="nav-link px-3 item-with-child" href="@secondLevelPage.Url()" data-link-type="menu" data-link="@secondLevelPage.Name" data-link-destination="@secondLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias - @secondLevelPage.ContentType.Alias">@secondLevelPage.Name</a>
+												<input id="check-@secondLevelPage.Name" type="checkbox" class="d-none checkbox-menu-ovl" />
+												<label class="menu-toggle-icon mt-3" for="check-@secondLevelPage.Name">
+												</label>
+												<div class="menu-ovl-expandable modal-submenu">
+													<div class="modal-submenu-head row py-3">
+														<label class="modal-sumbenu-navigation" for="check-@secondLevelPage.Name"></label>
+														<div class="modal-submenu-title col-11">@secondLevelPage.Name</div>
+													</div>
+													<ul class="">
+														@foreach (var thirdLevelPage in secondLevelPage.Children)
+														{
+															bool hide3 = (thirdLevelPage.Value("hideInMenu") != null) ? (bool)thirdLevelPage.Value("hideInMenu") : false;
+															bool hideChildren3 = (thirdLevelPage.Value("hideChildrenInMenu") != null) ? (bool)thirdLevelPage.Value("hideChildrenInMenu") : false;
+															if (thirdLevelPage.Children != null && thirdLevelPage.Children.Any() && !hide3 && !hideChildren3)
+															{
+																<li class="nav-item d-flex row">
+																	<a title="@thirdLevelPage.Name" class="nav-link px-3 item-with-child" href="@thirdLevelPage.Url()" data-link-type="menu" data-link="@thirdLevelPage.Name" data-link-destination="@thirdLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias - @secondLevelPage.ContentType.Alias -@thirdLevelPage.ContentType.Alias">@thirdLevelPage.Name</a>
+																	<input id="check-@thirdLevelPage.Name" type="checkbox" class="d-none checkbox-menu-ovl" />
+																	<label class="menu-toggle-icon mt-3" for="check-@thirdLevelPage.Name">
+																	</label>
+																	<div class="menu-ovl-expandable modal-submenu modal-subsubmenu">
+																		<div class="modal-submenu-head row py-3">
+																			<label class="modal-sumbenu-navigation" for="check-@thirdLevelPage.Name"></label>
+																			<div class="modal-submenu-title col-11">@thirdLevelPage.Name</div>
+																		</div>
+																		<ul class="">
+																			@foreach (var fourthLevelPage in thirdLevelPage.Children)
+																			{
+																				bool hide4 = (fourthLevelPage.Value("hideInMenu") != null) ? (bool)fourthLevelPage.Value("hideInMenu") : false;
+																				bool hideChildren4 = (fourthLevelPage.Value("hideChildrenInMenu") != null) ? (bool)fourthLevelPage.Value("hideChildrenInMenu") : false;
+																				if (!hide4)
+																				{
+																					<li class="nav-item">
+																						<a title="@fourthLevelPage.Name" class="nav-link" href="@fourthLevelPage.Url()" data-link-type="menu" data-link="@fourthLevelPage.Name" data-link-destination="@fourthLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias - @secondLevelPage.ContentType.Alias - @thirdLevelPage.ContentType.Alias header @fourthLevelPage.ContentType.Alias">@fourthLevelPage.Name</a>
+																					</li>
+																				}
+																			}
+																		</ul>
+																	</div>
+																</li>
+															}
+															else if (!hide3)
+															{
+																<li class="nav-item">
+																	<a title="@thirdLevelPage.Name" class="nav-link" href="@thirdLevelPage.Url()" data-link-type="menu" data-link="@thirdLevelPage.Name" data-link-destination="@thirdLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias - @secondLevelPage.ContentType.Alias - @thirdLevelPage.ContentType.Alias">@thirdLevelPage.Name</a>
+																</li>
+															}
+														}
+													</ul>
+												</div>
+											</li>
+										}
+										else if (!hide2)
+										{
+											<li class="nav-item">
+												<a title="@secondLevelPage.Name" class="nav-link px-2" href="@secondLevelPage.Url()" data-link-type="menu" data-link="@secondLevelPage.Name" data-link-destination="@secondLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias - @secondLevelPage.ContentType.Alias">@secondLevelPage.Name</a>
+											</li>
+										}
+									}
+									@if (addSpecialChild1 && specialChild1 != null && specialChildLabel1 != "")
+									{
+										IPublishedContent spChild1 = (IPublishedContent)specialChild1;
+										<li class="nav-item"><a title="@spChild1.Name" class="nav-link px-2" href="@spChild1.Url()" data-link-type="menu" data-link="@spChild1.Name" data-link-destination="@spChild1.Url()" data-link-section="@firstLevelPage.Name - @spChild1.Name">@specialChildLabel1</a></li>
+									}
+								</ul>
+							</nav>
+						</div>
+					}
+					else if (!hide1)
+					{
+						<div class="container-fluid px-4 border-bottom bg-white">
+							<nav>
+								<h5 class="menu-heading"><a title="@firstLevelPage.Name" class="nav-link" href="@firstLevelPage.Url()" data-link-type="menu" data-link="@firstLevelPage.Name" data-link-destination="@firstLevelPage.Url()" data-link-section="@firstLevelPage.ContentType.Alias">@firstLevelPage.Name</a></h5>
+							</nav>
+						</div>
+
+					}
+				}
+			}
+			<div class="container-fluid px-4 pt-3 bg-white">
+				<a title="@menuSettings?.CtaSettings?.Name" href="@menuSettings?.CtaSettings?.Url" class="btn btn-primary w-100 mb-3" data-link-type="cta" data-link="@menuSettings?.CtaSettings?.Name" data-link-destination="@menuSettings?.CtaSettings?.Url" data-link-section="header">@menuSettings?.CtaSettings?.Name</a>
+
+				<nav>
+					<ul class="secondary-menu">
+						@{
+							if (menuSettings != null && menuSettings?.CustomLinks != null)
+							{
+								foreach (BlockExternalLink singleLink in menuSettings.CustomLinks)
+								{
+									<li class="nav-item country-toggle">
+										<a title="@singleLink?.ExternalLink?.Name" class="nav-link" href="@singleLink?.ExternalLink?.Url" target="@singleLink?.ExternalLink?.Target">@singleLink?.ExternalLink?.Name</a>
+									</li>
+								}
+							}
+							if (menuSettings != null && menuSettings.ContinentAndCountries != null)
+							{
+								<li class="nav-item">
+									<a class="nav-link country-mobile-toggle" href="@menuSettings.Url()">
+										@Umbraco.GetDictionaryValue("country_label")
+									</a>
+								</li>
+							}
+							@*if (Model.Cultures.Count() > 1)
+						{
+						<li class="nav-item">
+						<input id="language-toggler" type="checkbox" class="language-toggler d-none">
+						<label for="language-toggler" title="@ci.Parent.DisplayName" class="nav-link dropdown-toggle-language">@ci.Parent.DisplayName</label>
+						<ul class="dropdown-menu-languages">
+						@foreach (var (culture, infos) in Model.Cultures)
+						{
+						CultureInfo tempCI = new CultureInfo(culture);
+						<li class="nav-item"><a title="@tempCI.Parent.DisplayName" href="@Model.Url(culture)" class="nav-link">@tempCI.Parent.DisplayName</a></li>
+						}
+						</ul>
+						</li>
+						}*@
+						}
+					</ul>
+				</nav>
+			</div>
+		</section>
+	</div>
+
+	<script>
+		//Reduce size of menu on scroll
+		$(function () {
+			$(window).on("scroll touchmove", function () {
+				$('header').toggleClass('tiny', $(document).scrollTop() > 10);
+				if ($(document).scrollTop() > 10) {
+					$('header .navbar.secondary-menu').removeClass('d-lg-flex');
+				} else {
+					$('header .navbar.secondary-menu').addClass('d-lg-flex');
+				}
+			});
+		});
+	</script>
+	<script>
+		//Open and Close the Country Menu in top header
+		$(function () {
+			$('.country-toggle').click(function () {
+				$('.mega-toggle').parent().removeClass('open');
+				$('.sub-toggle').parent().removeClass('open');
+				$('.sub-sub-toggle').parent().removeClass('open');
+				$('.search-ovl').removeClass('open');
+				$(this).parent().toggleClass('open');
+			});
+		});
+		//Open and close of the megamenu in Header
+		$(function () {
+			$('.mega-toggle').hover(function (f) {
+				f.preventDefault();
+				$('.mega-toggle').not(this).parent().removeClass('open');
+				$('.sub-toggle').parent().removeClass('open');
+				$('.sub-sub-toggle').parent().removeClass('open');
+				$('.search-ovl').removeClass('open');
+				//$(this).parent().toggleClass('open');
+			});
+			$('.mega-toggle').mouseleave(function (f) {
+				f.preventDefault();
+				$(this).parent().removeClass('open');
+			});
+			$('.mega-toggle').mouseenter(function (f) {
+				f.preventDefault();
+				$(this).parent().addClass('open');
+			});
+			$('.mega-menu').hover(function () {
+				$(this).parent().toggleClass('open');
+			});
+			$('.mega-menu li a.nav-link, .mega-menu li button').hover(function () {
+				$(this).parent().toggleClass('open');
+			});
+			$('.sub-menu').hover(function () {
+				$(this).parent().toggleClass('open');
+			});
+			$('.sub-sub-menu').hover(function () {
+				$(this).parent().toggleClass('open');
+			});
+		});
+	</script>
+
+
+	<script>
+		$(function () {
+			$('.search-toggler').click(function () {
+				$('.mega-toggle').parent().removeClass('open');
+				$('.menu-ovl').removeClass('open');
+				$('.search-ovl').toggleClass('open');
+			});
+		});
+		$(function () {
+			$('.menu-toggler').click(function () {
+				$('.menu-ovl').addClass('open');
+			});
+		});
+		$(function () {
+			$('.menu-close').click(function () {
+				$('.menu-ovl').removeClass('open');
+				$('.search-ovl').removeClass('open');
+			});
+		});
+	</script>
+
+	<script>
+		var swiper = new Swiper(".trends-carousel", {
+			loop: false,
+			slidesPerView: "1",
+			spaceBetween: 16,
+			pagination: {
+				el: '.swiper-pagination',
+				type: 'bullets',
+				clickable: true,
+			},
+			breakpoints: {
+				992: {
+					loop: false,
+					slidesPerView: 2,
+					spaceBetween: 64,
+				},
+			},
+		});
+	</script>
+
+	<script>
+		var swiper = new Swiper(".kecards-carousel", {
+			loop: false,
+			slidesPerView: "1",
+			spaceBetween: 16,
+			pagination: {
+				el: '.swiper-pagination',
+				type: 'bullets',
+				clickable: true,
+			},
+			breakpoints: {
+				992: {
+					loop: false,
+					slidesPerView: 3,
+					spaceBetween: 32,
+				},
+			},
+		});
+	</script>
+
+	<script>
+		var swiper = new Swiper(".partners-carousel", {
+			loop: false,
+			slidesPerView: "3",
+			spaceBetween: 0,
+			breakpoints: {
+				992: {
+					loop: false,
+					slidesPerView: 5,
+					spaceBetween: 0,
+				},
+			},
+		});
+	</script>
+	<script>
+		var swiper = new Swiper(".countries-carousel", {
+			loop: false,
+			slidesPerView: "3",
+			spaceBetween: 8,
+
+		});
+	</script>
+
+
+	<script>
+		$(function () {
+			$('.play-video').click(function () {
+				if ($(this).prev().hasClass('video')) {
+					$(this).prev().trigger('play')
+					$(this).prev().attr('controls', true);
+					$(this).addClass('d-none');
+					var vTitle = $("video.video").attr("data-title")
+					dataLayer.push({
+						'event': 'video_start',
+						'videoTitle': vTitle
+					})
+				}
+			});
+		});
+	</script>
+
+	<script>
+		function visible(partial) {
+			var $t = partial,
+				$w = jQuery(window),
+				viewTop = $w.scrollTop(),
+				viewBottom = viewTop + $w.height(),
+				_top = $t.offset().top,
+				_bottom = _top + $t.height(),
+				compareTop = partial === true ? _bottom : _top,
+				compareBottom = partial === true ? _top : _bottom;
+			return ((compareBottom <= viewBottom) && (compareTop >= viewTop) && $t.is(':visible'));
+
+		}
+
+		// counter up
+
+		var numbers = [];
+		$('.counter-number span').each(function () {
+			numbers.push($(this).text())
+		})
+		function getOriginalNumbers(index) {
+			return numbers[index];
+		}
+		$(window).scroll(function () {
+			console.log(getOriginalNumbers())
+			if (visible($('.counter-number'))) {
+				if ($('.counter-number span').hasClass('counter-loaded')) return;
+				$('.counter-number span').addClass('counter-loaded');
+				$('.counter-number span').each(function (index) {
+					var $this = $(this);
+					jQuery({ Counter: 0 }).animate({ Counter: getOriginalNumbers(index) }, {
+						duration: 1000,
+						easing: 'swing',
+						step: function () {
+							$this.text(Math.ceil(this.Counter));
+						}
+					});
+				});
+			}
+		})
+	</script>
+
+	<script>
+		if ($('.internal-navigation.sticky-top')) {
+			$('.internal-navigation.sticky-top li.nav-item.internal-link ').each(function () {
+				$(this).click(function (event) {
+					event.preventDefault();
+					//$(this).addClass('current')
+					//$('.internal-navigation.sticky-top li.nav-item.internal-link ').not(this).removeClass('current')
+					var anchor = $(this).children(":first").attr("href");
+					if ($(anchor) != null && $(anchor).offset() != undefined) {
+						$('html, body').animate({ scrollTop: $(anchor).offset().top - 120 }, 'slow');
+					}
+				})
+			})
+
+			$(window).scroll(function () {
+				// This is then function used to detect if the element is scrolled into view
+				function elementScrolled(elem) {
+					var docViewTop = $(window).scrollTop();
+					var docViewBottom = docViewTop + $(window).height();
+					var elemTop = 0;
+					if (elem != null && $(elem).offset() != undefined) {
+						elemTop = $(elem).offset().top;
+					}
+					return ((elemTop <= docViewBottom) && (elemTop >= docViewTop));
+				}
+				$('.internal-navigation.sticky-top li.nav-item.internal-link ').each(function () {
+					var target = $(this).children().attr("href");
+					if (elementScrolled(target)) {
+						$(this).addClass('current')
+						$('.internal-navigation.sticky-top li.nav-item.internal-link ').not(this).removeClass('current')
+						return false;
+					}
+
+				});
+			});
+		}
+	</script>
+
+	<script>
+		$("#filtered-tags-list select").change(function () {
+			$("#filtered-tags-list form").submit()
+		})
+	</script>
+
+	<script>
+		$("#filtered-list select").change(function () {
+			$("#filtered-list form").submit()
+		})
+	</script>
+
+	<script>
+		$("div .social.link").click(function (event) {
+			event.preventDefault();
+			navigator.clipboard.writeText($(this).attr("data-url"));
+		});
+	</script>
+
+	<script>
+		var listOfAnimation = document.querySelectorAll(".internal-heading .caption h1,.internal-heading .caption p , .hp-heading .caption h2, .hp-heading .caption a, .textonly-heading .caption h1, .textonly-heading .caption p, .internal-heading .caption h2, .benefit .custom-card, .cards-list .custom-card, .classic-cards-block .classic-card,  .custom-card.industry, .key-point-img, .solution .custom-card, .consumer-services .custom-card, .trend-topics .custom-card, .history-year img");
+		listOfAnimation.forEach(function (element) {
+			new Waypoint({
+				element: element,
+				handler: function () { element.classList.add('active') },
+				group: 'animations',
+				offset: '98%'
+			})
+		})
+	</script>
+	<!--script>
+		const btn = document.getElementById('search-lens');
+		btn.addEventListener('click', function handleClick() {
+			setTimeout(function(){
+				var input = document.getElementById('search');
+				input.setSelectionRange(0, 0);
+				input.focus();
+			}, 500);
+		});
+	</script-->
+	<script type="application/ld+json">
+		{
+			"@@context": "https://schema.org",
+			"@@type": "BreadcrumbList",
+			"itemListElement": [
+		@for (int j = 0; j < Model.AncestorsOrSelf().Count(); j++)
+		{
+			var content = Model.AncestorsOrSelf().Reverse().ElementAt(j);
+			var counter = content?.Ancestors().Count() + 1;
+			if (j == Model.AncestorsOrSelf().Count() - 1)
+			{
+				<text>
+						{
+							"@@type": "ListItem",
+							"position": @counter,
+							"name": "@content?.Name",
+							"item": "@content?.Url(mode: UrlMode.Absolute)"
+						}
+				</text>
+			}
+			else
+			{
+				<text>
+						{
+							"@@type": "ListItem",
+							"position": @counter,
+							"name": "@content?.Name",
+							"item": "@content?.Url(mode: UrlMode.Absolute)"
+						},
+				</text>
+			}
+		}
+			]
+		}
+	</script>
+	@if (isHome)
+	{
+		<script type="application/ld+json">
+			{
+			"@@context": "http://schema.org",
+			"@@type": "SiteNavigationElement",
+			"name": [
+			@foreach (var content in Model.AncestorOrSelf(1).Children)
+			{
+				<text>
+									"@content.Name",
+				</text>
+			}
+			],
+			"url": [
+			@foreach (var content in Model.AncestorOrSelf(1).Children)
+			{
+				<text>
+									"@content.Url(mode: UrlMode.Absolute)",
+				</text>
+			}
+			]
+			}
+		</script>
+	}
+	<script>
+		$("video.video").on("ended", function () {
+			var vTitle = $("video.video").attr("data-title")
+			dataLayer.push({
+				'event': 'video_complete',
+				'videoTitle': vTitle
+			})
+		})
+	</script>
+
+</body>
+
+
+</html>

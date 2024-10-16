@@ -1,0 +1,286 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<KnowledgeEvents>
+@using Crif.It.Models;
+@using Crif.It.Utils;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    Layout = "Master.cshtml";
+
+    var categories = Model.Children();
+    MenuSettings? menuSettings = (MenuSettings?)Model.Root()?.Siblings()?.Where(x => x.ContentType.Alias == "menuSettings").FirstOrDefault();
+    CrifConfiguration? crifConfiguration = (CrifConfiguration?)Model.Root()?.Siblings()?.Where(x => x.ContentType.Alias == "crifConfiguration").FirstOrDefault();
+
+    var siteSection = Model.AncestorOrSelf(1);
+
+    var parentsingleItems = Model.Value<IEnumerable<IPublishedContent>>("mainList");
+    var parentSuccessStories = Model.Value<IEnumerable<IPublishedContent>>("filteredList");
+    var parentTrendTopics = Model.Value<IEnumerable<IPublishedContent>>("cardList");
+
+}
+<section class="textonly-heading pb-lg-3">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-12 banner ke">
+                @await(Html.PartialAsync("Breadcrumb", Model))
+                <div class="caption">
+                    <h1 class="h1 fade-in-box">@Model.KnowledgeEventsTitle</h1>
+                    <p class="big-text fade-in-box">@Model.KnowledgeEventsDescription</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (categories != null && categories.Any())
+{
+    <section class="internal-navigation sticky-top">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <nav>
+                        <ul class="internal-menu justify-content-start">
+                            <li class="nav-item current"><a title="All" href="" class="nav-link">All</a></li>
+                            @foreach (var category in categories)
+                            {
+                                @if (category.Children != null && category.Children.Any())
+                                {
+                                    <li class="nav-item"><a title="@category.Name" href="@category.Url()" class="nav-link" data-link="@category.Name" data-link-type="filter">@category.Name</a></li>
+                                }
+                            }
+                            @*@if (menuSettings != null && menuSettings.ShowSocial)
+                            {
+                                @if (crifConfiguration != null && crifConfiguration?.SocialLinks != null)
+                                {
+                                    <li class="nav-item ms-auto">
+                                        @menuSettings.SocialLabel
+                                        @foreach (BlockSocialLink singleLink in crifConfiguration.SocialLinks)
+                                        {
+                                            var imgName = "/assets/img/" + singleLink?.Social + ".svg";
+                                            <a title="@singleLink?.Social" href="@singleLink?.SocialLink?.Url" class="icon @singleLink?.Social"><img src="@imgName" alt="@singleLink?.Social"></a>
+                                        }
+                                    </li>
+                                }
+                            }*@
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@if (parentsingleItems != null && parentsingleItems.Any())
+{
+    var pageSize = Model.MainListItemsPerPage;
+    var page = 1; int.TryParse(HttpContextAccessor?.HttpContext?.Request.Query["page1"], out page);
+    var singleItems = parentsingleItems.SelectMany(x => x.Children).OrderByDescending(x => x.Value("customDate"));
+    var totalPages = (int)Math.Ceiling((double)parentsingleItems.SelectMany(x => x.Children).Count() / (double)pageSize);
+
+    if (page > totalPages)
+    {
+        page = totalPages;
+    }
+    else if (page < 1)
+    {
+        page = 1;
+    }
+
+    <section class="vertical-cards-block bg pb-80" data-section="@Model.MainListTitle">
+        <div class="container-lg">
+            @if (!string.IsNullOrEmpty(Model.MainListTitle))
+            {
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model.MainListTitle</h2>
+                    </div>
+                </div>
+            }
+            <div class="row g-large">
+                @foreach (SingleNewsEvents item in singleItems.Skip((page - 1) * pageSize).Take(pageSize))
+                {
+                    @(await Html.PartialAsync("CardKnowledgeEvents", item, new ViewDataDictionary(ViewData) { { "list", "main" } }))
+                }
+
+                @if (totalPages > 1)
+                {
+                    <div class="row pt-4 mt-2 mt-lg-0">
+                        @(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)page, TotalCount = (int)totalPages, RequestParameter = "page1" }))
+                    </div>
+                }
+            </div>
+        </div>
+
+    </section>
+}
+@if (parentSuccessStories != null)
+{
+    var pageSSSize = Model.FilteredListItemsPerPage;
+    var pageSS = 1; int.TryParse(HttpContextAccessor?.HttpContext?.Request.Query["page2"], out pageSS);
+
+    IEnumerable<IPublishedContent> successStories = (IEnumerable<IPublishedContent>)parentSuccessStories.SelectMany(x => x.Children).OrderByDescending(x => x.Value("customDate"));
+    var totalSSPages = (int)Math.Ceiling((double)parentSuccessStories.SelectMany(x => x.Children).Count() / (double)pageSSSize);
+
+    if (pageSS > totalSSPages)
+    {
+        pageSS = totalSSPages;
+    }
+    else if (pageSS < 1)
+    {
+        pageSS = 1;
+    }
+
+    string filterServ = Context.Request.Query["srv"];
+    string filterSol = Context.Request.Query["slt"];
+
+    <section id="filtered-list" class="vertical-cards-block pt-80 pb-80" data-section="@Model.FilteredListTitle">
+        <div class="container-lg">
+            @if (!string.IsNullOrEmpty(Model.FilteredListTitle))
+            {
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <h2 class="h2 text-center pb-0 pb-lg-3 mb-lg-3">@Model.FilteredListTitle</h2>
+                </div>
+            </div>
+            }
+            <div class="row pb-3 pb-lg-5">
+                <div class="col-12">
+                    <form action="@Model?.Url()#filtered-list" method="GET">
+                        <div class="filters">
+                            <label for="" class="form-label">Filter by</label>
+                            <select name="srv" id="filter-service-select" class="form-select">
+                                @if (filterServ != null && filterServ != "")
+                                {
+                                    <option value="@filterServ">@filterServ.ToFirstUpper()</option>
+                                }
+                                @if (filterServ != @Umbraco.GetDictionaryValue("filter_services_label")?.ToLower())
+                                {
+                                    <option value="@Umbraco.GetDictionaryValue("filter_services_label")?.ToLower()">@Umbraco.GetDictionaryValue("filter_services_label")</option>
+                                }
+
+                                @{
+                                    var allSrvs = Model?.Root()?.DescendantsOfType("Service");
+                                    if (allSrvs != null && allSrvs.Any())
+                                    {
+                                        foreach (Service srv in allSrvs)
+                                        {
+                                            if (srv.Name?.ToLower() != filterServ)
+                                            {
+                                                <option value="@srv?.Name?.ToLower()">@srv?.Name</option>
+                                            }
+                                        }
+                                    }
+
+                                }
+                            </select>
+                            <select name="slt" id="filter-solution-select" class="form-select">
+                                @if (filterSol != null && filterSol != "")
+                                {
+                                    <option value="@filterSol">@filterSol.ToFirstUpper()</option>
+                                }
+                                @if (filterSol != @Umbraco.GetDictionaryValue("filter_solutions_label")?.ToLower())
+                                {
+                                    <option value="@Umbraco.GetDictionaryValue("filter_solutions_label")?.ToLower()">@Umbraco.GetDictionaryValue("filter_solutions_label")</option>
+                                }
+                                @{
+                                    var allSltn = Model?.Root()?.DescendantsOfType("Solutions");
+                                    if (allSltn != null && allSltn.Any())
+                                    {
+                                        foreach (Solutions sltn in allSltn)
+                                        {
+                                            if (sltn.Name?.ToLower() != filterSol)
+                                            {
+                                                <option value="@sltn?.Name?.ToLower()">@sltn?.Name</option>
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row g-large">
+                @{
+                    if (filterServ != null && filterServ != "" && filterServ != Umbraco.GetDictionaryValue("filter_services_label")?.ToLower())
+                    {
+                        List<IPublishedContent> castedSer = new List<IPublishedContent>();
+                        foreach (SingleNewsEvents sne in successStories)
+                        {
+                            if (sne.SingleKnowledgeEventsRelatedServices != null && sne.SingleKnowledgeEventsRelatedServices.Any())
+                            {
+                                foreach (var serv in sne.SingleKnowledgeEventsRelatedServices)
+                                {
+                                    if (serv.Name?.ToLower() == filterServ)
+                                    {
+                                        castedSer.Add(sne);
+                                    }
+                                }
+                            }
+                        }
+                        successStories = castedSer;
+                    }
+                    if (filterSol != null && filterSol != "" && filterSol != Umbraco.GetDictionaryValue("filter_solutions_label")?.ToLower())
+                    {
+                        List<IPublishedContent> castedSol = new List<IPublishedContent>();
+                        foreach (SingleNewsEvents sne in successStories)
+                        {
+                            if (sne.SingleKnowledgeEventsRelatedServices != null && sne.SingleKnowledgeEventsRelatedServices.Any())
+                            {
+                                foreach (var serv in sne.SingleKnowledgeEventsRelatedServices)
+                                {
+                                    if (serv.Name?.ToLower() == filterSol)
+                                    {
+                                        castedSol.Add(sne);
+                                    }
+                                }
+                            }
+                        }
+                        successStories = castedSol;
+                    }
+                    totalSSPages = (int)Math.Ceiling((double)successStories.Count() / (double)pageSSSize);
+                }
+                @{
+                    var numberCard = successStories.Skip((pageSS - 1) * pageSSSize).Take(pageSSSize);
+                }
+                @foreach (var item in numberCard)
+                {
+                    @(await Html.PartialAsync("CardKnowledgeEvents", item))
+                }
+
+                @if (totalSSPages > 1)
+                {
+                    <div class="row pt-4 mt-2 mt-lg-0">
+                        @(await Html.PartialAsync("Pagination", new PagModel { PageIndex = (int)pageSS, TotalCount = (int)totalSSPages, RequestParameter = "page2" }))
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+@if (parentTrendTopics != null && parentTrendTopics.Any())
+{
+    var trendTopics = parentTrendTopics.SelectMany(x => x.Children);
+    <section class="cards-block bg pt-80" data-section="@Model?.CardListTitle">
+        <div class="container-lg">
+            @if (!string.IsNullOrEmpty(Model?.CardListTitle))
+            {
+            <div class="row justify-content-center">
+                <div class="col-7 col-lg-12">
+                    <h2 class="h2 text-center pb-lg-5 mb-lg--4">@Model?.CardListTitle</h2>
+                </div>
+            </div>
+            }
+            <div class="row g-mega g-overflow">
+                @foreach (var item in trendTopics)
+                {
+                    @(await Html.PartialAsync("CardTrendTopics", item))
+                }
+            </div>
+        </div>
+    </section>
+}
+@Html.GetBlockListHtml(Model?.KnowledgeEventsBlocks)

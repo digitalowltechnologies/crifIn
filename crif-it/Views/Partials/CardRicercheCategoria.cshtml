@@ -1,0 +1,25 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.RicercheAcademyCategoria>
+@model Crif.It.Models.RicercheAcademyCategoria
+@using Crif.It.Utils;
+@using Crif.It.Models;
+@{
+	string? dataSection = "altri-contenuti";
+	if (ViewData.ContainsKey("section"))
+	{
+		dataSection = (string?)ViewData["section"];
+	}
+}
+
+<div class="col-12 col-lg-6 benefit">
+    <div class="custom-card shadow fade-in-box">
+        <div class="card-body">
+            <div class="icon-wrapper"><img src="@Model.IconaCategoria?.Url()" alt="@HtmlUtils.GetImageAlt(Model.IconaCategoria)"></div>
+            <h4 class="h3 card-title">@Model.TitoloCategoria</h4>
+            @if (Model.AbstractCategoria != "")
+            {
+                <p>@Model.AbstractCategoria</p>
+            }
+            <a title="@Model.TitoloCategoria" href="@Model.Url()" class="stretched-link" data-link-type="page" data-link="@Model.TitoloCategoria" data-link-category="@Model.Parent?.Name" data-link-destination="@Model.Url()" data-link-section="@dataSection" ></a>
+        </div>
+    </div>
+</div>

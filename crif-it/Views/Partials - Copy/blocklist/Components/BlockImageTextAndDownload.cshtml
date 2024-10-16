@@ -1,0 +1,87 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@using System;
+@using System.Text.RegularExpressions;
+@{
+    ContentModels.BlockImageTextAndDownload content = (ContentModels.BlockImageTextAndDownload)Model.Content;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+    string pattern = "[ \\w-]+?(?=\\.)";
+
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (settings.AnchorID == "Sherlock")
+    {
+        <section class="pageSection" id="@settings.AnchorID">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(content.BlockTitle))
+                {
+                    <h2 class="title text-center">@content.BlockTitle</h2>
+                }
+                <div class="row align-items-start pt-md-4">
+                    <div class="col-12 col-md-5 col-lg-6">
+                        <img src="@content.BlockImage?.Url()" alt="@HtmlUtils.GetImageAlt(@content.BlockImage)" class="fitImg animateThis slideRight  me-md-5">
+                    </div>
+                    <div class="col-12 col-md-7 col-lg-6">
+                        @Html.Raw(content.BlockDescription)
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="annual-report" id="@settings.AnchorID">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="report">
+                            <img src="@content.BlockImage?.Url()" alt="@HtmlUtils.GetImageAlt(@content.BlockImage)">
+                            <div class="caption">
+                                @if (!string.IsNullOrEmpty(content.BlockTitle))
+                                {
+                                    <h2 class="h2">@content.BlockTitle</h2>
+                                }
+                                <blockquote class="mb-3 mb-lg-auto">@Html.Raw(content.BlockDescription)</blockquote>
+                                <p class="button-label">@content.PreButtonLabel</p>
+                                @if (content.BlockFile?.Url != null)
+                                {
+                                    string url = content.BlockFile.Url;
+                                    <a title="@content.BlockFile?.Name" href="@content.BlockFile?.Url" class="btn btn-secondary" target="@content.BlockFile?.Target" download data-link-type="download" data-link="@Regex.Matches(url, pattern, RegexOptions.IgnoreCase).FirstOrDefault()">@content.BlockFile?.Name</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+}
+else
+{
+    <section class="annual-report" id="@settings.AnchorID">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="report">
+                        <img src="@content.BlockImage?.Url()" alt="@HtmlUtils.GetImageAlt(@content.BlockImage)">
+                        <div class="caption">
+                            @if (!string.IsNullOrEmpty(content.BlockTitle))
+                            {
+                                <h2 class="h2">@content.BlockTitle</h2>
+                            }
+                            <blockquote class="mb-3 mb-lg-auto">@Html.Raw(content.BlockDescription)</blockquote>
+                            <p class="button-label">@content.PreButtonLabel</p>
+                            @if (content.BlockFile?.Url != null)
+                            {
+                                string url = content.BlockFile.Url;
+                                <a title="@content.BlockFile?.Name" href="@content.BlockFile?.Url" class="btn btn-secondary" target="@content.BlockFile?.Target" download data-link-type="download" data-link="@Regex.Matches(url, pattern, RegexOptions.IgnoreCase).FirstOrDefault()">@content.BlockFile?.Name</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}

@@ -1,0 +1,134 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockKeyBenefits content = (ContentModels.BlockKeyBenefits)Model.Content;
+    ContentModels.BlockGeneralBlockSettings settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    @if (settings?.AnchorID == "CreditInfo")
+    {
+        <section class="pageSection lightGreyBg2" id="microfinance">
+            <div class="container text-center">
+                @if (!string.IsNullOrEmpty((string?)content.Value("Title")))
+                {
+                    <h2 class="title mb-0">@content.Value("Title")</h2>
+                    <p class="text-center">
+                        @content.Value("SubTitle")
+                    </p>
+                }
+                <div class="row justify-content-center text-center">
+                    @if (content?.KeyBenefitsList != null)
+                    {
+                        @foreach (var card in content.KeyBenefitsList)
+                        {
+                            var listContent = (ContentModels.BlockCardKeyBenefits)card.Content;
+                            <div class="col-12 col-md-4 mt-md-5">
+                                <div class="roundIconCard">
+                                    <img src="@listContent.Icon?.Url()" alt="@listContent.Icon?.Value("alt")" class="animateThis fadeGrow" />
+
+                                    <p class="roundIconTitle">@listContent.Title</p>
+                                    @{
+                                        string? text = listContent.Text;
+                                        if (text != "")
+                                        {
+                                            <p>@text</p>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                        }
+                    }
+
+
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="pageSection" id="@settings?.AnchorID">
+            <div class="container">
+                @if (!string.IsNullOrEmpty((string?)content.Value("Title")))
+                {
+                    <div class="titleSection">
+                        <h2 class="title text-center">@content.Value("Title")</h2>
+                        <p class="text-center">
+                            @content.Value("SubTitle")
+                        </p>
+                    </div>
+                }
+
+                <div class="row justify-content-center align-items-start">
+                    @if (content?.KeyBenefitsList != null)
+                    {
+                        @foreach (var card in content.KeyBenefitsList)
+                        {
+                            var listContent = (ContentModels.BlockCardKeyBenefits)card.Content;
+                            <div class="col-12 col-md-6 pe-lg-5">
+                                <div class="d-md-flex align-items-center animateThis slideTop">
+                                    <div class="roundIconCard my-0 me-4">
+                                        <img src="@listContent.Icon?.Url()" alt="@listContent.Icon?.Value("alt")" />
+                                    </div>
+                                    <div>
+                                        <h5>@listContent.Title</h5>
+                                        @{
+                                            string? text = listContent.Text;
+                                            if (text != "")
+                                            {
+                                                <p>@text</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+        </section>
+    }
+}
+else
+{
+    <section class="cards-block" id="@settings?.AnchorID">
+        <div class="container-lg">
+            @if (!string.IsNullOrEmpty((string?)content.Value("Title")))
+            {
+                <div class="row justify-content-center">
+                    <div class="col-7 col-lg-12">
+                        <h2 class="h2 text-center pb-lg-5 mb-lg-4">@content.Value("Title")</h2>
+                    </div>
+                </div>
+            }
+            <div class="row g-mega g-overflow ">
+                @if (content?.KeyBenefitsList != null)
+                {
+                    @foreach (var card in content.KeyBenefitsList)
+                    {
+                        var listContent = (ContentModels.BlockCardKeyBenefits)card.Content;
+
+                        <div class="col-12 col-lg-6 benefit">
+                            <div class="custom-card shadow fade-in-box">
+                                <div class="card-body">
+                                    <div class="icon-wrapper"><img src="@listContent.Icon?.Url()" alt="@listContent.Icon?.Value("alt")"></div>
+                                    <h4 class="h3 card-title">@listContent.Title</h4>
+                                    @{
+                                        string? text = listContent.Text;
+                                        if (text != "")
+                                        {
+                                            <p>@text</p>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </section>
+}

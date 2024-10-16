@@ -1,0 +1,61 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockBannerCarousel? content = (ContentModels.BlockBannerCarousel?)Model.Content;
+    ContentModels.BlockGeneralBlockSettings? settings = (ContentModels.BlockGeneralBlockSettings?)Model.Settings;
+}
+
+<!--hero banner -->
+<section class="hero-slider hero-style">
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            @if (content != null && content.CardList != null && content.CardList.Any())
+            {
+                foreach (var card in content.CardList)
+                {
+                    var listContent = (ContentModels.BlockCardProduct)card.Content;
+                    <div class="swiper-slide">
+                        <div class="slide-inner">
+                            @if (listContent.BannerFullImage)
+                            {
+                                <div class="slide-bg-image full-image" data-swiper-parallax="-700"
+                                     data-background="@listContent.BackgroundImage?.Url()"></div>
+                            }
+                            else
+                            {
+                                <div class="slide-bg-image" data-swiper-parallax="-700"
+                                     data-background="@listContent.BackgroundImage?.Url()"></div>
+                            }
+
+                            <div class="container bannerContent">
+                                <div class="slide-title">
+                                    <h2>@listContent.Title</h2>
+                                </div>
+                                <div class="slide-text">
+                                    @listContent.Text
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="slide-btns">
+
+                                    <a href="@listContent.CallToAction?.Url" class="orangeBtn">
+                                        @listContent.CallToAction?.Name
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+
+        </div>
+        <!-- end swiper-wrapper -->
+        <div class="container">
+            <div class="swiper-pagination"></div>
+        </div>
+        <!-- swipper controls -->
+        <!-- <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div> -->
+    </div>
+</section>

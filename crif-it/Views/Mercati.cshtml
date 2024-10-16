@@ -1,0 +1,42 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Mercati>
+@{
+	Layout = "Master.cshtml";
+	var mercati = Model.Children()?.Where(x => x.ContentType.Alias == "mercato");
+}
+@if (Model.TitoloMercati != "")
+{
+<div class="container-lg">
+	<div class="row justify-content-center">
+		<div class="col-7 col-lg-12">
+			<h1 class="h2 text-center pb-lg-5 mb-lg-4">@Model.TitoloMercati</h1>
+		</div>
+	</div>
+</div>
+}
+@if(mercati!=null && mercati.Any()){
+<section class="cards-block" data-section="mercati">
+	<div class="container-lg">
+		<div class="row g-mega g-overflow">
+				@foreach(Mercato mercato in mercati)
+				{
+					<div class="col-12 col-lg-6">
+						<div class="custom-card industry shadow fade-in-box">
+							<div class="card-body">
+								<div class="icon-wrapper">
+									<img src="@mercato?.IconaCardMercato?.Url()" alt="@HtmlUtils.GetImageAlt(mercato?.IconaCardMercato)">
+								</div>
+								<h3 class="h3 card-title">@mercato?.TitoloHeroMercato</h3>
+								<p>@HtmlUtils.TextCut(@mercato?.AbstractCardMercato)</p>
+								<a title="@Umbraco.GetDictionaryValue("mercati_read_more")" href="@mercato?.Url()" class="more" data-link-type="page" data-link="@mercato?.TitoloHeroMercato" data-link-destination="@mercato?.Url()" data-link-section="@Model.TitoloMercati">@Umbraco.GetDictionaryValue("mercati_read_more")</a>
+							</div>
+						</div>
+					</div>
+				}
+		</div>
+	</div>
+</section>
+}
+@Html.GetBlockListHtml(Model.BlocchiMercati)

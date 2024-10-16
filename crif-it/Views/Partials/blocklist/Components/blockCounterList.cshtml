@@ -1,0 +1,72 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@using Umbraco.Cms.Core.Models.PublishedContent;
+@{
+    ContentModels.BlockCounterList content = (ContentModels.BlockCounterList)Model.Content;
+    ContentModels.BlockCounterListSettings settings = (ContentModels.BlockCounterListSettings)Model.Settings;
+    var grayBackground = settings.HasGreyBackground ? "bg-gray" : "";
+    var containerLayout = "";
+    var rowLayout = "";
+    var cardRowLayout = "";
+    var cardAlignment = "";
+    switch (content.SelectLayout)
+    {
+        case "3 card per row":
+            containerLayout = "px-mega py-5 mb-4";
+            rowLayout = "g-64";
+            cardRowLayout = "col-6 col-lg-4";
+            cardAlignment = "justify-content-start px-2";
+            break;
+        case "4 card per row":
+            containerLayout = "px-mega py-5 mb-4";
+            rowLayout = "g-large g-overflow";
+            cardRowLayout = "col-6 col-lg-3";
+            cardAlignment = "p-4";
+            break;
+        case "3 card in one row":
+            containerLayout = "px-mega pt-3 pb-4 pt-lg-4 mb-2";
+            rowLayout = "gx-mega";
+            cardRowLayout = "col-4";
+            cardAlignment = "";
+            break;
+        default:
+            containerLayout = "px-mega pt-3 pb-4 pt-lg-4 mb-2";
+            rowLayout = "gx-mega";
+            cardRowLayout = "col-4";
+            cardAlignment = "";
+            break;
+    }
+}
+<section class="@grayBackground m-0">
+<div class="container-lg @containerLayout" id="@settings?.AnchorID">
+    @if (content.CounterListTitle != "")
+    {
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <p class="h3 text-center pb-lg-4 mb-lg-4">@content.CounterListTitle</p>
+        </div>
+    </div>   
+    }
+    <div class="row @rowLayout"> 
+        @if (content.CardCounterList != null)
+        {
+            foreach (var item in content.CardCounterList)
+            {
+                var itemContent = (ContentModels.BlockSingleCounter)item.Content;
+                <div class="@cardRowLayout">
+                    <div class="counter shadow @cardAlignment">
+                        @if (!itemContent.CardTitle.IsNullOrWhiteSpace())
+                        {
+                            <h4 class="counter-title">@itemContent.CardTitle</h4>
+                        }
+                        <p class="counter-number">
+                            @itemContent.SignBefore<span>@itemContent.Title</span>@itemContent.SignAfter
+                        </p>
+                        <p class="counter-label">@itemContent.Text</p>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+</section>

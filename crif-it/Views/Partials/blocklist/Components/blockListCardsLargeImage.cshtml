@@ -1,0 +1,36 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using ContentModels = Crif.It.Models;
+@using Crif.It.Utils;
+@{
+    ContentModels.BlockListCardsLargeImage content = (ContentModels.BlockListCardsLargeImage)Model.Content;
+    ContentModels.BlockListCardLargeImageSettings settings = (ContentModels.BlockListCardLargeImageSettings)Model.Settings;
+    var bg = settings.GreyBackground ? "bg extra-padding-top" : "pt-0";
+    var anchorID = settings.AnchorID != "" ? settings.AnchorID : "values";
+}
+<section class="classic-cards-block @bg" id="@anchorID">
+    <div class="container-lg">
+        <div class="row justify-content-center">
+            <div class="col-7 col-lg-12">
+                <h3 class="h3 text-center pb-lg-5 mb-lg--4">@content.Value("TitleSection")</h3>
+            </div>
+        </div>
+        <div class="row g-mega g-overflow">
+            @if (content != null && content.CardList != null && content.CardList.Any())
+            {
+                foreach (var card in content.CardList)
+                {
+                    var listContent = (ContentModels.BlockCardLargeImage)card.Content;
+                    <div class="col-12 col-lg-6">
+                        <div class="classic-card shadow fade-in-box">
+                            <div class="img-wrapper"><img src="@listContent.Image?.Url()" alt="@HtmlUtils.GetImageAlt(listContent.Image)"></div>
+                            <div class="card-body">
+                                <h4 class="card-title">@listContent.Title</h4>
+                                <p>@listContent.Text</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+    </div>
+    </div>
+</section>

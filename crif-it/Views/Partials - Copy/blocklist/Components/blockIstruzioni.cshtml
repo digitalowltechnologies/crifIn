@@ -1,0 +1,148 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;
+@using ContentModels = Crif.It.Models;
+@{
+    ContentModels.BlockIstruzioni content = (ContentModels.BlockIstruzioni)Model.Content;
+    var settings = (ContentModels.BlockGeneralBlockSettings)Model.Settings;
+    var i = 1;
+    var j = 1;
+}
+@if (settings != null && settings.NewTemplate)
+{
+    <section class="lightGreyBg2 pageSection" id="@settings.AnchorID">
+        <div class="container">
+            @if (!content.TitoloIstruzioni.IsNullOrWhiteSpace())
+            {
+                <h2 class="title text-center">@content.TitoloIstruzioni</h2>
+            }
+            <div class="tabs_wrapper">
+                @if (content.Istruzioni != null && content.Istruzioni.Any())
+                {
+                    <ul class="tabs">
+
+                        @foreach (var item in content.Istruzioni)
+                        {
+                            ContentModels.BlockLittleParagraph itemContent = (ContentModels.BlockLittleParagraph)item.Content;
+                            @if (i == 1)
+                            {
+                                <li class="active" rel="@i">
+                                    @if (!itemContent.Titoletto.IsNullOrWhiteSpace())
+                                    {
+                                        @itemContent.Titoletto
+                                    }
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="" rel="@i">
+                                    @if (!itemContent.Titoletto.IsNullOrWhiteSpace())
+                                    {
+                                        @itemContent.Titoletto
+                                    }
+                                </li>
+                            }
+                            i++;
+                        }
+                    </ul>
+                    <div class="tab_container">
+                        @foreach (var item in content.Istruzioni)
+                        {
+                            ContentModels.BlockLittleParagraph itemContent = (ContentModels.BlockLittleParagraph)item.Content;
+                            @if (j == 1)
+                            {
+                                <h3 class="d_active tab_drawer_heading" rel="@j">
+                                    @if (!itemContent.Titoletto.IsNullOrWhiteSpace())
+                                    {
+                                        @itemContent.Titoletto
+                                    }
+                                </h3>
+                                <div id="@j" class="tab_content">
+                                    @if (itemContent.Testo != null)
+                                    {
+                                        @Html.Raw(itemContent.Testo)
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <h2 class=" tab_drawer_heading" rel="@j">
+                                    @if (!itemContent.Titoletto.IsNullOrWhiteSpace())
+                                    {
+                                        @itemContent.Titoletto
+                                    }
+                                </h2>
+                                <div id="@j" class="tab_content">
+                                    @if (itemContent.Testo != null)
+                                    {
+                                        @Html.Raw(itemContent.Testo)
+                                    }
+                                </div>
+                            }
+                            j++;
+                        }
+
+                    </div>
+                }
+
+                <!-- .tab_container -->
+            </div>
+
+
+        </div>
+    </section>
+}
+else
+{
+    <section class="request-steps" id="@settings.AnchorID">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="header">
+                        @if (!content.TitoloIstruzioni.IsNullOrWhiteSpace())
+                        {
+                            <h2 class="h2 mb-3 mb-lg-4">@content.TitoloIstruzioni</h2>
+                        }
+                        @if (content.DescrizioneIstruzioni != null)
+                        {
+                            @Html.Raw(content.DescrizioneIstruzioni)
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    @if (content.Istruzioni != null && content.Istruzioni.Any())
+                    {
+                        <ol>
+                            @foreach (var item in content.Istruzioni)
+                            {
+                                ContentModels.BlockLittleParagraph itemContent = (ContentModels.BlockLittleParagraph)item.Content;
+                                <li>
+                                    @if (!itemContent.Titoletto.IsNullOrWhiteSpace())
+                                    {
+                                        <h3 class="h3">@itemContent.Titoletto</h3>
+                                    }
+                                    @if (itemContent.Testo != null)
+                                    {
+                                        @Html.Raw(itemContent.Testo)
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    }
+                </div>
+            </div>
+            @if (content.CTA != null)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <div class="footer">
+                            <a href="@content.CTA.Url" target="@content.CTA.Target" class="btn btn-primary btn-large" data-link-type="cta" data-link="@content?.CTA?.Name" data-link-destination="@content?.CTA?.Url" data-link-section="@content?.TitoloIstruzioni">@content?.CTA.Name</a>
+                            @Html.Raw(content?.TestoFinale)
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </section>
+}

@@ -1,0 +1,62 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Consumatori>
+@{
+    Layout = "Master.cshtml";
+}
+@*<section class="consumer-heading breadcrumb-only">
+	<div class="container-lg">
+		<div class="caption">
+			@await (Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem))
+		</div>
+	</div>
+</section>*@
+<main>
+@Html.GetBlockListHtml(Model.BlocchiConsumatori)
+</main>
+@if (Model != null && Model.MostrareUltimiArticoli)
+{
+	var orderedArticles = Model?.Root()?.DescendantsOfType("articolo").OrderByDescending(articles => articles.Value("dataCustom"));
+	switch(Model?.TipologiaArticoli?.First().ContentType.Alias){
+		case "newsEdEventi":
+		case "ricercheAcademy":
+		case "ricerche":
+		case "academy":
+			orderedArticles = Model?.TipologiaArticoli.First().DescendantsOfType("articolo").OrderByDescending(articles => articles.Value("dataCustom"));
+			break;
+		case "news":
+		case "eventi":
+		case "areaStampa":
+		case "storieDiSuccesso":
+			orderedArticles = Model?.TipologiaArticoli.First()?.Children()?.OrderByDescending(articles => articles.Value("dataCustom"));
+			break;
+		default:
+			break;
+	}
+	int count = 1;
+	<section class="vertical-cards-block pb-80">
+		<div class="container-lg">
+			@if (!string.IsNullOrEmpty(Model?.TitoloUltimiArticoli))
+			{
+				<div class="row justify-content-center">
+					<div class="col-12">
+						<h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model?.TitoloUltimiArticoli</h2>
+					</div>
+				</div>
+			}
+			<div class="row g-large">
+
+				@foreach (Articolo art in orderedArticles)
+				{
+					if (count == 4)
+					{
+						break;
+					}
+					@(await Html.PartialAsync("CardArticolo", art, new ViewDataDictionary(ViewData){ {"list", "related" },{"section",@Model?.TitoloUltimiArticoli} }))
+					count++;
+				}
+			</div>
+		</div>
+	</section>
+}
+@Html.GetBlockListHtml(Model?.AltriBlocchi)

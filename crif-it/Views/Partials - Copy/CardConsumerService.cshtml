@@ -1,0 +1,21 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.ConsumerService>
+@model Crif.It.Models.ConsumerService
+@using Crif.It.Utils;
+@using Crif.It.Models;
+
+@{
+    var description = string.IsNullOrEmpty(Model.ConsumerServiceAbstract) ? Model.ConsumerServiceDescription : Model.ConsumerServiceAbstract;
+}
+<div class="col-12 col-lg-6 consumer-services">
+    <div class="custom-card shadow fade-in-box">
+        <div class="img-wrapper"><img src="@Model.CoverImage?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverImage)"></div>
+        <div class="card-body">
+            <div class="icon-wrapper">
+                <img src="@Model.CoverIcon?.Url()" alt="@HtmlUtils.GetImageAlt(Model.CoverIcon)">
+            </div>
+            <p class="h3 card-title">@Model.ConsumerServiceTitle</p>
+            @*<p>@HtmlUtils.TextCut(description)</p>*@
+            <a title="@Umbraco.GetDictionaryValue("consumer_read_more")" href="@Model.Url()" class="stretched-link more" data-link-type="cta" data-link="Read more" data-section="consumer services">@Umbraco.GetDictionaryValue("consumer_read_more")</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,98 @@
+﻿@using ContentModels = Crif.It.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.PagModel>
+@{
+    int countbefore = 0;
+    int countlater = 0;
+    int pageIndex = Model.PageIndex;
+    string startQuery = "?";
+
+    foreach(string key in Context.Request.Query.Keys)
+    {
+        if (key != Model.RequestParameter)
+        {
+            startQuery += string.Format("&{0}={1}", key, Context.Request.Query[key]);
+        }
+    }
+}
+@* 
+<li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+<li class="page-item"><a class="page-link" href="#">2</a></li>
+<li class="page-item"><a class="page-link" href="#">3</a></li>
+<li class="page-item"><a class="page-link" href="#">......</a></li>
+<li class="page-item"><a class="page-link" href="#">89</a></li> *@
+
+@* <div class="col-12 pt-lg-5">
+    <nav aria-label="results navigation">
+        <ul class="pagination justify-content-center">
+ *@
+            @if (pageIndex > 1)
+            {
+                <li class="first page-item">
+                    <a title="@Umbraco.GetDictionaryValue("previous_page", "Previous page")" class="page-link" href="@(startQuery)&@Model.RequestParameter=@(pageIndex-1)">
+                        @Umbraco.GetDictionaryValue("previous_page", "Previous page")
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="first page-item" style="visibility:hidden">
+                    <a class="page-link">
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= pageIndex; i++)
+            {
+                if (i == pageIndex)
+                {
+                    <li class="page-item current"><a title="@pageIndex" class="page-link" href="">@pageIndex</a></li>
+                }
+                else
+                {
+                    if (i > 1 && i < pageIndex - 2)
+                    {
+                        if (countbefore == 0)
+                        {
+                            countbefore++;
+                            <li class="page-item"><a title="..." class="page-link" href="#">...</a></li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="page-item"><a title="@i" class="page-link" href="@(startQuery)&@Model.RequestParameter=@i">@i</a></li>
+                    }
+                }
+            }
+
+            @for (int i = pageIndex + 1; i <= Model.TotalCount; i++)
+            {
+                if (i < pageIndex + 3 || i == Model.TotalCount)
+                {
+                    <li class="page-item"><a title="@i" class="page-link" href="@(startQuery)&@Model.RequestParameter=@i">@i</a></li>
+                }
+                else
+                {
+                    if (countlater == 0)
+                    {
+                        countlater++;
+                        <li class="page-item"><a title="..." class="page-link" href="">...</a></li>
+                    }
+                }
+            }
+
+            @if (pageIndex < Model.TotalCount)
+            {
+                <li class="last page-item">
+                    <a title="@Umbraco.GetDictionaryValue("next_page", "Next page")" class="page-link" href="@(startQuery)&@Model.RequestParameter=@(pageIndex+1)">@Umbraco.GetDictionaryValue("next_page", "Next page")</a>
+                </li>
+            }
+            else
+            {
+                <li class="last page-item" style="visibility:hidden">
+                    <a class="page-link">
+                    </a>
+                </li>
+            }
+        @* </ul>
+    </nav>
+</div> *@

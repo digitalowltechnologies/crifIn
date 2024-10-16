@@ -1,0 +1,24 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Crif.It.Models.SingleNewsEvents>
+@model Crif.It.Models.SingleNewsEvents
+@using Crif.It.Utils;
+@using Crif.It.Models;
+
+<div class="col-12 col-lg-6 trend-topics">
+    <div class="custom-card shadow fade-in-box">
+        <div class="img-wrapper">
+            <img src="@Model.SingleKnowledgeEventsCoverImage?.Url()" alt="@HtmlUtils.GetImageAlt(Model.SingleKnowledgeEventsCoverImage)">
+        </div>
+        <div class="card-body">
+            @if (Model.SingleKnowledgeEventsIconTitle != null)
+            {
+                <div class="icon-wrapper"><img src="@Model.SingleKnowledgeEventsIconTitle.Url()" alt="@Model.SingleNewsEventsTitle"></div>
+            }
+            <h4 class="h3 card-title pb-1">@Model.SingleNewsEventsTitle</h4>
+            @if (Model.SingleKnowledgeEventsAbstract != null)
+            {
+                <p>@Model.SingleKnowledgeEventsAbstract</p>
+            }
+            <a title="@Umbraco.GetDictionaryValue("trendtopics_read_more")" href="@Model.Url()" class="stretched-link more" data-link-type="article" data-link="@Model.SingleNewsEventsTitle" data-category="@Model.Parent?.Name" data-section="trend-topics" >@Umbraco.GetDictionaryValue("trendtopics_read_more")</a>
+        </div>
+    </div>
+</div>

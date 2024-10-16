@@ -1,0 +1,74 @@
+﻿@using Crif.It.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Crif.It.Utils;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Family>
+@{
+	Layout = "Master.cshtml";
+	var categorie = Model.Children()?.Where(x => x.ContentType.Alias == "category");
+}
+<section class="internal-heading pb-lg-3">
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-12 banner">
+				<div class="img-wrapper">
+					<img src="@Model?.ImmagineFamily?.Url()" alt="@HtmlUtils.GetImageAlt(Model?.ImmagineFamily)">
+				</div>
+				<div class="caption">
+					@await (Html.PartialAsync("Breadcrumb", Umbraco.AssignedContentItem))
+						<h1 class="h1 fade-in-box">@Model?.TitoloFamily</h1>
+					<p class="big-text fade-in-box">@HtmlUtils.TextCut(Model?.DescrizioneFamily,200)</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+@Html.GetBlockListHtml(Model?.PrimiBlocchi)
+@if(Model!=null && categorie != null && categorie.Any() && Model.MostraSezioneAutomatica)
+{
+	<section class="cards-block bg" data-section="categorie">
+	<div class="container-lg">
+		@if (Model?.TitoloSezioneAutomatica != "")
+		{
+		<div class="row justify-content-center">
+			<div class="col-7 col-lg-12">
+				<h2 class="h2 text-center pb-lg-5 mb-lg-4">@Model?.TitoloSezioneAutomatica</h2>
+			</div>
+		</div>
+		}
+		<div class="row g-mega g-overflow">
+		@foreach (Category cat in categorie)
+		{
+			var soluzioni = cat?.Children()?.Where(x => x.ContentType.Alias == "soluzione");
+			<div class="col-12 col-lg-6 service">
+				<div class="custom-card card-family shadow">
+					<div class="img-wrapper">
+						<img src="@cat?.ImmagineCategory?.Url()" alt="@HtmlUtils.GetImageAlt(cat?.ImmagineCategory)">
+					</div>
+					<div class="card-body">
+						<div class="icon-wrapper"><img src="@cat?.IconaCategory?.Url()" alt="@HtmlUtils.GetImageAlt(cat?.IconaCategory)"></div>
+						<h2 class="h3 card-title">@cat?.TitoloCategory</h2>
+						@*<p>@HtmlUtils.TextCut(cat?.AbstractCategory)</p>*@
+						<a title="Read more" href="@cat?.Url()" class="more" data-link-type="page" data-link="@cat?.TitoloCategory" data-link-destination="@cat?.Url()" data-link-section="@Model?.TitoloSezioneAutomatica">@Umbraco.GetDictionaryValue("family_read_more")</a>
+					</div>
+					@if (soluzioni != null && soluzioni.Any())
+					{
+						<div>
+							<button class="card-dropdown-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#card-@cat?.Id-dropdown" aria-expanded="false" aria-controls="card-@cat?.Id-dropdown">@Umbraco.GetDictionaryValue("soluzioni_accordion_label")</button>
+						</div>
+						<div class="card-dropdown collapse" id="card-@cat?.Id-dropdown">
+							<ul>
+								@foreach (var soluzione in soluzioni)
+								{
+									<li><a title="@soluzione.Name" href="@soluzione.Url()" data-link-type="page" data-link="@soluzione.Name" data-link-destination="@soluzione.Url()" data-link-section="@Model?.TitoloSezioneAutomatica">@soluzione.Name</a></li>
+								}
+							</ul>
+						</div>
+					}
+				</div>
+			</div>
+		}
+			</div>
+	</div>
+</section>
+}
+@Html.GetBlockListHtml(Model?.AltriBlocchi)
