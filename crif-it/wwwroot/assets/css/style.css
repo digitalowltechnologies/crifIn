@@ -4222,3 +4222,130 @@ form a, .dash {
         max-width: 15vw;
     }
 }
+
+/* css for cards */
+.orangeCard {
+    background-color: #ef7b10 !important;
+}
+
+.coralblueCard {
+    background-color: #0073af !important;
+}
+
+.skyblueCard {
+    background-color: #0685cb !important;
+}
+
+.lightbluecard {
+    background-color: #b0ceec !important;
+    color: black !important;
+}
+
+    .lightbluecard h5 {
+        color: black !important;
+    }
+
+    .lightbluecard .whiteArrowBtn {
+        color: black !important;
+    }
+
+.cantoupeCard {
+    background-color: #f6915d !important;
+}
+
+.honeycard {
+    background-color: #f6b746 !important;
+    color: black;
+}
+
+    .honeycard h5 {
+        color: black !important;
+    }
+
+    .honeycard .whiteArrowBtn {
+        color: black !important;
+    }
+
+.bananacard {
+    background-color: #f5e271;
+    color: black;
+}
+
+    .bananacard h5 {
+        color: black !important;
+    }
+
+    .bananacard .whiteArrowBtn {
+        color: black !important;
+    }
+
+.darkcard {
+    background-color: #1d1e20 !important;
+}
+
+.greydarkcard {
+    background-color: #4a4d50 !important;
+}
+
+.greymediumcard {
+    background-color: #788085 !important;
+}
+
+.greylightcard {
+    background-color: #B8BBBE !important;
+    color: black !important;
+}
+
+    .greylightcard h5 {
+        color: black !important;
+    }
+
+    .greylightcard .whiteArrowBtn {
+        color: black !important;
+    }
+
+.greylightercard {
+    background-color: #d7d9d8 !important;
+    color: black !important;
+}
+
+    .greylightercard h5 {
+        color: black !important;
+    }
+
+    .greylightercard .whiteArrowBtn {
+        color: black !important;
+    }
+
+.greyultralightercard {
+    background-color: #f9f9f9;
+    color: black !important;
+}
+
+    .greyultralightercard h5 {
+        color: black !important;
+    }
+
+    .greyultralightercard .whiteArrowBtn {
+        color: black !important;
+    }
+
+.blackBtn {
+    color: black;
+    font-weight: 500;
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+    .blackBtn::after {
+        content: url('./../images/icons/arrow-black.svg');
+        margin-right: -5px;
+        padding-left: 5px;
+        transition: all 0.3s linear;
+    }
+
+    .blackBtn:hover::after {
+        margin-right: -10px;
+        padding-left: 10px;
+    }
+

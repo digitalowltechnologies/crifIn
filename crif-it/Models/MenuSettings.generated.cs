@@ -58,6 +58,14 @@ namespace Crif.It.Models
 		public virtual global::System.Collections.Generic.IEnumerable<global::Crif.It.Models.BlockExternalLink> BusinessNeeds => this.Value<global::System.Collections.Generic.IEnumerable<global::Crif.It.Models.BlockExternalLink>>(_publishedValueFallback, "businessNeeds");
 
 		///<summary>
+		/// BusinessNeedsLabel
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("businessNeedsLabel")]
+		public virtual string BusinessNeedsLabel => this.Value<string>(_publishedValueFallback, "businessNeedsLabel");
+
+		///<summary>
 		/// Continent and Countries
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]
@@ -154,6 +162,14 @@ namespace Crif.It.Models
 		public virtual global::System.Collections.Generic.IEnumerable<global::Crif.It.Models.BlockExternalLink> ImportantLinks => this.Value<global::System.Collections.Generic.IEnumerable<global::Crif.It.Models.BlockExternalLink>>(_publishedValueFallback, "importantLinks");
 
 		///<summary>
+		/// ImportLinkLabel
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("importLinkLabel")]
+		public virtual string ImportLinkLabel => this.Value<string>(_publishedValueFallback, "importLinkLabel");
+
+		///<summary>
 		/// Mobile Country Page Title
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]
@@ -168,6 +184,14 @@ namespace Crif.It.Models
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("moreInformation")]
 		public virtual global::System.Collections.Generic.IEnumerable<global::Crif.It.Models.BlockExternalLink> MoreInformation => this.Value<global::System.Collections.Generic.IEnumerable<global::Crif.It.Models.BlockExternalLink>>(_publishedValueFallback, "moreInformation");
+
+		///<summary>
+		/// MoreInformationLabel
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("moreInformationLabel")]
+		public virtual string MoreInformationLabel => this.Value<string>(_publishedValueFallback, "moreInformationLabel");
 
 		///<summary>
 		/// Show social

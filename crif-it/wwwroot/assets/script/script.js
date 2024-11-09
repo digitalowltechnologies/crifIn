@@ -164,10 +164,10 @@ var customSwiper = new Swiper(".customSwiper", {
 	lazy: true,
 	loop: true,
 	autoplay: {
-		delay: 1000,
+		delay: 1400,
 		disableOnInteraction: false,
 	},
-	speed: 1000,
+	speed: 1400,
 	slidesPerView: 4,
 	// spaceBetween: 15,
 	// initialSlide: 1,

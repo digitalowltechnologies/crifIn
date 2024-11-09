@@ -50,6 +50,14 @@ namespace Crif.It.Models
 		// properties
 
 		///<summary>
+		/// BackGroundColor
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("backGroundColor")]
+		public virtual string BackGroundColor => this.Value<string>(_publishedValueFallback, "backGroundColor");
+
+		///<summary>
 		/// Card List
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "10.6.1+82eae48")]

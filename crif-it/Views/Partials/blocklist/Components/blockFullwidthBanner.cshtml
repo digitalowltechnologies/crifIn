@@ -9,7 +9,7 @@
 {
     @if (@settings?.AnchorID == "HalfBanner")
     {
-        <section class="pageSection">
+        <section class="pageSection  @content.BackGroundColor">
             <div class="container">
                 <div class="infoSection">
                     <div class="infoDetail px-3 px-lg-5 py-5">
@@ -31,7 +31,7 @@
     else if (@settings?.AnchorID == "HalfBannerLeft")
     {
         <section>
-            <div class="lightGreyBg infoSection colorFont">
+            <div class="lightGreyBg infoSection colorFont  @content.BackGroundColor">
                 <div class="infoImg" style="right: auto;left: 0;">
                     <img src="@content?.Image?.Url()" alt="@HtmlUtils.GetImageAlt(content?.Image)" class="animateThis slideLeft" style="object-position: right;" />
                 </div>
@@ -71,7 +71,7 @@
     }
     else if (@settings?.AnchorID == "FullBanner")
     {
-        <section class="innerBanner bannerGradient leadershipBanner" style="background-image: url('@content?.Image?.Url()');">
+        <section class="innerBanner bannerGradient leadershipBanner @content.BackGroundColor" style="background-image: url('@content?.Image?.Url()');">
             <div class="container innerBannerContent">
                 <div>
                     @if (!string.IsNullOrEmpty(content?.Title))
@@ -109,7 +109,7 @@
 }
 else
 {
-    <section class="blue-hero" data-section="full-width-banner" id="@settings?.AnchorID">
+    <section class="blue-hero  @content.BackGroundColor" data-section="full-width-banner" id="@settings?.AnchorID">
         <div class="container-lg h-100">
             <div class="row h-100">
                 <div class="col-12 banner">

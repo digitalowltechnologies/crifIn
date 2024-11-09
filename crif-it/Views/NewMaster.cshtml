@@ -103,7 +103,7 @@
     bool isCreditScore = false;
     if (Umbraco.AssignedContentItem.Name != null)
     {
-       isCreditScore = Umbraco.AssignedContentItem.Name == "Credit Score" ? true : false;
+        isCreditScore = Umbraco.AssignedContentItem.Name == "Credit Score" ? true : false;
     }
 }
 <!doctype html>
@@ -135,7 +135,7 @@
     <!-- swiper -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css" rel="stylesheet">
     <!-- custom styles -->
-    
+
 </head>
 
 <body>
@@ -469,54 +469,44 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 col-sm-12 col-lg-8">
                         <div class="row">
-                            @if (menuSettings.ImportantLinks != null)
-                            {
-                                <div class="col-12 col-md-4">
-                                    <div class="footerLinks lineEffect">
-                                        <h5 class="colorWhite my-2 mb-md-4">Important Links</h5>
-                                        <ul>
-                                            @foreach (var a in menuSettings.ImportantLinks)
+                            <div class="col-12 col-md-4">
+                                <div class="footerLinks lineEffect">
+                                    <h5 class="colorWhite my-2 mb-md-4">@menuSettings.ImportLinkLabel</h5>
+                                    <ul>
+                                        @foreach (var a in menuSettings.ImportantLinks)
+                                        {
+                                            <li><a href="@a.ExternalLink.Url">@a.ExternalLink.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="footerLinks lineEffect">
+                                    <h5 class="colorWhite my-2 mb-md-4">@menuSettings.BusinessNeedsLabel</h5>
+                                    <ul>
+                                        @foreach (var a in menuSettings.BusinessNeeds)
+                                        {
+                                            <li><a href="@a.ExternalLink.Url">@a.ExternalLink.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="footerLinks lineEffect">
+                                    <h5 class="colorWhite my-2 mb-md-4">@menuSettings.MoreInformationLabel</h5>
+                                    <ul>
+                                        @foreach (var a in menuSettings.MoreInformation)
+                                        {
+                                            if (a.ExternalLink != null)
                                             {
                                                 <li><a href="@a.ExternalLink.Url">@a.ExternalLink.Name</a></li>
                                             }
-                                        </ul>
-                                    </div>
+                                        }
+                                    </ul>
                                 </div>
-                            }
-                            @if (menuSettings.BusinessNeeds != null)
-                            {
-                                <div class="col-12 col-md-4">
-                                    <div class="footerLinks lineEffect">
-                                        <h5 class="colorWhite my-2 mb-md-4">Business Needs</h5>
-                                        <ul>
-                                            @foreach (var a in menuSettings.BusinessNeeds)
-                                            {
-                                                <li><a href="@a.ExternalLink.Url">@a.ExternalLink.Name</a></li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
-                            }
-                            @if (menuSettings.MoreInformation != null)
-                            {
-                                <div class="col-12 col-md-4">
-                                    <div class="footerLinks lineEffect">
-                                        <h5 class="colorWhite my-2 mb-md-4">More Information</h5>
-                                        <ul>
-                                            @foreach (var a in menuSettings.MoreInformation)
-                                            {
-                                                @if(a.ExternalLink != null)
-                                                {
-                                                <li><a href="@a.ExternalLink.Url">@a.ExternalLink.Name</a></li>
-                                                }
-                                                }
-                                        </ul>
-                                    </div>
-                                </div>
-                            }
+                            </div>
                         </div>
                     </div>
 
@@ -1048,23 +1038,23 @@
             if (j == Model.AncestorsOrSelf().Count() - 1)
             {
                 <text>
-                                                                                                                                                                                                                                                                                                                                                                                                {
-                                                                                                                                                                                                                                                                                                                                                                                                    "@@type": "ListItem",
-                                                                                                                                                                                                                                                                                                                                                                                                    "position": @counter,
-                                                                                                                                                                                                                                                                                                                                                                                                    "name": "@content?.Name",
-                                                                                                                                                                                                                                                                                                                                                                                                    "item": "@content?.Url(mode: UrlMode.Absolute)"
-                                                                                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                                                                                                                                                                                                            "@@type": "ListItem",
+                                                                                                                                                                                                                                                                                                                                                                                                            "position": @counter,
+                                                                                                                                                                                                                                                                                                                                                                                                            "name": "@content?.Name",
+                                                                                                                                                                                                                                                                                                                                                                                                            "item": "@content?.Url(mode: UrlMode.Absolute)"
+                                                                                                                                                                                                                                                                                                                                                                                                        }
                 </text>
             }
             else
             {
                 <text>
-                                                                                                                                                                                                                                                                                                                                                                                                {
-                                                                                                                                                                                                                                                                                                                                                                                                    "@@type": "ListItem",
-                                                                                                                                                                                                                                                                                                                                                                                                    "position": @counter,
-                                                                                                                                                                                                                                                                                                                                                                                                    "name": "@content?.Name",
-                                                                                                                                                                                                                                                                                                                                                                                                    "item": "@content?.Url(mode: UrlMode.Absolute)"
-                                                                                                                                                                                                                                                                                                                                                                                                },
+                                                                                                                                                                                                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                                                                                                                                                                                                            "@@type": "ListItem",
+                                                                                                                                                                                                                                                                                                                                                                                                            "position": @counter,
+                                                                                                                                                                                                                                                                                                                                                                                                            "name": "@content?.Name",
+                                                                                                                                                                                                                                                                                                                                                                                                            "item": "@content?.Url(mode: UrlMode.Absolute)"
+                                                                                                                                                                                                                                                                                                                                                                                                        },
                 </text>
             }
         }
@@ -1081,7 +1071,7 @@
             @foreach (var content in Model.AncestorOrSelf(1).Children)
             {
                 <text>
-                                                                                                                                                                                                                        "@content.Name",
+                                                                                                                                                                                                                            "@content.Name",
                 </text>
             }
             ],
@@ -1089,7 +1079,7 @@
             @foreach (var content in Model.AncestorOrSelf(1).Children)
             {
                 <text>
-                                                                                                                                                                                                                        "@content.Url(mode: UrlMode.Absolute)",
+                                                                                                                                                                                                                            "@content.Url(mode: UrlMode.Absolute)",
                 </text>
             }
             ]

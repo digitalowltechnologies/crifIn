@@ -3,7 +3,7 @@
 <div class="breadcrumb breadcrumb-2">
     @{
         var ancestors = Model.Ancestors().Reverse();
-        <span><a href="./">Home</a></span>
+        <span><a href="/">Home</a></span>
         @for (var i = 1; i < ancestors.Count(); i++)
         {
             if (ancestors.ElementAt(i).TemplateId != null)
